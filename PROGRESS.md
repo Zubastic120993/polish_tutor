@@ -179,7 +179,29 @@
 ---
 
 ### Checkpoint 2.3: Speech Engine (TTS)
-**Status:** ⏸️ Not Started
+**Status:** ✅ Completed  
+**Started:** 2024-12-19  
+**Completed:** 2024-12-19
+
+**Tasks:**
+- [x] Create `SpeechEngine` class
+- [x] Implement audio priority order (pre-recorded → cached → pyttsx3 → cloud)
+- [x] Add cache key generation (MD5 hash)
+- [x] Implement pyttsx3 offline TTS
+- [x] Add gTTS integration (optional, online)
+- [x] Create audio cache management
+- [x] Implement speed adjustment (0.75×, 1.0×)
+
+**Test Points:**
+- [x] Pre-recorded audio found and returned
+- [x] Cache lookup works (hash-based)
+- [x] pyttsx3 engine initialized and available
+- [x] Generated audio can be cached
+- [x] Speed adjustment implemented (pydub)
+- [x] Fallback chain works correctly
+- [x] Priority order tested
+
+---
 
 ### Checkpoint 2.4: Tutor Class (Orchestration)
 **Status:** ⏸️ Not Started
@@ -261,12 +283,12 @@
 
 ## Progress Summary
 
-**Completed Checkpoints:** 7 / 25  
-**Completion Percentage:** 28%
+**Completed Checkpoints:** 8 / 25  
+**Completion Percentage:** 32%
 
 **Phase 0:** 2 / 2 checkpoints ✅ **COMPLETE**  
 **Phase 1:** 3 / 3 checkpoints ✅ **COMPLETE**  
-**Phase 2:** 2 / 4 checkpoints  
+**Phase 2:** 3 / 4 checkpoints  
 **Phase 3:** 0 / 2 checkpoints  
 **Phase 4:** 0 / 4 checkpoints  
 **Phase 5:** 0 / 5 checkpoints  
