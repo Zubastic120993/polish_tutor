@@ -54,6 +54,19 @@ class SpeechEngine:
         if pyttsx3:
             try:
                 self._pyttsx3_engine = pyttsx3.init()
+                
+                # Set slower, more natural rate (default is usually 200, we want ~150)
+                try:
+                    self._pyttsx3_engine.setProperty("rate", 150)
+                except Exception:
+                    pass
+                
+                # Set volume (0.0 to 1.0)
+                try:
+                    self._pyttsx3_engine.setProperty("volume", 0.9)
+                except Exception:
+                    pass
+                
                 # Set language if supported
                 try:
                     voices = self._pyttsx3_engine.getProperty("voices")
@@ -61,6 +74,7 @@ class SpeechEngine:
                     for voice in voices:
                         if "polish" in voice.name.lower() or "pl" in voice.id.lower():
                             self._pyttsx3_engine.setProperty("voice", voice.id)
+                            logger.info(f"Using Polish voice: {voice.name}")
                             break
                 except Exception:
                     pass
@@ -68,18 +82,21 @@ class SpeechEngine:
                 logger.warning(f"Failed to initialize pyttsx3: {e}")
                 self._pyttsx3_engine = None
 
-    def generate_cache_key(self, text: str, voice_id: str = "default", speed: float = 1.0) -> str:
+    def generate_cache_key(self, text: str, voice_id: str = "default", speed: float = 1.0, online_mode: bool = False) -> str:
         """Generate MD5 cache key for audio.
 
         Args:
             text: Text to synthesize
             voice_id: Voice identifier
-            speed: Playback speed (0.75 or 1.0)
+            speed: Playback speed (0.75, 1.0, or 1.25)
+            online_mode: Whether using online TTS (affects quality/voice)
 
         Returns:
             MD5 hash string
         """
-        key_string = f"{text}:{voice_id}:{speed}"
+        # Include online_mode in cache key so offline/online audio are cached separately
+        mode_str = "online" if online_mode else "offline"
+        key_string = f"{text}:{voice_id}:{speed}:{mode_str}"
         return hashlib.md5(key_string.encode("utf-8")).hexdigest()
 
     def get_audio_path(
@@ -119,10 +136,10 @@ class SpeechEngine:
                 return (pre_recorded_path, "pre_recorded")
 
         # Priority 2: Cached generated audio
-        cache_key = self.generate_cache_key(text, voice_id, speed)
+        cache_key = self.generate_cache_key(text, voice_id, speed, self.online_mode)
         cached_path = self.cache_dir / f"{cache_key}.mp3"
         if cached_path.exists():
-            logger.debug(f"Found cached audio: {cached_path}")
+            logger.debug(f"Found cached audio: {cached_path} (mode: {'online' if self.online_mode else 'offline'})")
             return (cached_path, "cached")
 
         # Priority 3: Generate new audio
@@ -196,40 +213,84 @@ class SpeechEngine:
         """
         output_path = self.cache_dir / f"{cache_key}.mp3"
 
-        # Try pyttsx3 first (offline)
+        # If online mode enabled, try gTTS first (better quality for Polish)
+        if self.online_mode:
+            if not gTTS:
+                logger.warning("gTTS requested but not available. Install with: pip install gtts")
+            else:
+                try:
+                    logger.info(f"🎤 Generating audio with gTTS (online) for text: '{text[:50]}...'")
+                    # gTTS slow=True is approximately 0.75x speed
+                    use_slow = speed <= 0.8
+                    tts = gTTS(text=text, lang=self.language, slow=use_slow)
+                    temp_path = self.cache_dir / f"{cache_key}_temp.mp3"
+                    logger.info(f"Saving gTTS audio to: {temp_path}")
+                    tts.save(str(temp_path))
+
+                    # Adjust speed if needed (gTTS slow mode is ~0.75x, normal is ~1.0x)
+                    if temp_path.exists():
+                        if speed == 1.25:
+                            # Need to speed up from normal
+                            self._adjust_speed(temp_path, output_path, 1.25)
+                            temp_path.unlink()
+                        elif speed == 0.75 and not use_slow:
+                            # Need to slow down from normal
+                            self._adjust_speed(temp_path, output_path, 0.75)
+                            temp_path.unlink()
+                        else:
+                            # Speed is correct, just rename
+                            temp_path.rename(output_path)
+                        logger.info(f"✅ Successfully generated audio with gTTS: {output_path}")
+                        return output_path
+                    else:
+                        logger.error("gTTS temp file was not created")
+                except Exception as e:
+                    logger.error(f"❌ gTTS generation failed: {e}", exc_info=True)
+                    # Fall back to pyttsx3 if gTTS fails
+
+        # Try pyttsx3 (offline fallback)
         if self._pyttsx3_engine:
             try:
+                logger.info(f"🔊 Generating audio with pyttsx3 (offline) for text: '{text[:50]}...'")
+                # Adjust rate based on speed (slower for better quality)
+                # Base rate is 150, adjust proportionally
+                base_rate = 150
+                if speed == 0.75:
+                    rate = int(base_rate * 0.85)  # Slower for slow speed
+                elif speed == 1.25:
+                    rate = int(base_rate * 1.1)  # Slightly faster
+                else:
+                    rate = base_rate
+                
+                try:
+                    self._pyttsx3_engine.setProperty("rate", rate)
+                except Exception:
+                    pass
+                
                 temp_path = self.cache_dir / f"{cache_key}_temp.wav"
+                logger.info(f"Saving pyttsx3 audio to: {temp_path}")
                 self._pyttsx3_engine.save_to_file(text, str(temp_path))
                 self._pyttsx3_engine.runAndWait()
 
-                # Convert WAV to MP3 and adjust speed if needed
+                # Convert WAV to MP3 (don't adjust speed further, already set in rate)
                 if temp_path.exists():
-                    self._convert_and_adjust_speed(temp_path, output_path, speed)
-                    temp_path.unlink()  # Remove temp file
-                    logger.info(f"Generated audio with pyttsx3: {output_path}")
-                    return output_path
-            except Exception as e:
-                logger.warning(f"pyttsx3 generation failed: {e}")
-
-        # Try gTTS if online mode enabled
-        if self.online_mode and gTTS:
-            try:
-                tts = gTTS(text=text, lang=self.language, slow=(speed == 0.75))
-                temp_path = self.cache_dir / f"{cache_key}_temp.mp3"
-                tts.save(str(temp_path))
-
-                # Adjust speed if needed (gTTS slow mode might not be exact)
-                if temp_path.exists():
-                    if speed != 1.0:
-                        self._adjust_speed(temp_path, output_path, speed)
-                        temp_path.unlink()
+                    if AudioSegment:
+                        # Just convert format, don't change speed
+                        audio = AudioSegment.from_file(str(temp_path))
+                        audio.export(str(output_path), format="mp3", bitrate="128k")
                     else:
-                        temp_path.rename(output_path)
-                    logger.info(f"Generated audio with gTTS: {output_path}")
+                        # Fallback: copy file
+                        import shutil
+                        shutil.copy(temp_path, output_path)
+                    temp_path.unlink()  # Remove temp file
+                    logger.info(f"✅ Successfully generated audio with pyttsx3: {output_path}")
                     return output_path
             except Exception as e:
-                logger.warning(f"gTTS generation failed: {e}")
+                logger.error(f"❌ pyttsx3 generation failed: {e}", exc_info=True)
+        
+        # If online mode not enabled but gTTS available, suggest enabling it
+        if not self.online_mode and gTTS:
+            logger.info("gTTS available but online_mode disabled. Enable 'online' voice mode in settings for better Polish audio quality.")
 
         return None
 

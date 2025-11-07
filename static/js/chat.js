@@ -102,7 +102,6 @@ class ChatUI {
         
         // Add audio if available
         if (dialogue.audio) {
-            const audioUrl = `/static/audio/native/${this.currentLessonId}/${dialogue.audio}`;
             const bubble = messageEl.querySelector('.message__bubble');
             const audioContainer = document.createElement('div');
             audioContainer.className = 'audio-controls';
@@ -110,14 +109,24 @@ class ChatUI {
             audioContainer.style.alignItems = 'center';
             audioContainer.style.marginTop = 'var(--spacing-xs)';
             
-            const audioButton = this.createAudioButton(audioUrl);
-            audioContainer.appendChild(audioButton);
-            
-            // Add speed toggle
-            const speedToggle = this.createSpeedToggle();
-            audioContainer.appendChild(speedToggle);
-            
-            bubble.appendChild(audioContainer);
+            // Try pre-recorded audio first, fallback to TTS generation
+            const preRecordedUrl = `/static/audio/native/${this.currentLessonId}/${dialogue.audio}`;
+            this.getAudioUrl(dialogue, preRecordedUrl).then(audioUrl => {
+                const audioButton = this.createAudioButton(audioUrl);
+                audioContainer.appendChild(audioButton);
+                
+                // Add speed toggle
+                const speedToggle = this.createSpeedToggle();
+                audioContainer.appendChild(speedToggle);
+                
+                bubble.appendChild(audioContainer);
+            }).catch(error => {
+                console.error('Failed to get audio URL:', error);
+                // Still show the button, but it will show error when clicked
+                const audioButton = this.createAudioButton(preRecordedUrl);
+                audioContainer.appendChild(audioButton);
+                bubble.appendChild(audioContainer);
+            });
         }
         
         this.chatMessages.appendChild(messageEl);
@@ -704,6 +713,65 @@ class ChatUI {
             this.scrollToBottom();
         } else {
             this.showInfoMessage('No additional explanation available.');
+        }
+    }
+    
+    /**
+     * Get audio URL, checking pre-recorded first, then generating via TTS if needed
+     * @param {Object} dialogue - Dialogue object with audio filename
+     * @param {string} preRecordedUrl - Pre-recorded audio URL to try first
+     * @returns {Promise<string>} Audio URL (pre-recorded or generated)
+     */
+    async getAudioUrl(dialogue, preRecordedUrl) {
+        // First, check if pre-recorded audio exists
+        try {
+            const response = await fetch(preRecordedUrl, { method: 'HEAD' });
+            if (response.ok) {
+                return preRecordedUrl;
+            }
+        } catch (error) {
+            // File doesn't exist, continue to generate
+        }
+        
+        // Pre-recorded audio doesn't exist, generate via TTS API
+        const tutorText = dialogue.tutor || '';
+        if (!tutorText) {
+            throw new Error('No tutor text available for audio generation');
+        }
+        
+        // Get current audio speed from settings or audio manager
+        const speed = window.audioManager ? window.audioManager.getSpeed() : 0.75;
+        
+        try {
+            const response = await fetch('/api/audio/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: tutorText,
+                    lesson_id: this.currentLessonId,
+                    phrase_id: dialogue.id,
+                    speed: speed,
+                    user_id: this.userId,
+                }),
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Audio generation failed: ${response.statusText}`);
+            }
+            
+            const result = await response.json();
+            if (result.status === 'success' && result.data && result.data.audio_url) {
+                return result.data.audio_url;
+            }
+            
+            throw new Error('Invalid response from audio generation API');
+        } catch (error) {
+            console.error('Failed to generate audio:', error);
+            // Fallback to pre-recorded URL even if it doesn't exist
+            // The audio manager will handle the error gracefully
+            return preRecordedUrl;
         }
     }
     

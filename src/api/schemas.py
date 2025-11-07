@@ -86,10 +86,16 @@ class SettingsUpdateRequest(BaseModel):
     """Request schema for POST /settings/update."""
     user_id: int = Field(..., description="User ID", gt=0)
     voice_mode: Optional[str] = Field(None, description="Voice mode: 'offline' or 'online'", pattern="^(offline|online)$")
-    audio_speed: Optional[float] = Field(None, description="Audio speed (0.75 or 1.0)", ge=0.75, le=1.0)
-    confidence_slider: Optional[int] = Field(None, description="Confidence slider value (1-5)", ge=1, le=5)
-    theme: Optional[str] = Field(None, description="UI theme")
+    audio_speed: Optional[str] = Field(None, description="Audio speed: 'slow', 'normal', or 'fast'", pattern="^(slow|normal|fast)$")
+    translation: Optional[str] = Field(None, description="Translation mode: 'show', 'hide', or 'smart'", pattern="^(show|hide|smart)$")
+    mic_mode: Optional[str] = Field(None, description="Microphone mode: 'tap' or 'hold'", pattern="^(tap|hold)$")
+    tutor_mode: Optional[str] = Field(None, description="Tutor mode: 'coach', 'drill', or 'teacher'", pattern="^(coach|drill|teacher)$")
+    voice: Optional[str] = Field(None, description="Voice type: 'male', 'female', or 'neutral'", pattern="^(male|female|neutral)$")
+    audio_output: Optional[str] = Field(None, description="Audio output: 'speakers' or 'headphones'", pattern="^(speakers|headphones)$")
+    theme: Optional[str] = Field(None, description="UI theme: 'light', 'dark', or 'dyslexia'", pattern="^(light|dark|dyslexia)$")
     language: Optional[str] = Field(None, description="UI language")
+    confidence_slider: Optional[int] = Field(None, description="Confidence slider value (1-5)", ge=1, le=5)
+    profile_template: Optional[str] = Field(None, description="Profile template: 'kid', 'adult', or 'teacher'", pattern="^(kid|adult|teacher)$")
 
 
 class SettingsGetResponse(APIResponse):
@@ -114,7 +120,8 @@ class AudioGenerateRequest(BaseModel):
     text: str = Field(..., description="Text to generate audio for", min_length=1)
     lesson_id: Optional[str] = Field(None, description="Lesson ID for caching")
     phrase_id: Optional[str] = Field(None, description="Phrase ID for caching")
-    speed: Optional[float] = Field(1.0, description="Audio playback speed (0.75 or 1.0)", ge=0.75, le=1.0)
+    speed: Optional[float] = Field(1.0, description="Audio playback speed (0.75, 1.0, or 1.25)", ge=0.75, le=1.25)
+    user_id: Optional[int] = Field(None, description="User ID for checking voice_mode setting", gt=0)
 
 
 class AudioGenerateResponse(APIResponse):

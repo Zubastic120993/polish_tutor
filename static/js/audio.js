@@ -25,6 +25,15 @@ class AudioManager {
      * @param {HTMLElement} messageEl - Message element containing the button
      */
     play(audioUrl, button, messageEl) {
+        // Validate audio URL
+        if (!audioUrl || typeof audioUrl !== 'string' || audioUrl.trim() === '') {
+            console.error('Invalid audio URL:', audioUrl);
+            if (window.chatUI) {
+                window.chatUI.showErrorMessage('Invalid audio URL. Please check the audio file.');
+            }
+            return;
+        }
+        
         // Stop any currently playing audio
         this.stop();
         
@@ -119,12 +128,13 @@ class AudioManager {
     
     /**
      * Set playback speed
-     * @param {number} speed - Playback speed (0.75 or 1.0)
+     * @param {number} speed - Playback speed (0.75, 1.0, or 1.25)
      */
     setSpeed(speed) {
-        if (speed !== 0.75 && speed !== 1.0) {
-            console.warn('Invalid speed. Use 0.75 or 1.0');
-            return;
+        // Validate speed range (browsers typically support 0.25 to 4.0)
+        if (speed < 0.25 || speed > 4.0) {
+            console.warn(`Invalid speed ${speed}. Using default 1.0`);
+            speed = 1.0;
         }
         
         this.playbackSpeed = speed;
@@ -137,10 +147,17 @@ class AudioManager {
     }
     
     /**
-     * Toggle between 0.75× and 1.0× speed
+     * Toggle between 0.75×, 1.0×, and 1.25× speed
      */
     toggleSpeed() {
-        const newSpeed = this.playbackSpeed === 1.0 ? 0.75 : 1.0;
+        let newSpeed;
+        if (this.playbackSpeed === 0.75) {
+            newSpeed = 1.0;
+        } else if (this.playbackSpeed === 1.0) {
+            newSpeed = 1.25;
+        } else {
+            newSpeed = 0.75;
+        }
         this.setSpeed(newSpeed);
         return newSpeed;
     }
@@ -276,7 +293,39 @@ class AudioManager {
      * @param {Error|Event} error - Error object or event
      */
     handleAudioError(error) {
-        console.error('Audio playback error:', error);
+        const audio = this.currentAudio;
+        const audioUrl = audio ? audio.src : 'unknown';
+        
+        // Get more detailed error information
+        let errorMessage = 'Failed to play audio.';
+        if (audio) {
+            const errorCode = audio.error;
+            if (errorCode) {
+                switch (errorCode.code) {
+                    case MediaError.MEDIA_ERR_ABORTED:
+                        errorMessage = 'Audio playback was aborted.';
+                        break;
+                    case MediaError.MEDIA_ERR_NETWORK:
+                        errorMessage = 'Network error while loading audio.';
+                        break;
+                    case MediaError.MEDIA_ERR_DECODE:
+                        errorMessage = 'Audio file could not be decoded.';
+                        break;
+                    case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                        errorMessage = 'Audio format not supported.';
+                        break;
+                    default:
+                        errorMessage = `Audio error (code: ${errorCode.code}).`;
+                }
+            }
+        }
+        
+        console.error('Audio playback error:', {
+            error,
+            audioUrl,
+            errorCode: audio?.error?.code,
+            errorMessage: audio?.error?.message
+        });
         
         if (this.currentButton) {
             this.updateButtonState(this.currentButton, 'stopped');
@@ -301,7 +350,7 @@ class AudioManager {
         
         // Emit error event (can be listened to by chat UI)
         if (window.chatUI) {
-            window.chatUI.showErrorMessage('Failed to play audio. Please try again.');
+            window.chatUI.showErrorMessage(errorMessage + ' Please check the audio file path and try again.');
         }
     }
     

@@ -387,16 +387,29 @@ class Database:
     def get_user_setting(self, user_id: int, key: str) -> Optional[Setting]:
         """Get setting for a specific user and key."""
         with self.get_session() as session:
-            return (
+            setting = (
                 session.query(Setting)
                 .filter(Setting.user_id == user_id, Setting.key == key)
                 .first()
             )
+            if setting:
+                # Access attributes and expunge to avoid detached instance errors
+                _ = setting.key
+                _ = setting.value
+                session.expunge(setting)
+            return setting
 
     def get_user_settings(self, user_id: int) -> List[Setting]:
         """Get all settings for a user."""
         with self.get_session() as session:
-            return session.query(Setting).filter(Setting.user_id == user_id).all()
+            settings = session.query(Setting).filter(Setting.user_id == user_id).all()
+            # Expunge objects from session so they can be used outside the session
+            # Access attributes first to ensure they're loaded
+            for setting in settings:
+                _ = setting.key
+                _ = setting.value
+                session.expunge(setting)
+            return settings
 
     def update_setting(self, setting_id: int, **kwargs) -> Optional[Setting]:
         """Update setting."""

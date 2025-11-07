@@ -28,6 +28,14 @@
         <h1 class="header__title">🇵🇱 Patient Polish Tutor</h1>
         <div class="header__actions">
             <button 
+                class="header__button" 
+                id="settings-button"
+                aria-label="Open settings"
+                title="Settings"
+            >
+                <i data-feather="settings" class="header__button-icon"></i>
+            </button>
+            <button 
                 class="theme-toggle" 
                 id="theme-toggle"
                 aria-label="Toggle dark mode"
@@ -104,6 +112,22 @@
         </div>
     </main>
     
+    <!-- Settings Modal -->
+    <div class="modal" id="settings-modal" role="dialog" aria-labelledby="settings-modal-title" aria-hidden="true">
+        <div class="modal__overlay" id="settings-modal-overlay"></div>
+        <div class="modal__content modal__content--large">
+            <div class="modal__header">
+                <h2 class="modal__title" id="settings-modal-title">Settings</h2>
+                <button class="modal__close" id="settings-modal-close" aria-label="Close settings">
+                    <i data-feather="x"></i>
+                </button>
+            </div>
+            <div class="modal__body" id="settings-content">
+                <!-- Settings content will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+    
     <!-- JavaScript Files -->
     <script>
         // Initialize Feather Icons
@@ -153,6 +177,7 @@
     <script src="/static/js/audio.js"></script>
     <script src="/static/js/voice.js"></script>
     <script src="/static/js/lesson.js"></script>
+    <script src="/static/js/settings.js"></script>
     <script src="/static/js/chat.js"></script>
 </body>
 </html>

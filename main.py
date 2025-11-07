@@ -47,8 +47,13 @@ app.add_middleware(
 static_audio_dir = Path("./static/audio")
 static_audio_dir.mkdir(parents=True, exist_ok=True)
 
+# Set up audio cache directory
+audio_cache_dir = Path("./audio_cache")
+audio_cache_dir.mkdir(parents=True, exist_ok=True)
+
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/audio_cache", StaticFiles(directory="audio_cache"), name="audio_cache")
 
 # Include routers
 app.include_router(chat.router)
