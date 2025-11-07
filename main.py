@@ -3,7 +3,7 @@ import logging
 import os
 from pathlib import Path
 
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, Request, WebSocket, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -59,6 +59,13 @@ app.include_router(user.router)
 app.include_router(audio.router)
 app.include_router(backup.router)
 app.include_router(error.router)
+
+# WebSocket endpoint
+@app.websocket("/ws/chat")
+async def websocket_endpoint(websocket: WebSocket):
+    """WebSocket endpoint for real-time chat."""
+    from src.api.routers.websocket import websocket_chat
+    await websocket_chat(websocket)
 
 
 # Error handlers
