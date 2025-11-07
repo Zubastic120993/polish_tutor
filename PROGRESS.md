@@ -156,7 +156,27 @@
 ---
 
 ### Checkpoint 2.2: SRS Manager
-**Status:** ⏸️ Not Started
+**Status:** ✅ Completed  
+**Started:** 2024-12-19  
+**Completed:** 2024-12-19
+
+**Tasks:**
+- [x] Create `SRSManager` class
+- [x] Implement SM-2 algorithm (efactor, intervals)
+- [x] Add confidence slider impact calculation
+- [x] Create `schedule_next()` method
+- [x] Implement `get_due_items()` query
+- [x] Add quality-to-efactor mapping
+
+**Test Points:**
+- [x] SM-2 calculations match specification exactly
+- [x] Initial efactor = 2.5
+- [x] Quality mapping (0-5) updates efactor correctly
+- [x] Confidence slider modifies intervals (±20% per step)
+- [x] Due items query implemented
+- [x] All quality levels and confidence values tested
+
+---
 
 ### Checkpoint 2.3: Speech Engine (TTS)
 **Status:** ⏸️ Not Started
@@ -241,12 +261,12 @@
 
 ## Progress Summary
 
-**Completed Checkpoints:** 6 / 25  
-**Completion Percentage:** 24%
+**Completed Checkpoints:** 7 / 25  
+**Completion Percentage:** 28%
 
 **Phase 0:** 2 / 2 checkpoints ✅ **COMPLETE**  
 **Phase 1:** 3 / 3 checkpoints ✅ **COMPLETE**  
-**Phase 2:** 1 / 4 checkpoints  
+**Phase 2:** 2 / 4 checkpoints  
 **Phase 3:** 0 / 2 checkpoints  
 **Phase 4:** 0 / 4 checkpoints  
 **Phase 5:** 0 / 5 checkpoints  
