@@ -156,10 +156,23 @@ class ChatUI {
             messageEl.querySelector('.message__bubble').appendChild(scoreEl);
         }
         
-        // Add audio button if audio URLs available
+        // Add audio button and speed toggle if audio URLs available
         if (data.audio && data.audio.length > 0) {
+            const bubble = messageEl.querySelector('.message__bubble');
+            const audioContainer = document.createElement('div');
+            audioContainer.className = 'audio-controls';
+            audioContainer.style.display = 'flex';
+            audioContainer.style.alignItems = 'center';
+            audioContainer.style.marginTop = 'var(--spacing-xs)';
+            
             const audioButton = this.createAudioButton(data.audio[0]);
-            messageEl.querySelector('.message__bubble').appendChild(audioButton);
+            audioContainer.appendChild(audioButton);
+            
+            // Add speed toggle
+            const speedToggle = this.createSpeedToggle();
+            audioContainer.appendChild(speedToggle);
+            
+            bubble.appendChild(audioContainer);
         }
         
         // Add quick actions
@@ -242,6 +255,41 @@ class ChatUI {
         setTimeout(() => feather.replace(), 0);
         
         return button;
+    }
+    
+    createSpeedToggle() {
+        const toggle = document.createElement('button');
+        toggle.className = 'audio-speed-toggle';
+        toggle.setAttribute('aria-label', 'Toggle playback speed');
+        toggle.setAttribute('title', 'Toggle playback speed (0.75× / 1.0×)');
+        toggle.setAttribute('type', 'button');
+        
+        const label = document.createElement('span');
+        label.className = 'audio-speed-toggle__label';
+        
+        const updateLabel = () => {
+            if (window.audioManager) {
+                const speed = window.audioManager.getSpeed();
+                label.textContent = `${speed}×`;
+            }
+        };
+        
+        updateLabel();
+        toggle.appendChild(label);
+        
+        toggle.addEventListener('click', () => {
+            if (window.audioManager) {
+                const newSpeed = window.audioManager.toggleSpeed();
+                updateLabel();
+                
+                // Update current audio if playing
+                if (window.audioManager.currentAudio) {
+                    window.audioManager.currentAudio.playbackRate = newSpeed;
+                }
+            }
+        });
+        
+        return toggle;
     }
     
     createQuickActions(data) {
@@ -413,38 +461,28 @@ class ChatUI {
     }
     
     playAudio(audioUrl, button) {
-        // Will be fully implemented in checkpoint 4.3
-        // For now, just create audio element and play
-        const audio = new Audio(audioUrl);
-        
-        button.classList.add('audio-button--playing');
-        const icon = button.querySelector('i');
-        if (icon) {
-            icon.setAttribute('data-feather', 'pause');
-            feather.replace();
+        // Find the message element containing this button
+        const messageEl = button.closest('.message');
+        if (!messageEl) {
+            console.error('Could not find message element for audio button');
+            return;
         }
         
-        audio.addEventListener('ended', () => {
-            button.classList.remove('audio-button--playing');
-            if (icon) {
-                icon.setAttribute('data-feather', 'play');
-                feather.replace();
+        // Use AudioManager for playback
+        if (window.audioManager) {
+            // If clicking the same button, toggle play/pause
+            if (window.audioManager.currentButton === button && window.audioManager.isPlaying()) {
+                window.audioManager.toggle();
+                return;
             }
-        });
-        
-        audio.addEventListener('error', () => {
-            button.classList.remove('audio-button--playing');
-            if (icon) {
-                icon.setAttribute('data-feather', 'play');
-                feather.replace();
-            }
-            this.showErrorMessage('Failed to play audio.');
-        });
-        
-        audio.play().catch((error) => {
-            console.error('Audio play error:', error);
-            this.showErrorMessage('Failed to play audio.');
-        });
+            
+            // Otherwise, play new audio
+            window.audioManager.play(audioUrl, button, messageEl);
+        } else {
+            // Fallback if AudioManager not loaded
+            console.error('AudioManager not available');
+            this.showErrorMessage('Audio playback not available.');
+        }
     }
     
     showInfoMessage(message) {

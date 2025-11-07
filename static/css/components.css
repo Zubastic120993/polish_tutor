@@ -262,6 +262,7 @@
   cursor: pointer;
   transition: background-color var(--transition-fast);
   margin-left: var(--spacing-xs);
+  position: relative;
 }
 
 .audio-button:hover {
@@ -272,11 +273,59 @@
   background-color: var(--color-warning);
 }
 
+.audio-button--paused {
+  background-color: var(--color-info);
+}
+
 .audio-button__icon {
   width: 16px;
   height: 16px;
   stroke: currentColor;
   fill: currentColor;
+}
+
+/* Audio Progress Bar */
+.audio-progress-container {
+  margin-top: var(--spacing-sm);
+  width: 100%;
+  position: relative;
+}
+
+.audio-progress-bar {
+  height: 4px;
+  background-color: var(--color-accent);
+  border-radius: var(--radius-sm);
+  transition: width 0.1s linear;
+  width: 0%;
+}
+
+.audio-progress-time {
+  font-size: var(--font-size-small);
+  color: var(--color-text-muted);
+  margin-top: var(--spacing-xs);
+  text-align: right;
+}
+
+/* Audio Speed Toggle */
+.audio-speed-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-left: var(--spacing-xs);
+  font-size: var(--font-size-small);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.audio-speed-toggle:hover {
+  background-color: var(--color-bg);
+}
+
+.audio-speed-toggle__label {
+  user-select: none;
 }
 
 /* Score Indicator */
