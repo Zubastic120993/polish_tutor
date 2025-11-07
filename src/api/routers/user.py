@@ -9,7 +9,7 @@ from src.models import Attempt, LessonProgress
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/user", tags=["user"])
+router = APIRouter(prefix="/api/user", tags=["user"])
 
 
 @router.get("/stats", response_model=UserStatsResponse, status_code=200)

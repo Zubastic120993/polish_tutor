@@ -7,7 +7,7 @@ from src.core.app_context import app_context
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/chat", tags=["chat"])
+router = APIRouter(prefix="/api/chat", tags=["chat"])
 
 
 @router.post("/respond", response_model=ChatRespondResponse, status_code=200)

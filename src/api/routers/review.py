@@ -8,7 +8,7 @@ from src.core.app_context import app_context
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/review", tags=["review"])
+router = APIRouter(prefix="/api/review", tags=["review"])
 
 
 @router.get("/get", response_model=ReviewGetResponse, status_code=200)

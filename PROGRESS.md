@@ -1,8 +1,8 @@
 # Patient Polish Tutor - Progress Tracker
 
 **Last Updated:** 2024-12-19  
-**Current Phase:** Phase 4 - Frontend & UI  
-**Current Checkpoint:** 4.4 - Voice Input (STT)
+**Current Phase:** Phase 5 - Integration & Polish  
+**Current Checkpoint:** 5.2 - Settings & Personalization
 
 ---
 
@@ -380,7 +380,27 @@
 ## Phase 5: Integration & Polish (Week 9-10)
 
 ### Checkpoint 5.1: Lesson Flow Integration
-**Status:** ⏸️ Not Started
+**Status:** ✅ Completed  
+**Started:** 2024-12-19  
+**Completed:** 2024-12-19
+
+**Tasks:**
+- [x] Integrate lesson loading with UI
+- [x] Implement lesson intro message
+- [x] Create dialogue loop (hear → respond → feedback → next)
+- [x] Add branching navigation
+- [x] Implement wrap-up summary
+- [⏭] Create mini-quiz (2-3 questions) - optional, requires quiz data structure
+- [x] Add lesson completion tracking
+
+**Test Points:**
+- [x] Lesson loads and displays correctly
+- [x] Dialogue loop works end-to-end
+- [x] Branching follows user input
+- [x] Summary shows at lesson end
+- [⏭] Quiz questions work (requires quiz data structure)
+- [x] Progress saved after each turn
+- [x] Can replay or skip without penalty (via lesson restart)
 
 ### Checkpoint 5.2: Settings & Personalization
 **Status:** ⏸️ Not Started
@@ -426,15 +446,15 @@
 
 ## Progress Summary
 
-**Completed Checkpoints:** 15 / 25  
-**Completion Percentage:** 60%
+**Completed Checkpoints:** 16 / 25  
+**Completion Percentage:** 64%
 
 **Phase 0:** 2 / 2 checkpoints ✅ **COMPLETE**  
 **Phase 1:** 3 / 3 checkpoints ✅ **COMPLETE**  
 **Phase 2:** 4 / 4 checkpoints ✅ **COMPLETE**  
 **Phase 3:** 2 / 2 checkpoints ✅ **COMPLETE**  
 **Phase 4:** 4 / 4 checkpoints ✅ **COMPLETE**  
-**Phase 5:** 0 / 5 checkpoints  
+**Phase 5:** 1 / 5 checkpoints  
 **Phase 6:** 0 / 4 checkpoints  
 **Final:** 0 / 1 checkpoint
 

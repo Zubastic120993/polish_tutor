@@ -7,7 +7,7 @@ from src.core.app_context import app_context
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/lesson", tags=["lesson"])
+router = APIRouter(prefix="/api/lesson", tags=["lesson"])
 
 
 @router.get("/get", response_model=LessonGetResponse, status_code=200)

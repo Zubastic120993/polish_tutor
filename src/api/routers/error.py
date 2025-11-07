@@ -7,7 +7,7 @@ from src.core.app_context import app_context
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/error", tags=["error"])
+router = APIRouter(prefix="/api/error", tags=["error"])
 
 
 @router.post("/report", response_model=ErrorReportResponse, status_code=200)

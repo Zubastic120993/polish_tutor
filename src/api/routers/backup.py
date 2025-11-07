@@ -11,7 +11,7 @@ from src.models import Attempt, LessonProgress, SRSMemory, Setting
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/backup", tags=["backup"])
+router = APIRouter(prefix="/api/backup", tags=["backup"])
 
 
 @router.get("/export", response_model=BackupExportResponse, status_code=200)

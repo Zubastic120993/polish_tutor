@@ -173,19 +173,31 @@ async def websocket_chat(websocket: WebSocket):
                         "message": f"Unknown message type: {msg_type}"
                     })
                     
+            except WebSocketDisconnect:
+                # Client disconnected, break out of loop
+                break
             except json.JSONDecodeError:
-                await websocket.send_json({
-                    "type": "error",
-                    "message": "Invalid JSON format"
-                })
+                try:
+                    await websocket.send_json({
+                        "type": "error",
+                        "message": "Invalid JSON format"
+                    })
+                except (WebSocketDisconnect, RuntimeError):
+                    # Connection closed, break out of loop
+                    break
             except Exception as e:
                 logger.error(f"Error processing WebSocket message: {e}", exc_info=True)
-                await websocket.send_json({
-                    "type": "error",
-                    "message": f"Internal server error: {str(e)}"
-                })
+                try:
+                    await websocket.send_json({
+                        "type": "error",
+                        "message": f"Internal server error: {str(e)}"
+                    })
+                except (WebSocketDisconnect, RuntimeError):
+                    # Connection closed, break out of loop
+                    break
                 
     except WebSocketDisconnect:
+        # Normal client disconnect
         if user_id:
             manager.disconnect(user_id)
         logger.info(f"WebSocket disconnected for user {user_id}")

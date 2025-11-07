@@ -4,9 +4,9 @@ An AI-assisted conversational tutor for learning spoken Polish (A0 → A1 level)
 
 ## 📋 Project Status
 
-**Phase:** API Layer (Phase 3)  
-**Current Checkpoint:** 3.1 - REST API Endpoints  
-**Progress:** 36% (9/25 checkpoints complete)
+**Phase:** Integration & Polish (Phase 5)  
+**Current Checkpoint:** 5.2 - Settings & Personalization  
+**Progress:** 64% (16/25 checkpoints complete)
 
 See [PROGRESS.md](PROGRESS.md) for detailed tracking.
 
@@ -171,8 +171,18 @@ See [ROADMAP.md](ROADMAP.md) for planned features and checkpoints.
 - ✅ **2.2** - SRS Manager
 - ✅ **2.3** - Speech Engine (TTS)
 - ✅ **2.4** - Tutor Class (Orchestration)
+- ✅ **3.1** - REST API Endpoints
+- ✅ **3.2** - WebSocket Chat
+- ✅ **4.1** - Basic HTML/CSS Structure
+- ✅ **4.2** - Chat UI Functionality
+- ✅ **4.3** - Audio Playback
+- ✅ **4.4** - Voice Input (STT)
+- ✅ **5.1** - Lesson Flow Integration
 
 **Phase 0:** Complete (2/2 checkpoints)  
 **Phase 1:** Complete (3/3 checkpoints)  
-**Phase 2:** Complete (4/4 checkpoints)
+**Phase 2:** Complete (4/4 checkpoints)  
+**Phase 3:** Complete (2/2 checkpoints)  
+**Phase 4:** Complete (4/4 checkpoints)  
+**Phase 5:** In Progress (1/5 checkpoints)
 

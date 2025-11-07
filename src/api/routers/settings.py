@@ -8,7 +8,7 @@ from src.models import Setting
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/settings", tags=["settings"])
+router = APIRouter(prefix="/api/settings", tags=["settings"])
 
 
 @router.get("/get", response_model=SettingsGetResponse, status_code=200)

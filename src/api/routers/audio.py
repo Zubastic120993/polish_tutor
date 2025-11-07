@@ -7,7 +7,7 @@ from src.core.app_context import app_context
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/audio", tags=["audio"])
+router = APIRouter(prefix="/api/audio", tags=["audio"])
 
 
 @router.post("/generate", response_model=AudioGenerateResponse, status_code=200)
