@@ -1,8 +1,8 @@
 # Patient Polish Tutor - Progress Tracker
 
 **Last Updated:** 2024-12-19  
-**Current Phase:** Phase 1 - Core Backend Infrastructure  
-**Current Checkpoint:** 1.3 - Lesson Manager & JSON Loader
+**Current Phase:** Phase 3 - API Layer  
+**Current Checkpoint:** 3.1 - REST API Endpoints
 
 ---
 
@@ -204,17 +204,82 @@
 ---
 
 ### Checkpoint 2.4: Tutor Class (Orchestration)
-**Status:** ⏸️ Not Started
+**Status:** ✅ Completed  
+**Started:** 2024-12-19  
+**Completed:** 2024-12-19
+
+**Tasks:**
+- [x] Create `Tutor` class
+- [x] Implement `respond()` method
+- [x] Integrate LessonManager, FeedbackEngine, SRSManager, SpeechEngine
+- [x] Add attempt logging
+- [x] Implement branching logic
+- [x] Create response formatting
+
+**Test Points:**
+- [x] Tutor responds to user input correctly
+- [x] Feedback generated and returned
+- [x] Attempts logged to database
+- [x] SRS updated after each attempt
+- [x] Branching works (exact → fuzzy → default)
+- [x] Response format matches API specification
+- [x] Integration tests for conversation flow
 
 ---
 
 ## Phase 3: API Layer (Week 6)
 
 ### Checkpoint 3.1: REST API Endpoints
-**Status:** ⏸️ Not Started
+**Status:** ⏸️ Not Started  
+**Started:** -  
+**Completed:** -
+
+**Tasks:**
+- [ ] Implement `/chat/respond` (POST)
+- [ ] Implement `/lesson/get` (GET)
+- [ ] Implement `/lesson/options` (GET)
+- [ ] Implement `/review/get` (GET)
+- [ ] Implement `/review/update` (POST)
+- [ ] Implement `/settings/get` (GET)
+- [ ] Implement `/settings/update` (POST)
+- [ ] Implement `/user/stats` (GET)
+- [ ] Implement `/audio/generate` (POST)
+- [ ] Implement `/backup/export` (GET)
+- [ ] Implement `/error/report` (POST)
+- [ ] Add Pydantic request/response models
+- [ ] Add error handling (400, 404, 500)
+
+**Test Points:**
+- [ ] All endpoints return correct status codes
+- [ ] Request validation works (Pydantic)
+- [ ] Response format matches API contract
+- [ ] Error responses follow specification format
+- [ ] Integration tests for all endpoints
+- [ ] Edge cases handled (missing data, invalid IDs)
+
+---
 
 ### Checkpoint 3.2: WebSocket Chat
-**Status:** ⏸️ Not Started
+**Status:** ⏸️ Not Started  
+**Started:** -  
+**Completed:** -
+
+**Tasks:**
+- [ ] Implement `/ws/chat` WebSocket endpoint
+- [ ] Add message type handling (message, typing, response)
+- [ ] Implement streaming responses
+- [ ] Add connection management
+- [ ] Create WebSocket client example (JavaScript)
+- [ ] Add reconnection logic
+
+**Test Points:**
+- [ ] WebSocket connection establishes
+- [ ] Messages sent/received correctly
+- [ ] Typing indicator works
+- [ ] Streaming responses work
+- [ ] Connection drops handled gracefully
+- [ ] Multiple clients supported (Phase 1: single user)
+- [ ] Integration tests with WebSocket client
 
 ---
 
@@ -283,12 +348,12 @@
 
 ## Progress Summary
 
-**Completed Checkpoints:** 8 / 25  
-**Completion Percentage:** 32%
+**Completed Checkpoints:** 9 / 25  
+**Completion Percentage:** 36%
 
 **Phase 0:** 2 / 2 checkpoints ✅ **COMPLETE**  
 **Phase 1:** 3 / 3 checkpoints ✅ **COMPLETE**  
-**Phase 2:** 3 / 4 checkpoints  
+**Phase 2:** 4 / 4 checkpoints ✅ **COMPLETE**  
 **Phase 3:** 0 / 2 checkpoints  
 **Phase 4:** 0 / 4 checkpoints  
 **Phase 5:** 0 / 5 checkpoints  
