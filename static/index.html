@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Patient Polish Tutor - AI-assisted conversational tutor for learning spoken Polish">
+    <title>Patient Polish Tutor</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="/static/css/variables.css">
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/layout.css">
+    <link rel="stylesheet" href="/static/css/components.css">
+    
+    <!-- Preconnect for external fonts (if using Google Fonts for Atkinson Hyperlegible) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Feather Icons (via CDN for now, can be self-hosted later) -->
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body>
+    <!-- Skip Link for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Header -->
+    <header class="header" role="banner">
+        <h1 class="header__title">🇵🇱 Patient Polish Tutor</h1>
+        <div class="header__actions">
+            <button 
+                class="theme-toggle" 
+                id="theme-toggle"
+                aria-label="Toggle dark mode"
+                title="Toggle dark mode"
+            >
+                <i data-feather="moon" class="theme-toggle__icon"></i>
+            </button>
+        </div>
+    </header>
+    
+    <!-- Connection Status Banner -->
+    <div 
+        class="connection-status" 
+        id="connection-status"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+    >
+        <span class="sr-only">Connection status: </span>
+        <span id="connection-status-text">Connecting...</span>
+    </div>
+    
+    <!-- Main Content -->
+    <main class="main" id="main-content" role="main">
+        <div class="container">
+            <div class="chat-container">
+                <!-- Chat Messages Container -->
+                <div 
+                    class="chat-messages" 
+                    id="chat-messages"
+                    role="log"
+                    aria-live="polite"
+                    aria-label="Chat messages"
+                >
+                    <!-- Messages will be dynamically inserted here -->
+                    
+                    <!-- Example Tutor Message -->
+                    <div class="message message--tutor" role="article" aria-label="Tutor message">
+                        <div class="message__bubble">
+                            <p>Cześć! Gotowy na krótką rozmowę? 👋</p>
+                        </div>
+                        <div class="message__meta">
+                            <span class="sr-only">Sent at </span>
+                            <time datetime="2024-12-19T10:00:00Z">Just now</time>
+                        </div>
+                    </div>
+                    
+                    <!-- Example Learner Message -->
+                    <div class="message message--learner" role="article" aria-label="Your message">
+                        <div class="message__bubble">
+                            <p>Tak, jestem gotowy!</p>
+                        </div>
+                        <div class="message__meta">
+                            <span class="sr-only">Sent at </span>
+                            <time datetime="2024-12-19T10:00:05Z">Just now</time>
+                        </div>
+                    </div>
+                    
+                    <!-- Example Hint Message -->
+                    <div class="message message--hint" role="article" aria-label="Hint">
+                        <div class="message__bubble">
+                            <p>💡 Tip: Use "poproszę" + item in accusative case</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Example Info Message -->
+                    <div class="message message--info" role="article" aria-label="Information">
+                        <div class="message__bubble">
+                            <p>📚 Starting lesson: In the Café</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Input Bar -->
+                <div class="input-bar" role="region" aria-label="Message input">
+                    <button 
+                        class="input-bar__button input-bar__button--secondary" 
+                        id="mic-button"
+                        aria-label="Start voice input"
+                        title="Start voice input"
+                        type="button"
+                    >
+                        <i data-feather="mic" class="input-bar__button-icon"></i>
+                    </button>
+                    
+                    <textarea 
+                        class="input-bar__input" 
+                        id="message-input"
+                        placeholder="Type your message or use voice input..."
+                        rows="1"
+                        aria-label="Message input"
+                        aria-describedby="input-help"
+                    ></textarea>
+                    
+                    <span id="input-help" class="sr-only">
+                        Press Enter to send, Shift+Enter for new line
+                    </span>
+                    
+                    <button 
+                        class="input-bar__button" 
+                        id="send-button"
+                        aria-label="Send message"
+                        title="Send message"
+                        type="submit"
+                    >
+                        <i data-feather="send" class="input-bar__button-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- JavaScript Files -->
+    <script>
+        // Initialize Feather Icons
+        feather.replace();
+        
+        // Theme Toggle Functionality
+        (function() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const html = document.documentElement;
+            
+            // Get saved theme or default to light
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            html.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+            
+            themeToggle.addEventListener('click', function() {
+                const currentTheme = html.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateThemeIcon(newTheme);
+            });
+            
+            function updateThemeIcon(theme) {
+                const icon = themeToggle.querySelector('i');
+                if (icon) {
+                    icon.setAttribute('data-feather', theme === 'dark' ? 'sun' : 'moon');
+                    feather.replace();
+                }
+            }
+        })();
+        
+        // Auto-resize textarea
+        (function() {
+            const textarea = document.getElementById('message-input');
+            if (textarea) {
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+                });
+            }
+        })();
+    </script>
+    
+    <!-- WebSocket Client (will be loaded in checkpoint 4.2) -->
+    <!-- <script src="/static/js/websocket_client_example.js"></script> -->
+    <!-- <script src="/static/js/chat.js"></script> -->
+</body>
+</html>
+

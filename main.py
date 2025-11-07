@@ -131,7 +131,14 @@ async def health_check():
 
 @app.get("/")
 async def root():
-    """Root endpoint."""
+    """Root endpoint - serve index.html."""
+    from fastapi.responses import FileResponse
+    return FileResponse("static/index.html")
+
+
+@app.get("/api")
+async def api_info():
+    """API information endpoint."""
     return {
         "message": "Patient Polish Tutor API",
         "docs": "/docs",

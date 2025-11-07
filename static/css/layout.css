@@ -1,0 +1,137 @@
+/**
+ * Layout Styles - Container, Grid, Flexbox
+ */
+
+.container {
+  max-width: var(--max-width-container);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+/* Header */
+.header {
+  height: var(--header-height);
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--spacing-lg);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.header__title {
+  font-size: var(--font-size-h3);
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+/* Main Content */
+.main {
+  min-height: calc(100vh - var(--header-height) - var(--input-height));
+  display: flex;
+  flex-direction: column;
+}
+
+/* Chat Container */
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  scroll-behavior: smooth;
+}
+
+.chat-messages:focus {
+  outline: none;
+}
+
+/* Input Bar */
+.input-bar {
+  height: var(--input-height);
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  gap: var(--spacing-sm);
+  position: sticky;
+  bottom: 0;
+  z-index: 50;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Connection Status Banner */
+.connection-status {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-warning);
+  color: white;
+  text-align: center;
+  font-size: var(--font-size-small);
+  display: none;
+}
+
+.connection-status--disconnected {
+  display: block;
+  background-color: var(--color-error);
+}
+
+.connection-status--connecting {
+  display: block;
+  background-color: var(--color-warning);
+}
+
+.connection-status--connected {
+  display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  :root {
+    --font-size-base: 16px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
+  }
+  
+  .header {
+    padding: 0 var(--spacing-md);
+  }
+  
+  .chat-messages {
+    padding: var(--spacing-md);
+  }
+  
+  .input-bar {
+    padding: var(--spacing-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 var(--spacing-sm);
+  }
+  
+  .header__title {
+    font-size: var(--font-size-base);
+  }
+}
+
