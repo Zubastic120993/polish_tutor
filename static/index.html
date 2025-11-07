@@ -63,17 +63,6 @@
                     aria-label="Chat messages"
                 >
                     <!-- Messages will be dynamically inserted here -->
-                    
-                    <!-- Welcome Message -->
-                    <div class="message message--tutor" role="article" aria-label="Tutor message">
-                        <div class="message__bubble">
-                            <p>Cześć! Gotowy na krótką rozmowę? 👋</p>
-                        </div>
-                        <div class="message__meta">
-                            <span class="sr-only">Sent at </span>
-                            <time datetime="2024-12-19T10:00:00Z">Just now</time>
-                        </div>
-                    </div>
                 </div>
                 
                 <!-- Input Bar -->
@@ -159,10 +148,11 @@
         })();
     </script>
     
-    <!-- WebSocket Client, Audio Manager, Voice Input, and Chat UI -->
+    <!-- WebSocket Client, Audio Manager, Voice Input, Lesson Flow, and Chat UI -->
     <script src="/static/js/websocket_client_example.js"></script>
     <script src="/static/js/audio.js"></script>
     <script src="/static/js/voice.js"></script>
+    <script src="/static/js/lesson.js"></script>
     <script src="/static/js/chat.js"></script>
 </body>
 </html>

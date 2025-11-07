@@ -9,9 +9,7 @@ import jsonschema
 from jsonschema import ValidationError
 
 from src.models import Lesson, Phrase
-
-if TYPE_CHECKING:
-    from src.services.database_service import Database
+from src.services.database_service import Database
 
 logger = logging.getLogger(__name__)
 

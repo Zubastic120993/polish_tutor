@@ -349,6 +349,14 @@
   color: var(--color-error);
 }
 
+/* Message Translation */
+.message__translation {
+  font-size: var(--font-size-small);
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-top: var(--spacing-xs);
+}
+
 /* Voice Input States */
 .mic-button--listening {
   background-color: var(--color-error) !important;

@@ -28,10 +28,100 @@ class ChatUI {
         // Set up event listeners
         this.setupEventListeners();
         
-        // Load initial lesson (will be implemented in checkpoint 5.1)
-        // For now, we'll use placeholder values
-        this.currentLessonId = 'coffee_001';
-        this.currentDialogueId = 'coffee_001_d1';
+        // Initialize lesson flow
+        this.initLessonFlow();
+    }
+    
+    async initLessonFlow() {
+        // Wait for lesson flow manager to be available
+        setTimeout(async () => {
+            if (typeof window.lessonFlowManager === 'undefined') {
+                console.warn('LessonFlowManager not loaded. Lesson flow will not be available.');
+                // Fallback to placeholder values
+                this.currentLessonId = 'coffee_001';
+                this.currentDialogueId = 'coffee_001_d1';
+                return;
+            }
+            
+            // Start default lesson
+            try {
+                await this.startLesson('coffee_001');
+            } catch (error) {
+                console.error('Failed to start lesson:', error);
+                this.showErrorMessage('Failed to load lesson. Please refresh the page.');
+                // Fallback to placeholder values
+                this.currentLessonId = 'coffee_001';
+                this.currentDialogueId = 'coffee_001_d1';
+            }
+        }, 100);
+    }
+    
+    async startLesson(lessonId) {
+        if (!window.lessonFlowManager) {
+            throw new Error('LessonFlowManager not available');
+        }
+        
+        const lessonData = await window.lessonFlowManager.startLesson(lessonId);
+        
+        this.currentLessonId = lessonData.lesson.id;
+        this.currentDialogueId = lessonData.dialogue.id;
+        
+        // Show intro message
+        if (lessonData.intro) {
+            const introEl = this.createInfoMessage(lessonData.intro);
+            this.chatMessages.appendChild(introEl);
+            this.scrollToBottom();
+        }
+        
+        // Show first tutor message
+        this.renderTutorDialogue(lessonData.dialogue);
+        
+        return lessonData;
+    }
+    
+    renderTutorDialogue(dialogue) {
+        if (!dialogue) return;
+        
+        const tutorText = dialogue.tutor || '';
+        const translation = dialogue.translation || '';
+        
+        // Create tutor message
+        const messageEl = this.createMessageElement('tutor', tutorText);
+        
+        // Add translation if available
+        if (translation) {
+            const translationEl = document.createElement('div');
+            translationEl.className = 'message__translation';
+            translationEl.textContent = `(${translation})`;
+            translationEl.style.fontSize = 'var(--font-size-small)';
+            translationEl.style.color = 'var(--color-text-muted)';
+            translationEl.style.fontStyle = 'italic';
+            translationEl.style.marginTop = 'var(--spacing-xs)';
+            messageEl.querySelector('.message__bubble').appendChild(translationEl);
+        }
+        
+        // Add audio if available
+        if (dialogue.audio) {
+            const audioUrl = `/static/audio/native/${this.currentLessonId}/${dialogue.audio}`;
+            const bubble = messageEl.querySelector('.message__bubble');
+            const audioContainer = document.createElement('div');
+            audioContainer.className = 'audio-controls';
+            audioContainer.style.display = 'flex';
+            audioContainer.style.alignItems = 'center';
+            audioContainer.style.marginTop = 'var(--spacing-xs)';
+            
+            const audioButton = this.createAudioButton(audioUrl);
+            audioContainer.appendChild(audioButton);
+            
+            // Add speed toggle
+            const speedToggle = this.createSpeedToggle();
+            audioContainer.appendChild(speedToggle);
+            
+            bubble.appendChild(audioContainer);
+        }
+        
+        this.chatMessages.appendChild(messageEl);
+        this.scrollToBottom();
     }
     
     initVoiceInput() {
@@ -173,6 +263,9 @@ class ChatUI {
             return;
         }
         
+        // Store last user message for progress tracking
+        this.lastUserMessage = text;
+        
         // Render learner message immediately
         this.renderLearnerMessage(text);
         
@@ -195,6 +288,45 @@ class ChatUI {
         }
     }
     
+    showLessonSummary() {
+        if (!window.lessonFlowManager || !window.lessonFlowManager.isActive()) {
+            return;
+        }
+        
+        const summary = window.lessonFlowManager.getLessonSummary();
+        if (!summary) {
+            return;
+        }
+        
+        // Create summary message
+        const summaryEl = document.createElement('div');
+        summaryEl.className = 'message message--info';
+        summaryEl.setAttribute('role', 'article');
+        summaryEl.setAttribute('aria-label', 'Lesson summary');
+        
+        const bubble = document.createElement('div');
+        bubble.className = 'message__bubble';
+        
+        let summaryText = `🎉 Lesson Complete!\n\n`;
+        summaryText += `Lesson: ${summary.title}\n`;
+        summaryText += `Dialogues completed: ${summary.completedDialogues}\n`;
+        
+        if (summary.avgScore !== null) {
+            summaryText += `Average score: ${Math.round(summary.avgScore * 100)}%\n`;
+        }
+        
+        summaryText += `\nGreat job! Keep practicing!`;
+        
+        bubble.textContent = summaryText;
+        summaryEl.appendChild(bubble);
+        
+        this.chatMessages.appendChild(summaryEl);
+        this.scrollToBottom();
+        
+        // Reset lesson state (but keep summary visible)
+        // User can start a new lesson if needed
+    }
+    
     renderLearnerMessage(text) {
         const messageEl = this.createMessageElement('learner', text);
         this.chatMessages.appendChild(messageEl);
@@ -202,9 +334,40 @@ class ChatUI {
     }
     
     renderTutorMessage(data, metadata) {
+        // Record progress if lesson flow manager is available
+        if (window.lessonFlowManager && window.lessonFlowManager.isActive()) {
+            const userText = this.lastUserMessage || '';
+            if (data.score !== undefined && data.feedback_type) {
+                window.lessonFlowManager.recordProgress(
+                    this.currentDialogueId,
+                    userText,
+                    data.score,
+                    data.feedback_type
+                );
+            }
+        }
+        
         // Update current dialogue ID if provided
         if (data.next_dialogue_id) {
             this.currentDialogueId = data.next_dialogue_id;
+            
+            // Advance lesson flow
+            if (window.lessonFlowManager && window.lessonFlowManager.isActive()) {
+                const nextDialogue = window.lessonFlowManager.advanceToDialogue(data.next_dialogue_id);
+                
+                // Check if lesson is complete
+                if (window.lessonFlowManager.isLessonComplete()) {
+                    // Show lesson summary
+                    setTimeout(() => {
+                        this.showLessonSummary();
+                    }, 1000);
+                } else if (nextDialogue) {
+                    // Show next dialogue after a short delay
+                    setTimeout(() => {
+                        this.renderTutorDialogue(nextDialogue);
+                    }, 1500);
+                }
+            }
         }
         
         // Create tutor message
