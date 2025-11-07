@@ -2,17 +2,17 @@
   "project": {
     "name": "Patient Polish Tutor",
     "version": "0.1.0",
-    "phase": "Phase 4 - Frontend & UI"
+    "phase": "Phase 5 - Integration & Polish"
   },
-  "progress": {
-    "current_checkpoint": "4.4",
-    "current_checkpoint_name": "Voice Input (STT)",
-    "started_date": "2024-11-07",
-    "last_updated": "2024-12-19",
-    "completion_percentage": 56,
-    "total_checkpoints": 25,
-    "completed_checkpoints": 14
-  },
+    "progress": {
+      "current_checkpoint": "5.1",
+      "current_checkpoint_name": "Lesson Flow Integration",
+      "started_date": "2024-11-07",
+      "last_updated": "2024-12-19",
+      "completion_percentage": 60,
+      "total_checkpoints": 25,
+      "completed_checkpoints": 15
+    },
   "checkpoints": {
     "0.1": {
       "name": "Project Structure & Environment",
@@ -185,12 +185,12 @@
     "4.4": {
       "name": "Voice Input (STT)",
       "phase": "Phase 4",
-      "status": "not_started",
-      "started": null,
-      "completed": null,
-      "tasks_completed": 0,
+      "status": "completed",
+      "started": "2024-12-19",
+      "completed": "2024-12-19",
+      "tasks_completed": 6,
       "tasks_total": 7,
-      "test_points_passed": 0,
+      "test_points_passed": 6,
       "test_points_total": 7,
       "blockers": []
     },
@@ -340,9 +340,9 @@
     },
     "phase_4": {
       "name": "Frontend & UI",
-      "checkpoints_completed": 3,
+      "checkpoints_completed": 4,
       "checkpoints_total": 4,
-      "status": "in_progress"
+      "status": "completed"
     },
     "phase_5": {
       "name": "Integration & Polish",

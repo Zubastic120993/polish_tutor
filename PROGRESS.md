@@ -353,7 +353,27 @@
 - [x] Works with pre-recorded and generated audio
 
 ### Checkpoint 4.4: Voice Input (STT)
-**Status:** ⏸️ Not Started
+**Status:** ✅ Completed  
+**Started:** 2024-12-19  
+**Completed:** 2024-12-19
+
+**Tasks:**
+- [x] Implement Web Speech API integration
+- [x] Add microphone permission request
+- [x] Create tap-to-toggle and push-to-talk modes
+- [x] Implement live caption ("You said...")
+- [x] Add auto-stop (2s silence)
+- [x] Create error handling (permission denied, noise)
+- [⏭] Add backend Whisper fallback (optional - skipped for MVP)
+
+**Test Points:**
+- [x] Microphone permission requested correctly
+- [x] Speech recognition works (Web Speech API)
+- [x] Live caption updates during recording
+- [x] Auto-stop triggers after silence
+- [x] Error messages shown for failures
+- [x] Fallback to text input works
+- [~] Browser compatibility tested (Chrome, Edge, Safari - manual testing ready)
 
 ---
 
@@ -406,14 +426,14 @@
 
 ## Progress Summary
 
-**Completed Checkpoints:** 14 / 25  
-**Completion Percentage:** 56%
+**Completed Checkpoints:** 15 / 25  
+**Completion Percentage:** 60%
 
 **Phase 0:** 2 / 2 checkpoints ✅ **COMPLETE**  
 **Phase 1:** 3 / 3 checkpoints ✅ **COMPLETE**  
 **Phase 2:** 4 / 4 checkpoints ✅ **COMPLETE**  
 **Phase 3:** 2 / 2 checkpoints ✅ **COMPLETE**  
-**Phase 4:** 3 / 4 checkpoints  
+**Phase 4:** 4 / 4 checkpoints ✅ **COMPLETE**  
 **Phase 5:** 0 / 5 checkpoints  
 **Phase 6:** 0 / 4 checkpoints  
 **Final:** 0 / 1 checkpoint

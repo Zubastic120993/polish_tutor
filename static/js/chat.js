@@ -18,6 +18,7 @@ class ChatUI {
         this.isTyping = false;
         
         this.init();
+        this.initVoiceInput();
     }
     
     init() {
@@ -31,6 +32,65 @@ class ChatUI {
         // For now, we'll use placeholder values
         this.currentLessonId = 'coffee_001';
         this.currentDialogueId = 'coffee_001_d1';
+    }
+    
+    initVoiceInput() {
+        // Wait for voice input manager to be available
+        // Use a small delay to ensure voice.js has loaded
+        setTimeout(() => {
+            if (typeof window.voiceInputManager === 'undefined') {
+                console.warn('VoiceInputManager not loaded. Voice input will not be available.');
+                return;
+            }
+            
+            const voiceManager = window.voiceInputManager;
+            
+            // Set up callbacks
+            voiceManager.onListeningStateChange = (isListening) => {
+                this.updateMicButtonState(isListening);
+            };
+            
+            voiceManager.onTranscriptReady = (transcript) => {
+                // Set transcript in input field
+                this.messageInput.value = transcript;
+                this.autoResizeTextarea();
+                
+                // Auto-send if in push-to-talk mode, or let user review in tap mode
+                const micMode = voiceManager.getMicMode();
+                if (micMode === 'push' && transcript.trim()) {
+                    // Small delay to show the text before sending
+                    setTimeout(() => {
+                        this.sendMessage();
+                    }, 300);
+                }
+            };
+            
+            voiceManager.onError = (errorMessage) => {
+                this.showErrorMessage(errorMessage);
+            };
+        }, 100);
+    }
+    
+    updateMicButtonState(isListening) {
+        if (!this.micButton) return;
+        
+        const icon = this.micButton.querySelector('i');
+        if (!icon) return;
+        
+        if (isListening) {
+            this.micButton.classList.add('mic-button--listening');
+            icon.setAttribute('data-feather', 'mic-off');
+            this.micButton.setAttribute('aria-label', 'Stop voice input');
+            this.micButton.setAttribute('title', 'Stop voice input');
+        } else {
+            this.micButton.classList.remove('mic-button--listening');
+            icon.setAttribute('data-feather', 'mic');
+            this.micButton.setAttribute('aria-label', 'Start voice input');
+            this.micButton.setAttribute('title', 'Start voice input');
+        }
+        
+        // Update feather icon
+        feather.replace();
     }
     
     initWebSocket() {
@@ -419,9 +479,33 @@ class ChatUI {
     }
     
     handleMicClick() {
-        // Will be implemented in checkpoint 4.4
-        console.log('Mic button clicked - voice input will be implemented in checkpoint 4.4');
-        this.showInfoMessage('Voice input will be available in the next update.');
+        if (!window.voiceInputManager) {
+            this.showErrorMessage('Voice input not available. Please refresh the page.');
+            return;
+        }
+        
+        const voiceManager = window.voiceInputManager;
+        
+        // Check if supported
+        if (!voiceManager.isSupported) {
+            this.showErrorMessage('Speech recognition is not supported in your browser. Please use Chrome, Edge, or Safari.');
+            return;
+        }
+        
+        // Handle based on mic mode
+        const micMode = voiceManager.getMicMode();
+        
+        if (micMode === 'tap') {
+            // Tap-to-toggle mode
+            voiceManager.toggleListening();
+        } else {
+            // Push-to-talk mode
+            if (voiceManager.isCurrentlyListening()) {
+                voiceManager.stopListening();
+            } else {
+                voiceManager.startListening('push');
+            }
+        }
     }
     
     handleRepeat() {
