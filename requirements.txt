@@ -1,0 +1,43 @@
+# Web Framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+websockets>=12.0
+python-multipart>=0.0.6
+
+# Database
+sqlalchemy>=2.0.0
+alembic>=1.12.0
+
+# Data Validation
+pydantic>=2.5.0
+jsonschema>=4.19.0
+
+# Authentication
+python-jose[cryptography]>=3.3.0
+
+# Speech & Audio
+pyttsx3>=2.90
+gTTS>=2.4.0
+pydub>=0.25.1
+mutagen>=1.47.0
+
+# Text Processing & Similarity
+python-Levenshtein>=0.23.0
+phonemizer>=3.2.0
+
+# Utilities
+aiofiles>=23.2.0
+python-dotenv>=1.0.0
+
+# Optional: Cloud TTS (if using Azure)
+# azure-cognitiveservices-speech>=1.32.0
+
+# Development (optional)
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+httpx>=0.25.0
+black>=23.11.0
+flake8>=6.1.0
+mypy>=1.7.0
+
