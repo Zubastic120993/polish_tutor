@@ -3,13 +3,15 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, TYPE_CHECKING
 
 import jsonschema
 from jsonschema import ValidationError
 
 from src.models import Lesson, Phrase
-from src.services.database_service import Database
+
+if TYPE_CHECKING:
+    from src.services.database_service import Database
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +74,7 @@ class LessonManager:
         self,
         lessons_dir: Optional[str] = None,
         audio_base_dir: Optional[str] = None,
-        database: Optional[Database] = None,
+        database: Optional["Database"] = None,
     ):
         """Initialize LessonManager.
 
