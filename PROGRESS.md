@@ -1,8 +1,8 @@
 # Patient Polish Tutor - Progress Tracker
 
-**Last Updated:** 2024-11-07  
-**Current Phase:** Phase 0 - Foundation & Setup  
-**Current Checkpoint:** 0.1 - Project Structure & Environment
+**Last Updated:** 2024-12-19  
+**Current Phase:** Phase 1 - Core Backend Infrastructure  
+**Current Checkpoint:** 1.1 - FastAPI Application Skeleton
 
 ---
 
@@ -18,35 +18,46 @@
 ## Phase 0: Foundation & Setup (Week 1)
 
 ### Checkpoint 0.1: Project Structure & Environment
-**Status:** 🔄 In Progress  
-**Started:** 2024-11-07
+**Status:** ✅ Completed  
+**Started:** 2024-11-07  
+**Completed:** 2024-12-19
 
 **Tasks:**
-- [ ] Create project directory structure
-- [ ] Set up Python virtual environment
-- [ ] Create `requirements.txt` with all dependencies
-- [ ] Create `.env` file template
-- [ ] Set up `.gitignore`
-- [ ] Initialize git repository
-- [ ] Create basic README.md
+- [x] Create project directory structure
+- [x] Set up Python virtual environment
+- [x] Create `requirements.txt` with all dependencies
+- [x] Create `.env` file template
+- [x] Set up `.gitignore`
+- [x] Initialize git repository
+- [x] Create basic README.md
 
 **Test Points:**
-- [ ] Virtual environment activates successfully
-- [ ] All dependencies install without errors
-- [ ] Python version check passes (3.9+)
-- [ ] Project structure matches specification
+- [x] Virtual environment activates successfully
+- [x] All dependencies install without errors
+- [x] Python version check passes (3.9+)
+- [x] Project structure matches specification
 
 ---
 
 ### Checkpoint 0.2: Database Schema & Migrations
-**Status:** ⏸️ Not Started
+**Status:** ✅ Completed  
+**Started:** 2024-12-19  
+**Completed:** 2024-12-19
 
 **Tasks:**
-- [ ] Initialize Alembic migrations
-- [ ] Create SQLAlchemy ORM models
-- [ ] Create initial Alembic migration
-- [ ] Set up database connection handler
-- [ ] Create database initialization script
+- [x] Initialize Alembic migrations
+- [x] Create SQLAlchemy ORM models (8 models: Users, Lessons, Phrases, LessonProgress, Attempts, SRSMemory, Settings, Meta)
+- [x] Create initial Alembic migration
+- [x] Set up database connection handler
+- [x] Create database initialization script
+
+**Test Points:**
+- [x] Alembic migrations run successfully
+- [x] All 8 tables created with correct schema
+- [x] Foreign key constraints enforced
+- [x] Indexes created correctly
+- [x] Database connection works
+- [x] Meta table initialized with db_version = '1.0'
 
 ---
 
@@ -154,10 +165,10 @@
 
 ## Progress Summary
 
-**Completed Checkpoints:** 0 / 25  
-**Completion Percentage:** 0%
+**Completed Checkpoints:** 2 / 25  
+**Completion Percentage:** 8%
 
-**Phase 0:** 0 / 2 checkpoints  
+**Phase 0:** 2 / 2 checkpoints ✅ **COMPLETE**  
 **Phase 1:** 0 / 3 checkpoints  
 **Phase 2:** 0 / 4 checkpoints  
 **Phase 3:** 0 / 2 checkpoints  
