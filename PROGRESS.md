@@ -107,7 +107,25 @@
 ---
 
 ### Checkpoint 1.3: Lesson Manager & JSON Loader
-**Status:** ⏸️ Not Started
+**Status:** ✅ Completed  
+**Started:** 2024-12-19  
+**Completed:** 2024-12-19
+
+**Tasks:**
+- [x] Create `LessonManager` class
+- [x] Implement JSON schema validation (jsonschema)
+- [x] Create lesson JSON loader
+- [x] Implement branch validation
+- [x] Add audio file existence checks
+- [x] Create lesson caching mechanism
+
+**Test Points:**
+- [x] Valid lesson JSON loads successfully
+- [x] Invalid JSON rejected with clear errors
+- [x] Branch integrity validated (all `next` IDs exist)
+- [x] Audio file paths validated (warnings for missing files)
+- [x] Lessons cached after first load
+- [x] Can save lessons to database
 
 ---
 
@@ -202,11 +220,11 @@
 
 ## Progress Summary
 
-**Completed Checkpoints:** 4 / 25  
-**Completion Percentage:** 16%
+**Completed Checkpoints:** 5 / 25  
+**Completion Percentage:** 20%
 
 **Phase 0:** 2 / 2 checkpoints ✅ **COMPLETE**  
-**Phase 1:** 2 / 3 checkpoints  
+**Phase 1:** 3 / 3 checkpoints ✅ **COMPLETE**  
 **Phase 2:** 0 / 4 checkpoints  
 **Phase 3:** 0 / 2 checkpoints  
 **Phase 4:** 0 / 4 checkpoints  

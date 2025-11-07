@@ -1,0 +1,69 @@
+{
+  "id": "coffee_001",
+  "title": "In the Café",
+  "level": "A0",
+  "cefr_goal": "Can order a drink politely",
+  "tags": ["food", "greeting"],
+  "dialogues": [
+    {
+      "id": "coffee_001_d1",
+      "tutor": "Dzień dobry, co podać?",
+      "expected": ["Poproszę kawę.", "Kawę, proszę."],
+      "translation": "Good morning, what would you like?",
+      "hint": "Use 'poproszę' + item in accusative.",
+      "grammar": "Accusative",
+      "audio": "coffee_001_d1.mp3",
+      "audio_slow": "coffee_001_d1_slow.mp3",
+      "options": [
+        {
+          "match": "herbata",
+          "next": "coffee_001_d2",
+          "description": "User orders tea"
+        },
+        {
+          "match": "sok",
+          "next": "coffee_001_d3",
+          "description": "User orders juice"
+        },
+        {
+          "default": true,
+          "next": "coffee_001_d2",
+          "description": "Default coffee order"
+        }
+      ]
+    },
+    {
+      "id": "coffee_001_d2",
+      "tutor": "Świetnie! Poproszę kawę. Co jeszcze?",
+      "expected": ["To wszystko.", "Nic więcej."],
+      "translation": "Great! I'll have a coffee. Anything else?",
+      "hint": "Say 'that's all' or 'nothing more'",
+      "grammar": "Politeness",
+      "audio": "coffee_001_d2.mp3",
+      "options": [
+        {
+          "default": true,
+          "next": "coffee_001_d3",
+          "description": "Continue conversation"
+        }
+      ]
+    },
+    {
+      "id": "coffee_001_d3",
+      "tutor": "Dziękuję bardzo!",
+      "expected": ["Proszę bardzo.", "Nie ma za co."],
+      "translation": "Thank you very much!",
+      "hint": "Respond politely",
+      "grammar": "Gratitude",
+      "audio": "coffee_001_d3.mp3",
+      "options": [
+        {
+          "default": true,
+          "next": "coffee_001_d3",
+          "description": "End of lesson"
+        }
+      ]
+    }
+  ]
+}
+
