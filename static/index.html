@@ -64,7 +64,7 @@
                 >
                     <!-- Messages will be dynamically inserted here -->
                     
-                    <!-- Example Tutor Message -->
+                    <!-- Welcome Message -->
                     <div class="message message--tutor" role="article" aria-label="Tutor message">
                         <div class="message__bubble">
                             <p>Cześć! Gotowy na krótką rozmowę? 👋</p>
@@ -72,31 +72,6 @@
                         <div class="message__meta">
                             <span class="sr-only">Sent at </span>
                             <time datetime="2024-12-19T10:00:00Z">Just now</time>
-                        </div>
-                    </div>
-                    
-                    <!-- Example Learner Message -->
-                    <div class="message message--learner" role="article" aria-label="Your message">
-                        <div class="message__bubble">
-                            <p>Tak, jestem gotowy!</p>
-                        </div>
-                        <div class="message__meta">
-                            <span class="sr-only">Sent at </span>
-                            <time datetime="2024-12-19T10:00:05Z">Just now</time>
-                        </div>
-                    </div>
-                    
-                    <!-- Example Hint Message -->
-                    <div class="message message--hint" role="article" aria-label="Hint">
-                        <div class="message__bubble">
-                            <p>💡 Tip: Use "poproszę" + item in accusative case</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Example Info Message -->
-                    <div class="message message--info" role="article" aria-label="Information">
-                        <div class="message__bubble">
-                            <p>📚 Starting lesson: In the Café</p>
                         </div>
                     </div>
                 </div>
@@ -184,9 +159,9 @@
         })();
     </script>
     
-    <!-- WebSocket Client (will be loaded in checkpoint 4.2) -->
-    <!-- <script src="/static/js/websocket_client_example.js"></script> -->
-    <!-- <script src="/static/js/chat.js"></script> -->
+    <!-- WebSocket Client and Chat UI -->
+    <script src="/static/js/websocket_client_example.js"></script>
+    <script src="/static/js/chat.js"></script>
 </body>
 </html>
 
