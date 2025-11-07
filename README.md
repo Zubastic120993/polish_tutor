@@ -4,9 +4,9 @@ An AI-assisted conversational tutor for learning spoken Polish (A0 → A1 level)
 
 ## 📋 Project Status
 
-**Phase:** Foundation & Setup (Phase 0)  
-**Current Checkpoint:** 0.1 - Project Structure & Environment  
-**Progress:** 0% (0/25 checkpoints complete)
+**Phase:** Core Backend Infrastructure (Phase 1)  
+**Current Checkpoint:** 1.3 - Lesson Manager & JSON Loader  
+**Progress:** 16% (4/25 checkpoints complete)
 
 See [PROGRESS.md](PROGRESS.md) for detailed tracking.
 
@@ -157,4 +157,16 @@ See [ROADMAP.md](ROADMAP.md) for planned features and checkpoints.
 
 **Current Version:** 0.1.0-dev  
 **Target Release:** Phase 1 MVP (11 weeks)
+
+---
+
+## ✅ Completed Checkpoints
+
+- ✅ **0.1** - Project Structure & Environment
+- ✅ **0.2** - Database Schema & Migrations
+- ✅ **1.1** - FastAPI Application Skeleton
+- ✅ **1.2** - Database Models & Services
+
+**Phase 0:** Complete (2/2 checkpoints)  
+**Phase 1:** In Progress (2/3 checkpoints)
 

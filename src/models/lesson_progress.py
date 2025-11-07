@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, UniqueConstraint
+from sqlalchemy.orm import relationship
 
 from src.core.database import Base
 
@@ -19,6 +20,10 @@ class LessonProgress(Base):
     completed_at = Column(DateTime)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    user = relationship("User", back_populates="lesson_progresses")
+    lesson = relationship("Lesson", back_populates="lesson_progresses")
 
     # Constraints and indexes
     __table_args__ = (

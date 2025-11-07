@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, Float, ForeignKey, Index, Integer, String, UniqueConstraint
+from sqlalchemy.orm import relationship
 
 from src.core.database import Base
 
@@ -22,6 +23,10 @@ class SRSMemory(Base):
     review_count = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    user = relationship("User", back_populates="srs_memories")
+    phrase = relationship("Phrase", back_populates="srs_memories")
 
     # Constraints and indexes
     __table_args__ = (

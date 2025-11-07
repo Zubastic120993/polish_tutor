@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, Float, Index, Integer, String, Text
+from sqlalchemy.orm import relationship
 
 from src.core.database import Base
 
@@ -19,6 +20,10 @@ class Attempt(Base):
     phoneme_diffs = Column(Text)  # JSON array of mismatches
     feedback_type = Column(String)  # high, medium, low
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    user = relationship("User", back_populates="attempts")
+    phrase = relationship("Phrase", back_populates="attempts")
 
     # Indexes
     __table_args__ = (

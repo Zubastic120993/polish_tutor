@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, Text, UniqueConstraint
+from sqlalchemy.orm import relationship
 
 from src.core.database import Base
 
@@ -16,6 +17,9 @@ class Setting(Base):
     key = Column(String, nullable=False)
     value = Column(Text)  # JSON blob
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    user = relationship("User", back_populates="settings")
 
     # Constraints and indexes
     __table_args__ = (
