@@ -1,13 +1,20 @@
 """Main FastAPI application entry point."""
+import logging
 import os
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from src.api.routers import audio, backup, chat, error, lesson, review, settings, user
 from src.core.app_context import app_context
 from src.core.logging_config import setup_logging
+
+logger = logging.getLogger(__name__)
 
 # Set up logging
 config = app_context.config
@@ -42,6 +49,67 @@ static_audio_dir.mkdir(parents=True, exist_ok=True)
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Include routers
+app.include_router(chat.router)
+app.include_router(lesson.router)
+app.include_router(review.router)
+app.include_router(settings.router)
+app.include_router(user.router)
+app.include_router(audio.router)
+app.include_router(backup.router)
+app.include_router(error.router)
+
+
+# Error handlers
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """Handle validation errors (400 Bad Request)."""
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={
+            "status": "error",
+            "message": "Invalid request: " + str(exc.errors()),
+            "data": None
+        }
+    )
+
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    """Handle HTTP exceptions (404, etc.)."""
+    if exc.status_code == 404:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "status": "error",
+                "message": f"Resource not found: {request.url.path}",
+                "data": None
+            }
+        )
+    # For other HTTP exceptions, return the default response
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "status": "error",
+            "message": exc.detail if hasattr(exc, 'detail') else "An error occurred",
+            "data": None
+        }
+    )
+
+
+@app.exception_handler(Exception)
+async def general_exception_handler(request: Request, exc: Exception):
+    """Handle unhandled exceptions (500 Internal Server Error)."""
+    logger.error(f"Unhandled exception: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={
+            "status": "error",
+            "message": "Internal server error",
+            "data": None
+        }
+    )
 
 
 @app.get("/health")

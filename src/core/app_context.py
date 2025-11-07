@@ -2,6 +2,8 @@
 from typing import Optional
 
 from src.core.database import SessionLocal
+from src.core.tutor import Tutor
+from src.services.database_service import Database
 
 
 class AppContext:
@@ -12,6 +14,8 @@ class AppContext:
         self._db_session_factory = SessionLocal
         self._config: Optional[dict] = None
         self._cache_manager = None  # Will be implemented later
+        self._tutor: Optional[Tutor] = None
+        self._database: Optional[Database] = None
 
     @property
     def db_session_factory(self):
@@ -38,6 +42,20 @@ class AppContext:
     def cache_manager(self):
         """Get cache manager (placeholder for future implementation)."""
         return self._cache_manager
+
+    @property
+    def database(self) -> Database:
+        """Get database service instance."""
+        if self._database is None:
+            self._database = Database(session_factory=self._db_session_factory)
+        return self._database
+
+    @property
+    def tutor(self) -> Tutor:
+        """Get Tutor instance."""
+        if self._tutor is None:
+            self._tutor = Tutor(database=self.database)
+        return self._tutor
 
 
 # Global app context instance
