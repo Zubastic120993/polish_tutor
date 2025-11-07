@@ -20,13 +20,12 @@ class ConnectionManager:
         self.active_connections: Dict[int, WebSocket] = {}
     
     async def connect(self, websocket: WebSocket, user_id: int):
-        """Accept a new WebSocket connection.
+        """Register a WebSocket connection (connection should already be accepted).
         
         Args:
-            websocket: WebSocket connection
+            websocket: WebSocket connection (already accepted)
             user_id: User ID
         """
-        await websocket.accept()
         # For Phase 1: single user per connection, disconnect existing if any
         if user_id in self.active_connections:
             try:
