@@ -124,9 +124,17 @@ class AudioGenerateRequest(BaseModel):
     user_id: Optional[int] = Field(None, description="User ID for checking voice_mode setting", gt=0)
 
 
+class AudioGenerateData(BaseModel):
+    """Response data for POST /audio/generate."""
+    audio_url: str = Field(..., description="URL to audio file")
+    cached: bool = Field(..., description="Whether audio was retrieved from cache")
+    engine: str = Field(..., description="TTS engine used (gpt4, elevenlabs, coqui, gtts, pyttsx3)")
+    source: str = Field(..., description="Full source info (e.g., 'cached_gpt4', 'generated_coqui')")
+
+
 class AudioGenerateResponse(APIResponse):
     """Response schema for POST /audio/generate."""
-    data: Optional[dict] = Field(None, description="Contains audio_url")
+    data: Optional[AudioGenerateData] = None
 
 
 # Backup endpoint

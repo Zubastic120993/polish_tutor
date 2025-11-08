@@ -1,5 +1,6 @@
 """Audio API endpoints."""
 import logging
+import os
 from fastapi import APIRouter, HTTPException
 
 from src.api.schemas import AudioGenerateRequest, AudioGenerateResponse
@@ -39,13 +40,16 @@ async def audio_generate(request: AudioGenerateRequest):
         else:
             logger.info("No user_id provided, using default offline mode")
         
-        # Create SpeechEngine with appropriate mode
-        # If online mode, prefer gTTS for better quality
+        # Create SpeechEngine with appropriate mode and API keys
         from src.services.speech_engine import SpeechEngine
-        speech_engine = SpeechEngine(online_mode=online_mode)
+        speech_engine = SpeechEngine(
+            online_mode=online_mode,
+            openai_api_key=os.getenv("OPENAI_API_KEY"),
+            elevenlabs_api_key=os.getenv("ELEVENLABS_API_KEY"),
+        )
         
         # Generate audio
-        audio_path, is_cached = speech_engine.get_audio_path(
+        audio_path, source = speech_engine.get_audio_path(
             text=request.text,
             lesson_id=request.lesson_id,
             phrase_id=request.phrase_id,
@@ -65,12 +69,20 @@ async def audio_generate(request: AudioGenerateRequest):
             rel_path = rel_path[2:]
         audio_url = f"/{rel_path}"
         
+        # Determine if cached based on source
+        is_cached = source.startswith("cached_")
+        engine_used = source.replace("cached_", "").replace("generated_", "")
+        
+        message = f"Audio retrieved from cache ({engine_used})" if is_cached else f"Audio generated with {engine_used}"
+        
         return {
             "status": "success",
-            "message": "Audio generated successfully" if not is_cached else "Audio retrieved from cache",
+            "message": message,
             "data": {
                 "audio_url": audio_url,
                 "cached": is_cached,
+                "engine": engine_used,
+                "source": source,
             }
         }
         
@@ -78,6 +90,39 @@ async def audio_generate(request: AudioGenerateRequest):
         raise
     except Exception as e:
         logger.error(f"Error in audio_generate: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(e)}"
+        )
+
+
+@router.get("/engines", status_code=200)
+async def get_available_engines():
+    """Get information about available TTS engines.
+    
+    Returns:
+        Dictionary with engine availability and configuration
+    """
+    try:
+        from src.services.speech_engine import SpeechEngine
+        
+        # Create a temporary engine instance to check availability
+        speech_engine = SpeechEngine(
+            online_mode=True,  # Check both online and offline
+            openai_api_key=os.getenv("OPENAI_API_KEY"),
+            elevenlabs_api_key=os.getenv("ELEVENLABS_API_KEY"),
+        )
+        
+        engines_info = speech_engine.get_available_engines()
+        
+        return {
+            "status": "success",
+            "message": "Retrieved TTS engine information",
+            "data": engines_info
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting engine info: {e}", exc_info=True)
         raise HTTPException(
             status_code=500,
             detail=f"Internal server error: {str(e)}"

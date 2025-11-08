@@ -16,8 +16,18 @@ jsonschema>=4.19.0
 python-jose[cryptography]>=3.3.0
 
 # Speech & Audio
-pyttsx3>=2.90
+# Online TTS (Premium Quality)
+openai>=1.0.0  # GPT-4-TTS
+elevenlabs>=0.2.0  # ElevenLabs TTS
+
+# Offline TTS
+coqui-tts>=0.21.0  # Coqui-TTS (offline, high quality)
+pyttsx3>=2.90  # Emergency fallback
+
+# Legacy online TTS (will be deprecated)
 gTTS>=2.4.0
+
+# Audio Processing
 pydub>=0.25.1
 mutagen>=1.47.0
 
