@@ -27,6 +27,16 @@ class VoiceInputManager {
         if (savedMicMode === 'push' || savedMicMode === 'tap') {
             this.micMode = savedMicMode;
         }
+        
+        // Listen for settings changes
+        document.addEventListener('settingsChanged', (event) => {
+            const settings = event.detail;
+            if (settings.mic_mode && (settings.mic_mode === 'tap' || settings.mic_mode === 'hold')) {
+                // Map 'hold' to 'push' for internal use
+                const mode = settings.mic_mode === 'hold' ? 'push' : 'tap';
+                this.setMicMode(mode);
+            }
+        });
     }
     
     /**

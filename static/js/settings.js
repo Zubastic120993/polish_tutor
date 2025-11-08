@@ -369,6 +369,16 @@ class SettingsManager {
         if (settings.theme) {
             document.documentElement.setAttribute('data-theme', settings.theme);
             localStorage.setItem('theme', settings.theme);
+            
+            // Update theme toggle icon if it exists
+            const themeToggle = document.getElementById('theme-toggle');
+            if (themeToggle) {
+                const icon = themeToggle.querySelector('i');
+                if (icon) {
+                    icon.setAttribute('data-feather', settings.theme === 'dark' ? 'sun' : 'moon');
+                    feather.replace();
+                }
+            }
         }
         
         // Apply audio speed (convert to numeric value for audio manager)
@@ -376,10 +386,21 @@ class SettingsManager {
             const speedMap = { slow: 0.75, normal: 1.0, fast: 1.25 };
             const speed = speedMap[settings.audio_speed] || 1.0;
             window.audioManager.setSpeed(speed);
+            localStorage.setItem('audioSpeed', speed.toString());
+        }
+        
+        // Apply mic mode
+        if (settings.mic_mode && window.voiceInputManager) {
+            window.voiceInputManager.setMicMode(settings.mic_mode);
+            localStorage.setItem('micMode', settings.mic_mode);
         }
         
         // Store settings in localStorage for quick access
         localStorage.setItem('userSettings', JSON.stringify(settings));
+        
+        // Broadcast settings change event
+        const event = new CustomEvent('settingsChanged', { detail: settings });
+        document.dispatchEvent(event);
     }
     
     /**

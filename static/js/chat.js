@@ -16,6 +16,29 @@ class ChatUI {
         this.connectionStatus = document.getElementById('connection-status');
         this.connectionStatusText = document.getElementById('connection-status-text');
         this.isTyping = false;
+        this.translationMode = 'smart'; // 'show', 'hide', or 'smart'
+        this.successfulPhrases = new Set(); // Track phrases that were answered correctly
+        
+        // Load translation setting from localStorage
+        const savedSettings = localStorage.getItem('userSettings');
+        if (savedSettings) {
+            try {
+                const settings = JSON.parse(savedSettings);
+                if (settings.translation) {
+                    this.translationMode = settings.translation;
+                }
+            } catch (e) {
+                console.warn('Failed to parse saved settings:', e);
+            }
+        }
+        
+        // Listen for settings changes
+        document.addEventListener('settingsChanged', (event) => {
+            const settings = event.detail;
+            if (settings.translation) {
+                this.translationMode = settings.translation;
+            }
+        });
         
         this.init();
         this.initVoiceInput();
@@ -79,6 +102,25 @@ class ChatUI {
         return lessonData;
     }
     
+    /**
+     * Check if translation should be shown based on settings
+     * @param {string} phraseId - Phrase/dialogue ID
+     * @returns {boolean} True if translation should be shown
+     */
+    shouldShowTranslation(phraseId) {
+        if (this.translationMode === 'show') {
+            return true;
+        }
+        if (this.translationMode === 'hide') {
+            return false;
+        }
+        // Smart mode: hide if phrase was answered correctly
+        if (this.translationMode === 'smart') {
+            return !this.successfulPhrases.has(phraseId);
+        }
+        return true; // Default to showing
+    }
+    
     renderTutorDialogue(dialogue) {
         if (!dialogue) return;
         
@@ -88,8 +130,8 @@ class ChatUI {
         // Create tutor message
         const messageEl = this.createMessageElement('tutor', tutorText);
         
-        // Add translation if available
-        if (translation) {
+        // Add translation if available and should be shown
+        if (translation && this.shouldShowTranslation(dialogue.id)) {
             const translationEl = document.createElement('div');
             translationEl.className = 'message__translation';
             translationEl.textContent = `(${translation})`;
@@ -386,6 +428,11 @@ class ChatUI {
         if (data.score !== undefined) {
             const scoreEl = this.createScoreIndicator(data.score, data.feedback_type);
             messageEl.querySelector('.message__bubble').appendChild(scoreEl);
+            
+            // Track successful phrases for smart translation mode
+            if (this.translationMode === 'smart' && this.currentDialogueId && data.score >= 0.85) {
+                this.successfulPhrases.add(this.currentDialogueId);
+            }
         }
         
         // Add audio button and speed toggle if audio URLs available

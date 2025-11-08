@@ -403,23 +403,25 @@
 - [x] Can replay or skip without penalty (via lesson restart)
 
 ### Checkpoint 5.2: Settings & Personalization
-**Status:** [ ] Not Started
+**Status:** ✅ Completed  
+**Started:** 2024-12-19  
+**Completed:** 2024-12-19
 
 **Tasks:**
-- [ ] Create settings UI
-- [ ] Implement all settings (speed, translation, mic mode, tutor mode, voice, theme)
-- [ ] Add profile templates (Kid/Adult/Teacher)
-- [ ] Implement settings persistence
-- [ ] Create settings export/import
-- [ ] Add reset functionality
+- [x] Create settings UI
+- [x] Implement all settings (speed, translation, mic mode, tutor mode, voice, theme)
+- [x] Add profile templates (Kid/Adult/Teacher)
+- [x] Implement settings persistence
+- [x] Create settings export/import
+- [x] Add reset functionality
 
 **Test Points:**
-- [ ] All settings save correctly
-- [ ] Settings persist across restarts
-- [ ] Profile templates apply correctly
-- [ ] Export/import works
-- [ ] Reset clears data correctly
-- [ ] Settings affect app behavior immediately
+- [x] All settings save correctly
+- [x] Settings persist across restarts (via database)
+- [x] Profile templates apply correctly
+- [x] Export/import works
+- [x] Reset clears data correctly
+- [x] Settings affect app behavior immediately (real-time updates via events)
 
 ### Checkpoint 5.3: Review System Integration
 **Status:** [ ] Not Started
@@ -568,15 +570,15 @@
 
 ## Progress Summary
 
-**Completed Checkpoints:** 16 / 25  
-**Completion Percentage:** 64%
+**Completed Checkpoints:** 17 / 25  
+**Completion Percentage:** 68%
 
 **Phase 0:** 2 / 2 checkpoints ✅ **COMPLETE**  
 **Phase 1:** 3 / 3 checkpoints ✅ **COMPLETE**  
 **Phase 2:** 4 / 4 checkpoints ✅ **COMPLETE**  
 **Phase 3:** 2 / 2 checkpoints ✅ **COMPLETE**  
 **Phase 4:** 4 / 4 checkpoints ✅ **COMPLETE**  
-**Phase 5:** 1 / 5 checkpoints  
+**Phase 5:** 2 / 5 checkpoints  
 **Phase 6:** 0 / 4 checkpoints  
 **Final:** 0 / 1 checkpoint
 

@@ -16,6 +16,16 @@ class AudioManager {
         if (savedSpeed) {
             this.playbackSpeed = parseFloat(savedSpeed);
         }
+        
+        // Listen for settings changes
+        document.addEventListener('settingsChanged', (event) => {
+            const settings = event.detail;
+            if (settings.audio_speed) {
+                const speedMap = { slow: 0.75, normal: 1.0, fast: 1.25 };
+                const speed = speedMap[settings.audio_speed] || 1.0;
+                this.setSpeed(speed);
+            }
+        });
     }
     
     /**
