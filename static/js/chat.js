@@ -379,9 +379,15 @@ class ChatUI {
     }
     
     renderLearnerMessage(text) {
+        this.lastUserMessage = text;
         const messageEl = this.createMessageElement('learner', text);
         this.chatMessages.appendChild(messageEl);
         this.scrollToBottom();
+        
+        // Save session after user message
+        if (window.sessionManager) {
+            window.sessionManager.saveAfterResponse();
+        }
     }
     
     renderTutorMessage(data, metadata) {
@@ -432,6 +438,11 @@ class ChatUI {
             // Track successful phrases for smart translation mode
             if (this.translationMode === 'smart' && this.currentDialogueId && data.score >= 0.85) {
                 this.successfulPhrases.add(this.currentDialogueId);
+            }
+            
+            // Save session after response
+            if (window.sessionManager) {
+                window.sessionManager.saveAfterResponse();
             }
         }
         

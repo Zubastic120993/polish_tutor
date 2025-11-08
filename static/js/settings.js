@@ -96,6 +96,22 @@ class SettingsManager {
         
         content.innerHTML = `
             <div class="settings">
+                <!-- User Profile -->
+                <section class="settings__section">
+                    <h3 class="settings__section-title">User Profile</h3>
+                    <div class="settings__group">
+                        <label class="settings__label">Active User</label>
+                        <select class="settings__select" name="user_profile" id="user-profile-select">
+                            <option value="1" ${settings.user_id === 1 || !settings.user_id ? 'selected' : ''}>User 1</option>
+                            <option value="2" ${settings.user_id === 2 ? 'selected' : ''}>User 2</option>
+                            <option value="3" ${settings.user_id === 3 ? 'selected' : ''}>User 3</option>
+                        </select>
+                        <small class="settings__help" style="display: block; margin-top: var(--spacing-xs); color: var(--color-text-muted); font-size: var(--font-size-small);">
+                            Switch between different user profiles. Each profile has separate progress and settings.
+                        </small>
+                    </div>
+                </section>
+                
                 <!-- Profile Templates -->
                 <section class="settings__section">
                     <h3 class="settings__section-title">Profile Templates</h3>
@@ -302,6 +318,20 @@ class SettingsManager {
                 }
             });
         });
+        
+        // User profile switcher
+        const userProfileSelect = document.getElementById('user-profile-select');
+        if (userProfileSelect) {
+            userProfileSelect.addEventListener('change', (e) => {
+                const newUserId = parseInt(e.target.value);
+                if (newUserId !== this.userId && window.sessionManager) {
+                    window.sessionManager.switchProfile(newUserId);
+                    this.userId = newUserId;
+                    // Reload settings for new user
+                    this.loadSettings();
+                }
+            });
+        }
     }
     
     /**
