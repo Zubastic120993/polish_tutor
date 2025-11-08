@@ -1039,3 +1039,115 @@
   }
 }
 
+/* Error Notifications */
+.error-notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  box-shadow: var(--shadow-xl);
+  z-index: 10000;
+  max-width: 500px;
+  width: 90%;
+  animation: slideInDown 0.3s ease-out;
+}
+
+.error-notification--dismissing {
+  animation: slideOutUp 0.3s ease-out;
+}
+
+.error-notification--high {
+  border-color: var(--color-error);
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.error-notification--medium {
+  border-color: #f59e0b;
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+.error-notification--low {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent-light);
+}
+
+.error-notification__content {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.error-notification__icon {
+  font-size: var(--font-size-xl);
+  flex-shrink: 0;
+}
+
+.error-notification__message {
+  flex: 1;
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.error-notification__actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--color-border);
+}
+
+.error-notification__button {
+  padding: var(--spacing-xs) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.error-notification__button:hover {
+  background-color: var(--color-surface-hover);
+  transform: translateY(-1px);
+}
+
+.error-notification__button--dev {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.error-notification__button--dev:hover {
+  background-color: var(--color-accent-light);
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateX(-50%) translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutUp {
+  from {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-50%) translateY(-100%);
+    opacity: 0;
+  }
+}
+

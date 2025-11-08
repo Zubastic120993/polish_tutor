@@ -71,7 +71,13 @@ class ChatUI {
                 await this.startLesson('coffee_001');
             } catch (error) {
                 console.error('Failed to start lesson:', error);
-                this.showErrorMessage('Failed to load lesson. Please refresh the page.');
+                if (window.errorHandler) {
+                    window.errorHandler.handleError('LESSON_DATA', error, {
+                        lessonId: 'coffee_001'
+                    });
+                } else {
+                    this.showErrorMessage('Failed to load lesson. Please refresh the page.');
+                }
                 // Fallback to placeholder values
                 this.currentLessonId = 'coffee_001';
                 this.currentDialogueId = 'coffee_001_d1';
@@ -256,7 +262,13 @@ class ChatUI {
         
         this.wsClient.onError((errorMessage) => {
             this.hideTypingIndicator();
-            this.showErrorMessage(errorMessage);
+            if (window.errorHandler) {
+                window.errorHandler.handleError('NETWORK', new Error(errorMessage), {
+                    connectionType: 'websocket'
+                });
+            } else {
+                this.showErrorMessage(errorMessage);
+            }
         });
         
         // Connect
@@ -335,7 +347,13 @@ class ChatUI {
             );
         } catch (error) {
             console.error('Error sending message:', error);
-            this.showErrorMessage('Failed to send message. Please try again.');
+            if (window.errorHandler) {
+                window.errorHandler.handleError('NETWORK', error, {
+                    action: 'send_message'
+                });
+            } else {
+                this.showErrorMessage('Failed to send message. Please try again.');
+            }
         }
     }
     

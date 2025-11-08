@@ -291,7 +291,16 @@ class VoiceInputManager {
                 errorMessage = `Speech recognition error: ${error}. Please try again.`;
         }
         
-        this.onError(errorMessage);
+        // Use error handler if available
+        if (window.errorHandler) {
+            const category = error === 'not-allowed' ? 'MICROPHONE_DENIED' : 
+                           error === 'no-speech' ? 'STT_TIMEOUT' : 'SPEECH';
+            window.errorHandler.handleError(category, new Error(errorMessage), {
+                errorCode: error
+            });
+        } else {
+            this.onError(errorMessage);
+        }
         this.stopListening();
     }
     
@@ -310,7 +319,14 @@ class VoiceInputManager {
             errorMessage = `Microphone error: ${error.message}. Please try again.`;
         }
         
-        this.onError(errorMessage);
+        // Use error handler if available
+        if (window.errorHandler) {
+            window.errorHandler.handleError('MICROPHONE_DENIED', error, {
+                errorName: error.name
+            });
+        } else {
+            this.onError(errorMessage);
+        }
     }
     
     /**

@@ -246,6 +246,20 @@ class SettingsManager {
                     </div>
                 </section>
                 
+                <!-- Developer Options -->
+                <section class="settings__section">
+                    <h3 class="settings__section-title">Developer Options</h3>
+                    <div class="settings__group">
+                        <label class="settings__radio">
+                            <input type="checkbox" id="developer-mode-toggle" ${localStorage.getItem('developerMode') === 'true' ? 'checked' : ''}>
+                            <span>Enable Developer Mode</span>
+                        </label>
+                        <small class="settings__help" style="display: block; margin-top: var(--spacing-xs); color: var(--color-text-muted); font-size: var(--font-size-small);">
+                            Shows detailed error information and debug logs. For troubleshooting only.
+                        </small>
+                    </div>
+                </section>
+                
                 <!-- Actions -->
                 <section class="settings__section">
                     <div class="settings__actions">
@@ -329,6 +343,20 @@ class SettingsManager {
                     this.userId = newUserId;
                     // Reload settings for new user
                     this.loadSettings();
+                }
+            });
+        }
+        
+        // Developer mode toggle
+        const devModeToggle = document.getElementById('developer-mode-toggle');
+        if (devModeToggle) {
+            devModeToggle.addEventListener('change', (e) => {
+                if (window.errorHandler) {
+                    window.errorHandler.toggleDeveloperMode();
+                    this.showMessage(
+                        e.target.checked ? 'Developer mode enabled' : 'Developer mode disabled',
+                        'info'
+                    );
                 }
             });
         }

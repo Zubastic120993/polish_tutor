@@ -34,11 +34,13 @@ async def error_report(request: ErrorReportRequest):
         if request.context:
             logger.debug(f"Error context: {request.context}")
         
+        from datetime import datetime
+        
         return {
             "status": "success",
             "message": "Error report logged successfully",
             "data": {
-                "reported_at": "2024-01-15T10:30:00Z",  # Would use actual timestamp in production
+                "reported_at": datetime.utcnow().isoformat() + "Z",
             }
         }
         

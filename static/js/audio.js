@@ -358,8 +358,13 @@ class AudioManager {
         this.currentButton = null;
         this.currentProgressBar = null;
         
-        // Emit error event (can be listened to by chat UI)
-        if (window.chatUI) {
+        // Use error handler if available
+        if (window.errorHandler) {
+            window.errorHandler.handleError('AUDIO', error, {
+                audioUrl,
+                phrase: 'Audio playback failed'
+            });
+        } else if (window.chatUI) {
             window.chatUI.showErrorMessage(errorMessage + ' Please check the audio file path and try again.');
         }
     }

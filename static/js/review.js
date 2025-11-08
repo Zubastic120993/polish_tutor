@@ -109,7 +109,8 @@ class ReviewManager {
      */
     async checkDueReviews() {
         try {
-            const response = await fetch(`/api/review/get?user_id=${this.userId}`);
+            const fetchFn = window.errorHandler?.fetchWithOfflineQueue || fetch;
+            const response = await fetchFn(`/api/review/get?user_id=${this.userId}`);
             if (!response.ok) {
                 throw new Error(`Failed to fetch reviews: ${response.statusText}`);
             }
