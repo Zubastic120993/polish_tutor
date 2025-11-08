@@ -403,32 +403,154 @@
 - [x] Can replay or skip without penalty (via lesson restart)
 
 ### Checkpoint 5.2: Settings & Personalization
-**Status:** ⏸️ Not Started
+**Status:** [ ] Not Started
+
+**Tasks:**
+- [ ] Create settings UI
+- [ ] Implement all settings (speed, translation, mic mode, tutor mode, voice, theme)
+- [ ] Add profile templates (Kid/Adult/Teacher)
+- [ ] Implement settings persistence
+- [ ] Create settings export/import
+- [ ] Add reset functionality
+
+**Test Points:**
+- [ ] All settings save correctly
+- [ ] Settings persist across restarts
+- [ ] Profile templates apply correctly
+- [ ] Export/import works
+- [ ] Reset clears data correctly
+- [ ] Settings affect app behavior immediately
 
 ### Checkpoint 5.3: Review System Integration
-**Status:** ⏸️ Not Started
+**Status:** [ ] Not Started
+
+**Tasks:**
+- [ ] Create review queue UI
+- [ ] Implement daily scheduler check
+- [ ] Add browser notifications
+- [ ] Create review attempt interface
+- [ ] Implement confidence slider
+- [ ] Add review completion tracking
+- [ ] Create "forgotten items" reinjection
+
+**Test Points:**
+- [ ] Review queue shows due items
+- [ ] Daily scheduler triggers correctly
+- [ ] Browser notifications work
+- [ ] Confidence slider updates intervals
+- [ ] Reviews update SRS correctly
+- [ ] Forgotten items added to next lesson
+- [ ] Review batch ≤ 5 minutes
 
 ### Checkpoint 5.4: Session Management
-**Status:** ⏸️ Not Started
+**Status:** [ ] Not Started
+
+**Tasks:**
+- [ ] Implement session snapshots
+- [ ] Add auto-save (after each response, every 30s)
+- [ ] Create resume functionality
+- [ ] Implement multi-profile support
+- [ ] Add crash recovery
+- [ ] Create session history archive
+
+**Test Points:**
+- [ ] Sessions save correctly
+- [ ] Auto-save triggers at correct intervals
+- [ ] Resume loads last session
+- [ ] Multi-profile switching works
+- [ ] Crash recovery restores state
+- [ ] Session history archived weekly
 
 ### Checkpoint 5.5: Error Handling & Logging
-**Status:** ⏸️ Not Started
+**Status:** [ ] Not Started
+
+**Tasks:**
+- [ ] Implement error categories (speech, audio, database, etc.)
+- [ ] Add user-friendly error messages
+- [ ] Create error recovery actions
+- [ ] Implement offline queue
+- [ ] Add developer diagnostics toggle
+- [ ] Create error reporting endpoint
+
+**Test Points:**
+- [ ] All error types show appropriate messages
+- [ ] Recovery actions work (retry, fallback)
+- [ ] Offline queue stores and syncs events
+- [ ] Logging captures all errors
+- [ ] Developer mode shows raw logs
+- [ ] Error reporting endpoint works
 
 ---
 
 ## Phase 6: Testing & Quality Assurance (Week 11)
 
 ### Checkpoint 6.1: Unit Tests
-**Status:** ⏸️ Not Started
+**Status:** [ ] Not Started
+
+**Tasks:**
+- [ ] Write unit tests for LessonManager
+- [ ] Write unit tests for FeedbackEngine
+- [ ] Write unit tests for SRSManager
+- [ ] Write unit tests for SpeechEngine
+- [ ] Write unit tests for Tutor
+- [ ] Achieve >80% code coverage
+
+**Test Points:**
+- [ ] All unit tests pass
+- [ ] Code coverage ≥80%
+- [ ] Edge cases covered
+- [ ] Mock dependencies used correctly
 
 ### Checkpoint 6.2: Integration Tests
-**Status:** ⏸️ Not Started
+**Status:** [ ] Not Started
+
+**Tasks:**
+- [ ] Write integration tests for all REST endpoints
+- [ ] Write WebSocket integration tests
+- [ ] Test with mocked speech services
+- [ ] Test error scenarios
+- [ ] Test authentication (if implemented)
+
+**Test Points:**
+- [ ] All integration tests pass
+- [ ] Endpoints return correct schemas
+- [ ] Error responses tested
+- [ ] WebSocket tests pass
 
 ### Checkpoint 6.3: UI Smoke Tests
-**Status:** ⏸️ Not Started
+**Status:** [ ] Not Started
+
+**Tasks:**
+- [ ] Create Cypress/Playwright test suite
+- [ ] Test voice-only session flow
+- [ ] Test text-only session flow
+- [ ] Test offline resume flow
+- [ ] Test branch navigation
+- [ ] Test settings changes
+
+**Test Points:**
+- [ ] All smoke tests pass
+- [ ] Voice-only flow works
+- [ ] Text-only flow works
+- [ ] Offline resume works
+- [ ] Branching works correctly
 
 ### Checkpoint 6.4: Performance Testing
-**Status:** ⏸️ Not Started
+**Status:** [ ] Not Started
+
+**Tasks:**
+- [ ] Measure TTS latency (target: ≤1500ms pre-recorded, ≤2500ms synth)
+- [ ] Measure STT latency (target: ≤1800ms offline)
+- [ ] Measure UI response time (target: ≤300ms)
+- [ ] Test database query performance
+- [ ] Test under load (single user for Phase 1)
+
+**Test Points:**
+- [ ] TTS latency within targets
+- [ ] STT latency within targets
+- [ ] UI response time within targets
+- [ ] Database queries <100ms
+- [ ] Memory usage reasonable (<200MB base)
 
 ---
 
