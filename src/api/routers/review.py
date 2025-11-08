@@ -27,16 +27,44 @@ async def review_get(user_id: int = Query(..., description="User ID", gt=0)):
         # Get due items using database service
         due_items = database.get_due_srs_items(user_id=user_id)
         
-        # Format response
+        # Format response with phrase details
+        lesson_manager = app_context.tutor.lesson_manager
         items_data = []
         for item in due_items:
+            # Get phrase from database
+            phrase = database.get_phrase(item.phrase_id)
+            
+            # Try to get dialogue details from lesson JSON
+            phrase_text = phrase.text if phrase else item.phrase_id
+            translation = None
+            audio = None
+            
+            # Extract lesson_id from phrase_id (format: lesson_id_dialogue_id)
+            if phrase and phrase.lesson_id:
+                lesson_data = lesson_manager.get_lesson(phrase.lesson_id)
+                if lesson_data:
+                    # Find dialogue in lesson data
+                    for dialogue in lesson_data.get("dialogues", []):
+                        if dialogue.get("id") == item.phrase_id:
+                            translation = dialogue.get("translation")
+                            audio = dialogue.get("audio")
+                            # Use tutor text if available, otherwise use expected text
+                            if dialogue.get("tutor"):
+                                phrase_text = dialogue.get("tutor")
+                            break
+            
             items_data.append({
                 "phrase_id": item.phrase_id,
                 "user_id": item.user_id,
+                "phrase_text": phrase_text,
+                "translation": translation,
+                "audio": audio,
+                "lesson_id": phrase.lesson_id if phrase else None,
                 "next_review": item.next_review.isoformat() + "Z" if item.next_review else None,
                 "efactor": item.efactor,
                 "interval_days": item.interval_days,
                 "repetitions": item.repetitions,
+                "strength_level": item.strength_level,
             })
         
         return {

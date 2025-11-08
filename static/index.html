@@ -29,6 +29,14 @@
         <div class="header__actions">
             <button 
                 class="header__button" 
+                id="review-button"
+                aria-label="Open review queue"
+                title="Review Queue"
+            >
+                <i data-feather="refresh-cw" class="header__button-icon"></i>
+            </button>
+            <button 
+                class="header__button" 
                 id="settings-button"
                 aria-label="Open settings"
                 title="Settings"
@@ -128,6 +136,22 @@
         </div>
     </div>
     
+    <!-- Review Modal -->
+    <div class="modal" id="review-modal" role="dialog" aria-labelledby="review-modal-title" aria-hidden="true">
+        <div class="modal__overlay" id="review-modal-overlay"></div>
+        <div class="modal__content modal__content--large">
+            <div class="modal__header">
+                <h2 class="modal__title" id="review-modal-title">Review Queue</h2>
+                <button class="modal__close" id="review-modal-close" aria-label="Close review">
+                    <i data-feather="x"></i>
+                </button>
+            </div>
+            <div class="modal__body" id="review-content">
+                <!-- Review content will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+    
     <!-- JavaScript Files -->
     <script>
         // Initialize Feather Icons
@@ -178,6 +202,7 @@
     <script src="/static/js/voice.js"></script>
     <script src="/static/js/lesson.js"></script>
     <script src="/static/js/settings.js"></script>
+    <script src="/static/js/review.js"></script>
     <script src="/static/js/chat.js"></script>
 </body>
 </html>
