@@ -19,6 +19,13 @@ Patient Polish Tutor is a locally-hosted FastAPI application that teaches practi
 - Patient, encouraging feedback
 - Offline-first functionality
 
+
+## ✨ Recent UX Improvements (Nov 2025)
+- Guided onboarding card introduces the scenario and quick commands.
+- First-turn checklist clarifies how to listen, reply, and ask for help.
+- Feedback messages now feature a colored summary banner with score badges.
+- Phrase practice cards include clearer typography and translation cues.
+
 ## 📚 Documentation
 
 - **[SPECIFICATION.md](SPECIFICATION.md)** - Complete technical specification
