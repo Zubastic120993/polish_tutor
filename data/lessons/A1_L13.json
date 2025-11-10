@@ -1,0 +1,86 @@
+{
+  "id": "A1_L13",
+  "title": "Ciało",
+  "level": "A0",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi nazwać podstawowe części ciała i opisać, co go boli.",
+  "objectives": [
+    "Nazywanie części ciała",
+    "Używanie przymiotników do opisu wyglądu"
+  ],
+  "vocabulary": [
+    {"pl": "głowa", "en": "head"},
+    {"pl": "ręka", "en": "hand / arm"},
+    {"pl": "noga", "en": "leg"},
+    {"pl": "oko", "en": "eye"},
+    {"pl": "ucho", "en": "ear"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "body_parts_plural",
+      "title": "Liczba mnoga części ciała",
+      "content": "'Ręka – ręce', 'oko – oczy', 'ucho – uszy'."
+    },
+    {
+      "id": "adjectives_body",
+      "title": "Przymiotniki opisujące ciało",
+      "content": "Użyj przymiotników: 'duży nos', 'zielone oczy', 'długa noga'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L13_d1",
+      "tutor": "Gdzie masz ból?",
+      "expected": ["Boli mnie ..."],
+      "translation": "Where does it hurt?",
+      "hint": "Odpowiedz 'Boli mnie ...'.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L13_d2",
+      "tutor": "Boli mnie głowa i gardło.",
+      "expected": ["Boli mnie głowa i gardło."],
+      "translation": "My head and throat hurt.",
+      "hint": "Wymień więcej części ciała jeśli chcesz.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L13_d3",
+      "tutor": "Masz gorączkę?",
+      "expected": ["Nie, nie mam.", "Tak, mam."],
+      "translation": "Do you have a fever?",
+      "hint": "Odpowiedz 'tak' lub 'nie'.",
+      "audio": null,
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L13_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz nazwy części ciała.",
+      "instruction_en": "Repeat the names of body parts.",
+      "items": ["głowa", "ręka", "noga", "oko", "ucho"]
+    },
+    {
+      "id": "A1_L13_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Boli mnie ...'",
+      "instruction_en": "Fill in: 'My ... hurts.'",
+      "blanks": [
+        {"sentence_pl": "Boli mnie ___.", "answer_pl": "głowa"},
+        {"sentence_en": "My ___ hurts.", "answer_en": "leg"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W języku polskim mówimy 'boli mnie głowa', nie 'mam ból głowy'.",
+    "Często używamy zdrobnień: 'rączka', 'nóżka', 'oczko'."
+  ],
+  "audio_meta": {
+    "tracks": ["CD025", "CD026"],
+    "duration_sec": 65
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "id": "A1_L02",
+  "title": "Przedstawianie się",
+  "level": "A0",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi zapytać o imię i przedstawić siebie lub inną osobę.",
+  "objectives": [
+    "Udzielanie i odbieranie informacji o imieniu i nazwisku",
+    "Stosowanie zwrotów przedstawiających siebie i inne osoby"
+  ],
+  "vocabulary": [
+    {"pl": "Jak masz na imię?", "en": "What’s your name?"},
+    {"pl": "Mam na imię...", "en": "My name is..."},
+    {"pl": "To jest...", "en": "This is..."},
+    {"pl": "Miło mi", "en": "Nice to meet you"},
+    {"pl": "Również mi miło", "en": "Nice to meet you too"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "introductions_structure",
+      "title": "Konstrukcje przedstawiania",
+      "content": "Użyj 'Mam na imię ...' mówiąc o sobie. Przedstawiając kogoś, powiedz 'To jest ...'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L02_d1",
+      "tutor": "Cześć! Mam na imię Amir.",
+      "expected": ["Cześć! Mam na imię ..."],
+      "translation": "Hi! My name is Amir.",
+      "hint": "W odpowiedzi zamień imię na swoje.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L02_d2",
+      "tutor": "Cześć, Amir. Jestem Saida.",
+      "expected": ["Cześć, ... Jestem ..."],
+      "translation": "Hi Amir, I’m Saida.",
+      "hint": "Przedstawiając się, użyj 'Jestem ...'.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L02_d3",
+      "tutor": "Miło mi.",
+      "expected": ["Również mi miło."],
+      "translation": "Nice to meet you.",
+      "hint": "Odpowiedz grzecznie 'Również mi miło'.",
+      "audio": null,
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L02_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz dialog, zmieniając imię.",
+      "instruction_en": "Repeat the dialogue, changing the name.",
+      "items": [
+        {"prompt_pl": "Jak masz na imię?", "prompt_en": "What’s your name?"},
+        {"prompt_pl": "Mam na imię ...", "prompt_en": "My name is ..."}
+      ]
+    },
+    {
+      "id": "A1_L02_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij brakujące słowa: 'Mam na ___ Amir.'",
+      "instruction_en": "Fill in the missing word: 'My ___ is Amir.'",
+      "blanks": [
+        {"sentence_pl": "Mam na ___ Amir.", "answer_pl": "imię"},
+        {"sentence_en": "My ___ is Amir.", "answer_en": "name"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce przy pierwszym spotkaniu zwykle podaje się rękę.",
+    "Zwrot 'Miło mi' jest neutralny i powszechny."
+  ],
+  "audio_meta": {
+    "tracks": ["CD003", "CD004"],
+    "duration_sec": 50
+  }
+}

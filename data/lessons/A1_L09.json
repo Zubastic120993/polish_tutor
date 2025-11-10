@@ -1,0 +1,81 @@
+{
+  "id": "A1_L09",
+  "title": "Mój dzień",
+  "level": "A0",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi opowiedzieć o swoim dniu, używając czasowników codziennych czynności.",
+  "objectives": [
+    "Opowiadanie o swoim dniu",
+    "Używanie czasowników codziennych czynności"
+  ],
+  "vocabulary": [
+    {"pl": "wstawać", "en": "to get up"},
+    {"pl": "jeść śniadanie", "en": "to eat breakfast"},
+    {"pl": "iść do pracy", "en": "to go to work"},
+    {"pl": "wracać do domu", "en": "to return home"},
+    {"pl": "spać", "en": "to sleep"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "present_tense_routines",
+      "title": "Czas teraźniejszy",
+      "content": "Opowiadając o zwyczajach, używamy czasu teraźniejszego: 'Rano wstaję o siódmej', 'Wieczorem oglądam film'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L09_d1",
+      "tutor": "O której wstajesz?",
+      "expected": ["Wstaję o siódmej."],
+      "translation": "What time do you get up?",
+      "hint": "Odpowiedz 'Wstaję o ...'.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L09_d2",
+      "tutor": "Wstaję o siódmej.",
+      "expected": ["Wstaję o ..."],
+      "translation": "I get up at seven.",
+      "hint": "Powtórz i zmień godzinę, jeśli chcesz.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L09_d3",
+      "tutor": "A o której idziesz spać?",
+      "expected": ["Idę spać o ..."],
+      "translation": "And what time do you go to bed?",
+      "hint": "Użyj konstrukcji 'Idę spać o ...'.",
+      "audio": null,
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L09_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Posłuchaj czynności dnia i powtórz.",
+      "instruction_en": "Listen to daily activities and repeat.",
+      "items": ["rano wstaję", "jem śniadanie", "wracam do domu"]
+    },
+    {
+      "id": "A1_L09_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij zdania: 'Rano ___ o siódmej.'",
+      "instruction_en": "Fill in: 'In the morning I ___ at seven.'",
+      "blanks": [
+        {"sentence_pl": "Rano ___ o siódmej.", "answer_pl": "wstaję"},
+        {"sentence_en": "In the evening I ___ at eleven.", "answer_en": "go to bed"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Polacy często pracują od 8:00 do 16:00.",
+    "Zwróć uwagę na szyk: 'O której?', 'O ósmej idę do pracy.'"
+  ],
+  "audio_meta": {
+    "tracks": ["CD017", "CD018"],
+    "duration_sec": 65
+  }
+}

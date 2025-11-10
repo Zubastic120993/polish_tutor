@@ -1,0 +1,87 @@
+{
+  "id": "A1_L05",
+  "title": "Rodzina",
+  "level": "A0",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi nazwać podstawowych członków rodziny i używać zaimków dzierżawczych.",
+  "objectives": [
+    "Nazywanie członków rodziny",
+    "Używanie zaimków dzierżawczych (mój, moja, moi)"
+  ],
+  "vocabulary": [
+    {"pl": "Mama", "en": "Mother"},
+    {"pl": "Tata", "en": "Father"},
+    {"pl": "Brat", "en": "Brother"},
+    {"pl": "Siostra", "en": "Sister"},
+    {"pl": "Dziecko", "en": "Child"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "possessive_pronouns_basic",
+      "title": "Zaimki dzierżawcze: mój / moja / moi",
+      "content": "Użyj 'mój' przed rzeczownikami w rodzaju męskim (mój tata), 'moja' przed żeńskimi (moja mama), a 'moi' przy liczbie mnogiej (moi rodzice)."
+    },
+    {
+      "id": "noun_gender_single",
+      "title": "Rodzaje rzeczowników",
+      "content": "'Brat' jest rodzaju męskiego, 'siostra' żeńskiego, 'dziecko' nijakiego. Zwracaj uwagę na zgodę z zaimkiem dzierżawczym."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L05_d1",
+      "tutor": "To jest moja mama.",
+      "expected": ["To jest moja mama."],
+      "translation": "This is my mother.",
+      "hint": "Użyj 'moja' przed rzeczownikiem żeńskim.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L05_d2",
+      "tutor": "A to jest mój tata.",
+      "expected": ["To jest mój tata."],
+      "translation": "And this is my father.",
+      "hint": "Zaimki dobierz do rodzaju: 'mój tata'.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L05_d3",
+      "tutor": "Mam jednego brata i dwie siostry.",
+      "expected": ["Mam jednego brata i dwie siostry."],
+      "translation": "I have one brother and two sisters.",
+      "hint": "Zwróć uwagę na liczebniki: 'jednego' + dopełniacz.",
+      "audio": null,
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L05_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Posłuchaj i powtórz nazwy członków rodziny.",
+      "instruction_en": "Listen and repeat family member names.",
+      "items": ["Moja mama", "Mój tata", "Mój brat", "Moja siostra"]
+    },
+    {
+      "id": "A1_L05_task_match",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz osoby z ich opisami.",
+      "instruction_en": "Match people with their descriptions.",
+      "pairs": [
+        {"person_pl": "Mama", "description_pl": "moja mama"},
+        {"person_pl": "Tata", "description_pl": "mój tata"},
+        {"person_pl": "Siostra", "description_pl": "moja siostra"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce dorośli również mówią 'mama' i 'tata', a nie 'matka' i 'ojciec' w rozmowach codziennych.",
+    "Rodzina jest częstym tematem small talku – pytanie 'Masz brata lub siostrę?' jest neutralne."
+  ],
+  "audio_meta": {
+    "tracks": ["CD009", "CD010"],
+    "duration_sec": 50
+  }
+}

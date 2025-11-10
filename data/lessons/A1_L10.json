@@ -1,0 +1,87 @@
+{
+  "id": "A1_L10",
+  "title": "Artykuły spożywcze",
+  "level": "A0",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi nazwać podstawowe produkty spożywcze i poprosić o nie w sklepie.",
+  "objectives": [
+    "Nazywanie podstawowych produktów spożywczych",
+    "Używanie liczby mnogiej i rodzajów żywności"
+  ],
+  "vocabulary": [
+    {"pl": "chleb", "en": "bread"},
+    {"pl": "mleko", "en": "milk"},
+    {"pl": "ser", "en": "cheese"},
+    {"pl": "jabłko", "en": "apple"},
+    {"pl": "woda", "en": "water"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "plural_food",
+      "title": "Liczba mnoga produktów",
+      "content": "Twórz liczbę mnogą: 'jabłka', 'bułki', 'pomarańcze'."
+    },
+    {
+      "id": "please_accusative",
+      "title": "Proszę + biernik",
+      "content": "Zamawiając, użyj biernika: 'Proszę chleb', 'Proszę wodę'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L10_d1",
+      "tutor": "Co kupujesz w sklepie?",
+      "expected": ["Kupuję ..."],
+      "translation": "What are you buying in the shop?",
+      "hint": "Wylicz produkty w bierniku.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L10_d2",
+      "tutor": "Kupuję chleb i mleko.",
+      "expected": ["Kupuję chleb i mleko."],
+      "translation": "I’m buying bread and milk.",
+      "hint": "Powtórz i podaj swoje produkty.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L10_d3",
+      "tutor": "Proszę dwa jabłka i ser.",
+      "expected": ["Proszę ..."],
+      "translation": "Two apples and cheese, please.",
+      "hint": "Użyj liczby mnogiej: 'dwa jabłka', 'trzy banany'.",
+      "audio": null,
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L10_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Posłuchaj nazw produktów i powtórz.",
+      "instruction_en": "Listen to food names and repeat.",
+      "items": ["chleb", "mleko", "ser", "jabłko", "woda"]
+    },
+    {
+      "id": "A1_L10_task_match",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz produkt z obrazkiem.",
+      "instruction_en": "Match each product with the picture.",
+      "pairs": [
+        {"product_pl": "chleb", "description_pl": "świeży bochenek"},
+        {"product_pl": "jabłko", "description_pl": "czerwony owoc"},
+        {"product_pl": "woda", "description_pl": "butelka wody"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce większość sklepów spożywczych jest otwarta do 21:00.",
+    "Przy zakupach często mówimy 'proszę' jako formę grzecznościową."
+  ],
+  "audio_meta": {
+    "tracks": ["CD019", "CD020"],
+    "duration_sec": 55
+  }
+}

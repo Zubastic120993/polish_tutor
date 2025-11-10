@@ -1,0 +1,95 @@
+{
+  "id": "A1_L01",
+  "title": "Powitania i pożegnania",
+  "level": "A0",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi powitać i pożegnać rozmówcę w sytuacji formalnej i nieformalnej.",
+  "objectives": [
+    "Poznawanie podstawowych form powitania i pożegnania",
+    "Rozróżnianie sytuacji oficjalnych i nieoficjalnych"
+  ],
+  "vocabulary": [
+    {"pl": "Cześć", "en": "Hi"},
+    {"pl": "Dzień dobry", "en": "Good morning / Good afternoon"},
+    {"pl": "Dobry wieczór", "en": "Good evening"},
+    {"pl": "Do widzenia", "en": "Goodbye"},
+    {"pl": "Pa", "en": "Bye"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "forms_of_address",
+      "title": "Formy grzecznościowe",
+      "content": "Używaj 'pan', 'pani' i 'państwo' w rozmowach formalnych. W relacjach nieformalnych wybierz 'ty'."
+    },
+    {
+      "id": "formal_vs_informal",
+      "title": "Sytuacje oficjalne i nieoficjalne",
+      "content": "Pozdrawiając klienta lub nieznajomego wybierz 'Dzień dobry' / 'Do widzenia'. W gronie znajomych powiedz 'Cześć' lub 'Pa'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L01_d1",
+      "tutor": "Dzień dobry, pani Święto!",
+      "expected": ["Dzień dobry"],
+      "translation": "Good morning, Mrs Święto!",
+      "hint": "Użyj 'Dzień dobry' w sytuacji formalnej.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L01_d2",
+      "tutor": "Dzień dobry, panie Amirze!",
+      "expected": ["Dzień dobry"],
+      "translation": "Good morning, Mr Amir!",
+      "hint": "Przy powitaniach formalnych dodaj 'pan' lub 'pani'.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L01_d3",
+      "tutor": "Do widzenia!",
+      "expected": ["Do widzenia"],
+      "translation": "Goodbye!",
+      "hint": "Zakończ rozmowę formalnie 'Do widzenia'.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L01_d4",
+      "tutor": "Pa!",
+      "expected": ["Pa!"],
+      "translation": "Bye!",
+      "hint": "'Pa' to nieformalna forma pożegnania.",
+      "audio": null,
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L01_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Posłuchaj i powtórz powitania i pożegnania.",
+      "instruction_en": "Listen and repeat greetings and farewells.",
+      "items": ["Dzień dobry", "Do widzenia", "Cześć", "Pa"]
+    },
+    {
+      "id": "A1_L01_task_match",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz powitania z odpowiednimi pożegnaniami.",
+      "instruction_en": "Match greetings with correct farewells.",
+      "pairs": [
+        {"greeting": "Dzień dobry", "farewell": "Do widzenia"},
+        {"greeting": "Cześć", "farewell": "Pa"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce mówimy 'dzień dobry' nawet w sklepie lub windzie.",
+    "'Cześć' używamy tylko w sytuacjach nieformalnych."
+  ],
+  "audio_meta": {
+    "tracks": ["CD001", "CD002"],
+    "duration_sec": 45
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "id": "A1_L15",
+  "title": "Pogoda",
+  "level": "A0",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi opisać podstawowe warunki pogodowe i małą rozmowę o pogodzie.",
+  "objectives": [
+    "Opisywanie pogody",
+    "Używanie czasowników i przymiotników pogodowych"
+  ],
+  "vocabulary": [
+    {"pl": "słońce", "en": "sun"},
+    {"pl": "deszcz", "en": "rain"},
+    {"pl": "wiatr", "en": "wind"},
+    {"pl": "śnieg", "en": "snow"},
+    {"pl": "chmura", "en": "cloud"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "weather_adjectives",
+      "title": "Przymiotniki pogodowe",
+      "content": "Używamy konstrukcji 'Jest ciepło / zimno / słonecznie / pochmurno'."
+    },
+    {
+      "id": "weather_verbs",
+      "title": "Czasowniki pogodowe",
+      "content": "Czas teraźniejszy: 'Pada deszcz', 'Wieje wiatr'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L15_d1",
+      "tutor": "Jaka jest dziś pogoda?",
+      "expected": ["Jest ..."],
+      "translation": "What’s the weather like today?",
+      "hint": "Odpowiedz przymiotnikiem: 'Jest słonecznie'.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L15_d2",
+      "tutor": "Jest słonecznie, ale wieje wiatr.",
+      "expected": ["Jest słonecznie, ale wieje wiatr."],
+      "translation": "It’s sunny but windy.",
+      "hint": "Zwróć uwagę na dwa elementy pogody.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L15_d3",
+      "tutor": "Wczoraj padał deszcz.",
+      "expected": ["Wczoraj padał deszcz."],
+      "translation": "It rained yesterday.",
+      "hint": "Użyj czasu przeszłego dla wczoraj.",
+      "audio": null,
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L15_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Posłuchaj opisów pogody i powtórz.",
+      "instruction_en": "Listen to the weather descriptions and repeat.",
+      "items": ["Jest słonecznie", "Pada deszcz", "Wieje wiatr"]
+    },
+    {
+      "id": "A1_L15_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij zdanie: 'Jest ... i ...'.",
+      "instruction_en": "Complete: 'It is ... and ...'.",
+      "blanks": [
+        {"sentence_pl": "Jest ___ i wieje wiatr.", "answer_pl": "słonecznie"},
+        {"sentence_en": "It is ___ and cloudy.", "answer_en": "cold"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce pogoda zmienia się często – mamy cztery wyraźne pory roku.",
+    "Rozmowa o pogodzie to bezpieczny temat small talku."
+  ],
+  "audio_meta": {
+    "tracks": ["CD029", "CD030"],
+    "duration_sec": 55
+  }
+}

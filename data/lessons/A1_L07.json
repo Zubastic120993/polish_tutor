@@ -1,0 +1,86 @@
+{
+  "id": "A1_L07",
+  "title": "Liczby",
+  "level": "A0",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi liczyć od 1 do 20 i podać numer telefonu.",
+  "objectives": [
+    "Poznanie liczb od 1 do 20",
+    "Rozumienie i zapisywanie numerów telefonu"
+  ],
+  "vocabulary": [
+    {"pl": "jeden", "en": "one"},
+    {"pl": "dwa", "en": "two"},
+    {"pl": "trzy", "en": "three"},
+    {"pl": "cztery", "en": "four"},
+    {"pl": "pięć", "en": "five"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "numbers_basic",
+      "title": "Liczebniki główne 1–20",
+      "content": "Ćwicz wymowę liczb od 1 do 20. Zwróć uwagę na miękkie brzmienia: 'dziewięć', 'dziesięć'."
+    },
+    {
+      "id": "phone_numbers",
+      "title": "Mówienie numerów telefonu",
+      "content": "Numer telefonu czytamy cyframi: 'zero, dziewięć, pięć...'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L07_d1",
+      "tutor": "Jaki masz numer telefonu?",
+      "expected": ["Mój numer to ..."],
+      "translation": "What’s your phone number?",
+      "hint": "Odpowiadaj kolejno cyframi.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L07_d2",
+      "tutor": "Zero siedem, osiem, dziewięć, pięć, cztery, dwa.",
+      "expected": ["Zero siedem, osiem, dziewięć, pięć, cztery, dwa."],
+      "translation": "Zero seven, eight, nine, five, four, two.",
+      "hint": "Powtórz numer powoli.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L07_d3",
+      "tutor": "Dziękuję!",
+      "expected": ["Dziękuję!"],
+      "translation": "Thank you!",
+      "hint": "Zakończ rozmowę grzecznie.",
+      "audio": null,
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L07_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Posłuchaj liczb i powtórz.",
+      "instruction_en": "Listen to the numbers and repeat.",
+      "items": ["jeden", "dwa", "trzy", "cztery", "pięć", "sześć", "siedem", "osiem", "dziewięć", "dziesięć"]
+    },
+    {
+      "id": "A1_L07_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij brakujące liczby w zdaniach.",
+      "instruction_en": "Fill in missing numbers in sentences.",
+      "blanks": [
+        {"sentence_pl": "Mam ___ jabłka.", "answer_pl": "dwa"},
+        {"sentence_en": "I live at number ___.", "answer_en": "five"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Numery telefonów w Polsce mają 9 cyfr.",
+    "Liczby 2, 3, 4 łączymy z mianownikiem: 'dwa domy', 'trzy samochody'."
+  ],
+  "audio_meta": {
+    "tracks": ["CD013", "CD014"],
+    "duration_sec": 55
+  }
+}

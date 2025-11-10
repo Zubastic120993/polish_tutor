@@ -1,0 +1,87 @@
+{
+  "id": "A1_L08",
+  "title": "Dni tygodnia, miesiące i pory roku",
+  "level": "A0",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi nazwać dni tygodnia, miesiące i pory roku oraz określić, kiedy coś się dzieje.",
+  "objectives": [
+    "Nazywanie dni tygodnia i miesięcy",
+    "Określanie pór roku i planowanie zajęć"
+  ],
+  "vocabulary": [
+    {"pl": "poniedziałek", "en": "Monday"},
+    {"pl": "wtorek", "en": "Tuesday"},
+    {"pl": "środa", "en": "Wednesday"},
+    {"pl": "czwartek", "en": "Thursday"},
+    {"pl": "piątek", "en": "Friday"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "days_accusative",
+      "title": "Dni tygodnia w bierniku",
+      "content": "Mówimy 'w poniedziałek', 'we wtorek', 'w środę'."
+    },
+    {
+      "id": "seasons_prepositions",
+      "title": "Pory roku",
+      "content": "Używamy 'latem', 'zimą', 'wiosną', 'jesienią' aby powiedzieć, kiedy coś robimy."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L08_d1",
+      "tutor": "Kiedy masz lekcje polskiego?",
+      "expected": ["We wtorek i w czwartek."],
+      "translation": "When do you have Polish lessons?",
+      "hint": "Pamiętaj o formie 'we wtorek'.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L08_d2",
+      "tutor": "We wtorek i w czwartek.",
+      "expected": ["We wtorek i w czwartek."],
+      "translation": "On Tuesday and Thursday.",
+      "hint": "Powtórz odpowiedź, zwracając uwagę na wymowę.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L08_d3",
+      "tutor": "Latem lubię chodzić nad jezioro.",
+      "expected": ["Latem lubię ..."],
+      "translation": "In summer, I like to go to the lake.",
+      "hint": "Użyj pory roku w narzędniku: 'latem', 'zimą'.",
+      "audio": null,
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L08_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz dni tygodnia.",
+      "instruction_en": "Repeat days of the week.",
+      "items": ["poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota", "niedziela"]
+    },
+    {
+      "id": "A1_L08_task_match",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz miesiące z porami roku.",
+      "instruction_en": "Match months to seasons.",
+      "pairs": [
+        {"month_pl": "styczeń", "season_pl": "zima"},
+        {"month_pl": "czerwiec", "season_pl": "lato"},
+        {"month_pl": "październik", "season_pl": "jesień"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce tydzień zaczyna się od poniedziałku.",
+    "Nazwy dni i miesięcy piszemy małą literą."
+  ],
+  "audio_meta": {
+    "tracks": ["CD015", "CD016"],
+    "duration_sec": 60
+  }
+}

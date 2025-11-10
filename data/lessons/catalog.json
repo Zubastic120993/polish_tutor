@@ -1,0 +1,462 @@
+{
+  "course_title": "Polski na dobry start (A1)",
+  "publisher": "Universitas / Beata Jędryka et al.",
+  "meta": {
+    "levels": [
+      "A0",
+      "A1"
+    ],
+    "total_lessons": 60,
+    "source": "Polski na dobry start podręcznik",
+    "status": "draft",
+    "notes": "Lesson content pending transcription from textbook sessions."
+  },
+  "parts": [
+    {
+      "id": "part_1",
+      "title": "Kurs wstępny – Pierwsze spotkanie",
+      "hours": 40,
+      "total_lessons": 20,
+      "lessons": [
+        {
+          "id": "A1_L01",
+          "title_pl": "Powitania i pożegnania",
+          "title_en": "Greetings and farewells",
+          "status": "in_progress"
+        },
+        {
+          "id": "A1_L02",
+          "title_pl": "Przedstawianie się",
+          "title_en": "Introducing oneself",
+          "status": "in_progress"
+        },
+        {
+          "id": "A1_L03",
+          "title_pl": "Pochodzenie",
+          "title_en": "Country of origin",
+          "status": "in_progress"
+        },
+        {
+          "id": "A1_L04",
+          "title_pl": "Samopoczucie",
+          "title_en": "Feelings / How are you",
+          "status": "in_progress"
+        },
+        {
+          "id": "A1_L05",
+          "title_pl": "Rodzina",
+          "title_en": "Family",
+          "status": "in_progress"
+        },
+        {
+          "id": "A1_L06",
+          "title_pl": "Zawody i zajęcia",
+          "title_en": "Occupations",
+          "status": "in_progress"
+        },
+        {
+          "id": "A1_L07",
+          "title_pl": "Liczby",
+          "title_en": "Numbers",
+          "status": "in_progress"
+        },
+        {
+          "id": "A1_L08",
+          "title_pl": "Dni tygodnia, miesiące i pory roku",
+          "title_en": "Days, months and seasons",
+          "status": "in_progress"
+        },
+        {
+          "id": "A1_L09",
+          "title_pl": "Mój dzień",
+          "title_en": "My day",
+          "status": "in_progress"
+        },
+        {
+          "id": "A1_L10",
+          "title_pl": "Artykuły spożywcze",
+          "title_en": "Food items",
+          "status": "in_progress"
+        },
+        {
+          "id": "A1_L11",
+          "title_pl": "Zakupy i pieniądze",
+          "title_en": "Shopping and money",
+          "status": "in_progress"
+        },
+        {
+          "id": "A1_L12",
+          "title_pl": "Przy stole",
+          "title_en": "At the table",
+          "status": "in_progress"
+        },
+        {
+          "id": "A1_L13",
+          "title_pl": "Ciało",
+          "title_en": "Body parts",
+          "status": "in_progress"
+        },
+        {
+          "id": "A1_L14",
+          "title_pl": "U lekarza",
+          "title_en": "At the doctor",
+          "status": "in_progress"
+        },
+        {
+          "id": "A1_L15",
+          "title_pl": "Pogoda",
+          "title_en": "Weather",
+          "status": "in_progress"
+        },
+        {
+          "id": "A1_L16",
+          "title_pl": "Ubrania",
+          "title_en": "Clothes",
+          "status": "pending"
+        },
+        {
+          "id": "A1_L17",
+          "title_pl": "Mieszkanie",
+          "title_en": "Housing",
+          "status": "pending"
+        },
+        {
+          "id": "A1_L18",
+          "title_pl": "W mieście",
+          "title_en": "Around the city",
+          "status": "pending"
+        },
+        {
+          "id": "A1_L19",
+          "title_pl": "Środki transportu",
+          "title_en": "Transport",
+          "status": "pending"
+        },
+        {
+          "id": "A1_L20",
+          "title_pl": "Czas wolny",
+          "title_en": "Free time",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "part_2",
+      "title": "Kurs podstawowy – Z polskim na co dzień",
+      "hours": 180,
+      "total_modules": 10,
+      "modules": [
+        {
+          "id": "M1",
+          "title_pl": "Poznajmy się",
+          "title_en": "Let's get to know each other",
+          "lessons": [
+            {
+              "id": "A1_L21",
+              "title_pl": "Dzień dobry!",
+              "title_en": "Good morning!",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L22",
+              "title_pl": "Jestem…",
+              "title_en": "I am…",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L23",
+              "title_pl": "Mieszkam w…",
+              "title_en": "I live in…",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L24",
+              "title_pl": "Co to jest?",
+              "title_en": "What is this?",
+              "status": "pending"
+            }
+          ]
+        },
+        {
+          "id": "M2",
+          "title_pl": "Moja rodzina",
+          "title_en": "My family",
+          "lessons": [
+            {
+              "id": "A1_L25",
+              "title_pl": "Kto to jest?",
+              "title_en": "Who is this?",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L26",
+              "title_pl": "Jaki on jest?",
+              "title_en": "What is he like?",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L27",
+              "title_pl": "Kim on jest?",
+              "title_en": "Who is he?",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L28",
+              "title_pl": "Gdzie on pracuje?",
+              "title_en": "Where does he work?",
+              "status": "pending"
+            }
+          ]
+        },
+        {
+          "id": "M3",
+          "title_pl": "Robię zakupy",
+          "title_en": "Shopping",
+          "lessons": [
+            {
+              "id": "A1_L29",
+              "title_pl": "Gdzie jest piekarnia?",
+              "title_en": "Where is the bakery?",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L30",
+              "title_pl": "Proszę chleb i bułkę",
+              "title_en": "Bread and rolls, please",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L31",
+              "title_pl": "Ile kosztuje…",
+              "title_en": "How much does it cost…",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L32",
+              "title_pl": "Warzywa i owoce",
+              "title_en": "Vegetables and fruits",
+              "status": "pending"
+            }
+          ]
+        },
+        {
+          "id": "M4",
+          "title_pl": "Smacznego",
+          "title_en": "Bon appétit",
+          "lessons": [
+            {
+              "id": "A1_L33",
+              "title_pl": "Śniadanie w barze",
+              "title_en": "Breakfast at the bar",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L34",
+              "title_pl": "Obiad w restauracji",
+              "title_en": "Lunch in a restaurant",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L35",
+              "title_pl": "Kolacja w domu",
+              "title_en": "Dinner at home",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L36",
+              "title_pl": "Na wynos",
+              "title_en": "Takeaway",
+              "status": "pending"
+            }
+          ]
+        },
+        {
+          "id": "M5",
+          "title_pl": "Moje mieszkanie",
+          "title_en": "My home",
+          "lessons": [
+            {
+              "id": "A1_L37",
+              "title_pl": "Dom czy mieszkanie?",
+              "title_en": "House or apartment?",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L38",
+              "title_pl": "Meble",
+              "title_en": "Furniture",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L39",
+              "title_pl": "Chcę wynająć mieszkanie",
+              "title_en": "I want to rent a flat",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L40",
+              "title_pl": "Okolica",
+              "title_en": "Neighborhood",
+              "status": "pending"
+            }
+          ]
+        },
+        {
+          "id": "M6",
+          "title_pl": "Dzień za dniem",
+          "title_en": "Day by day",
+          "lessons": [
+            {
+              "id": "A1_L41",
+              "title_pl": "Która godzina?",
+              "title_en": "What time is it?",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L42",
+              "title_pl": "Najpierw kawa, potem prysznic",
+              "title_en": "First coffee, then shower",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L43",
+              "title_pl": "O której zaczynasz pracę?",
+              "title_en": "What time do you start work?",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L44",
+              "title_pl": "Co robisz w weekend?",
+              "title_en": "What do you do on weekends?",
+              "status": "pending"
+            }
+          ]
+        },
+        {
+          "id": "M7",
+          "title_pl": "Poproszę bilet do Wrocławia",
+          "title_en": "A ticket to Wrocław, please",
+          "lessons": [
+            {
+              "id": "A1_L45",
+              "title_pl": "Czym jeździsz do pracy?",
+              "title_en": "How do you get to work?",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L46",
+              "title_pl": "Gdzie mogę kupić bilet?",
+              "title_en": "Where can I buy a ticket?",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L47",
+              "title_pl": "Gdzie byłeś wczoraj?",
+              "title_en": "Where were you yesterday?",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L48",
+              "title_pl": "Co robiłeś w styczniu?",
+              "title_en": "What did you do in January?",
+              "status": "pending"
+            }
+          ]
+        },
+        {
+          "id": "M8",
+          "title_pl": "Ach, ta pogoda!",
+          "title_en": "Oh, that weather!",
+          "lessons": [
+            {
+              "id": "A1_L49",
+              "title_pl": "Deszcz ze śniegiem",
+              "title_en": "Rain and snow",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L50",
+              "title_pl": "Jesienią mam zawsze parasol",
+              "title_en": "In autumn, I always have an umbrella",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L51",
+              "title_pl": "Boli mnie głowa",
+              "title_en": "I have a headache",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L52",
+              "title_pl": "Od internisty do specjalisty",
+              "title_en": "From GP to specialist",
+              "status": "pending"
+            }
+          ]
+        },
+        {
+          "id": "M9",
+          "title_pl": "Szukam pracy",
+          "title_en": "Looking for work",
+          "lessons": [
+            {
+              "id": "A1_L53",
+              "title_pl": "Zatrudnię…",
+              "title_en": "Help wanted…",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L54",
+              "title_pl": "Umiem szybko pisać",
+              "title_en": "I can type fast",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L55",
+              "title_pl": "Jakie ma pan doświadczenie?",
+              "title_en": "What experience do you have?",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L56",
+              "title_pl": "Od kiedy mogę zacząć pracę?",
+              "title_en": "When can I start work?",
+              "status": "pending"
+            }
+          ]
+        },
+        {
+          "id": "M10",
+          "title_pl": "Dzieci idą do szkoły",
+          "title_en": "Children go to school",
+          "lessons": [
+            {
+              "id": "A1_L57",
+              "title_pl": "Polska edukacja",
+              "title_en": "Polish education",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L58",
+              "title_pl": "Pierwszy dzień w szkole",
+              "title_en": "First day at school",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L59",
+              "title_pl": "Praca domowa",
+              "title_en": "Homework",
+              "status": "pending"
+            },
+            {
+              "id": "A1_L60",
+              "title_pl": "Dzienniczek ucznia",
+              "title_en": "Student's journal",
+              "status": "pending"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

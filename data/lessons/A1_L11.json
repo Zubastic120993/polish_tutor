@@ -1,0 +1,86 @@
+{
+  "id": "A1_L11",
+  "title": "Zakupy i pieniądze",
+  "level": "A0",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi zapytać o cenę, zrozumieć odpowiedź i poprosić o produkt w sklepie.",
+  "objectives": [
+    "Kupowanie produktów w sklepie",
+    "Rozumienie i stosowanie cen w złotych i groszach"
+  ],
+  "vocabulary": [
+    {"pl": "sklep", "en": "shop"},
+    {"pl": "kasa", "en": "checkout"},
+    {"pl": "rachunek", "en": "bill / receipt"},
+    {"pl": "drogi / tani", "en": "expensive / cheap"},
+    {"pl": "reszta", "en": "change (money)"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "ask_price",
+      "title": "Pytanie o cenę",
+      "content": "Użyj zwrotów 'Ile to kosztuje?' oraz 'Ile kosztuje ...?'."
+    },
+    {
+      "id": "currency_expressions",
+      "title": "Wyrażenia walutowe",
+      "content": "1 złoty = 100 groszy. Odpowiadamy np. 'trzy złote pięćdziesiąt'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L11_d1",
+      "tutor": "Dzień dobry, ile kosztuje chleb?",
+      "expected": ["Ile kosztuje ...?"],
+      "translation": "Good morning, how much is the bread?",
+      "hint": "Zacznij pytanie od 'Ile kosztuje'.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L11_d2",
+      "tutor": "Trzy złote pięćdziesiąt.",
+      "expected": ["Trzy złote pięćdziesiąt."],
+      "translation": "Three zloty fifty.",
+      "hint": "Powtórz cenę z groszami.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L11_d3",
+      "tutor": "Poproszę dwa chleby.",
+      "expected": ["Poproszę ..."],
+      "translation": "Two breads, please.",
+      "hint": "Użyj 'Poproszę' + biernik.",
+      "audio": null,
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L11_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Posłuchaj i powtórz pytania o ceny.",
+      "instruction_en": "Listen and repeat questions about prices.",
+      "items": ["Ile to kosztuje?", "Ile kosztuje chleb?", "Poproszę rachunek."]
+    },
+    {
+      "id": "A1_L11_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Ile ___ kosztuje?'",
+      "instruction_en": "Fill in: 'How much ___?'",
+      "blanks": [
+        {"sentence_pl": "Ile ___ kosztuje?", "answer_pl": "to"},
+        {"sentence_en": "How much ___?", "answer_en": "is this"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Polska waluta to złoty (PLN). 1 złoty = 100 groszy.",
+    "W małych sklepach często można płacić tylko gotówką."
+  ],
+  "audio_meta": {
+    "tracks": ["CD021", "CD022"],
+    "duration_sec": 60
+  }
+}

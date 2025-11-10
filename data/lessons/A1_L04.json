@@ -1,0 +1,81 @@
+{
+  "id": "A1_L04",
+  "title": "Samopoczucie",
+  "level": "A0",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi zapytać o samopoczucie i odpowiedzieć na podstawowym poziomie.",
+  "objectives": [
+    "Wyrażanie samopoczucia",
+    "Rozumienie podstawowych zwrotów emocjonalnych"
+  ],
+  "vocabulary": [
+    {"pl": "Jak się masz?", "en": "How are you?"},
+    {"pl": "Dobrze", "en": "Good"},
+    {"pl": "Świetnie", "en": "Great"},
+    {"pl": "Tak sobie", "en": "So-so"},
+    {"pl": "Źle", "en": "Bad"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "adjectives_m_f",
+      "title": "Przymiotniki w rodzaju męskim i żeńskim",
+      "content": "Powiedz 'zmęczony' kiedy mówisz o mężczyźnie i 'zmęczona' o kobiecie. Podobnie 'zadowolony' / 'zadowolona'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L04_d1",
+      "tutor": "Cześć, Amir! Jak się masz?",
+      "expected": ["Dobrze", "Świetnie", "Tak sobie", "Źle"],
+      "translation": "Hi, Amir! How are you?",
+      "hint": "Odpowiedz jednym słowem, np. 'Dobrze'.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L04_d2",
+      "tutor": "Dobrze, dziękuję. A ty?",
+      "expected": ["Świetnie!", "Tak sobie."],
+      "translation": "Good, thanks. And you?",
+      "hint": "Wybierz odpowiedź pasującą do twojego nastroju.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L04_d3",
+      "tutor": "Świetnie!",
+      "expected": ["Świetnie!"],
+      "translation": "Great!",
+      "hint": "Powtórz entuzjastycznie 'Świetnie!'.",
+      "audio": null,
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L04_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Posłuchaj i powtórz zwroty.",
+      "instruction_en": "Listen and repeat phrases.",
+      "items": ["Jak się masz?", "Dobrze", "Świetnie"]
+    },
+    {
+      "id": "A1_L04_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij brakujące słowo: 'Jak się ___?'",
+      "instruction_en": "Fill in the missing word: 'How ___ you?'",
+      "blanks": [
+        {"sentence_pl": "Jak się ___?", "answer_pl": "masz"},
+        {"sentence_en": "How ___ you?", "answer_en": "are"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Zwykle odpowiada się krótko: 'Dobrze, dziękuję.'",
+    "Nie rozwijamy szczegółów w small talku – wystarczy jedno słowo."
+  ],
+  "audio_meta": {
+    "tracks": ["CD007", "CD008"],
+    "duration_sec": 45
+  }
+}

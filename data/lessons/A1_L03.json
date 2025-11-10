@@ -1,0 +1,86 @@
+{
+  "id": "A1_L03",
+  "title": "Pochodzenie",
+  "level": "A0",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi zapytać o kraj pochodzenia i odpowiedzieć na takie pytanie.",
+  "objectives": [
+    "Mówienie o kraju pochodzenia i narodowości",
+    "Zadawanie pytań: Skąd jesteś?"
+  ],
+  "vocabulary": [
+    {"pl": "Skąd jesteś?", "en": "Where are you from?"},
+    {"pl": "Jestem z Polski", "en": "I’m from Poland"},
+    {"pl": "Jestem z Egiptu", "en": "I’m from Egypt"},
+    {"pl": "Polak / Polka", "en": "Pole (male/female)"},
+    {"pl": "Egipcjanin / Egipcjanka", "en": "Egyptian (male/female)"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "origin_genitive",
+      "title": "Jestem z + dopełniacz",
+      "content": "Kiedy mówisz skąd jesteś, użyj konstrukcji 'Jestem z ...' i dopełniacza: 'Jestem z Polski', 'Jestem z Egiptu'."
+    },
+    {
+      "id": "nationality_gender",
+      "title": "Narodowość – rodzaj żeński i męski",
+      "content": "'Polak' – mężczyzna z Polski, 'Polka' – kobieta. Podobnie: 'Egipcjanin' / 'Egipcjanka'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L03_d1",
+      "tutor": "Skąd jesteś, Amir?",
+      "expected": ["Jestem z ..."],
+      "translation": "Where are you from, Amir?",
+      "hint": "Odpowiedź rozpocznij od 'Jestem z ...'.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L03_d2",
+      "tutor": "Jestem z Egiptu. A ty?",
+      "expected": ["Jestem z ..."],
+      "translation": "I’m from Egypt. And you?",
+      "hint": "Dodaj swój kraj w dopełniaczu.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L03_d3",
+      "tutor": "Jestem z Polski.",
+      "expected": ["Jestem z Polski."],
+      "translation": "I’m from Poland.",
+      "hint": "Użyj poprawnej formy kraju.",
+      "audio": null,
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L03_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Posłuchaj i powtórz pytania o pochodzenie.",
+      "instruction_en": "Listen and repeat questions about origin.",
+      "items": ["Skąd jesteś?", "Jestem z ..."]
+    },
+    {
+      "id": "A1_L03_task_match",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz kraj z narodowością.",
+      "instruction_en": "Match the country with nationality.",
+      "pairs": [
+        {"country_pl": "Polska", "nationality_pl": "Polak / Polka"},
+        {"country_pl": "Egipt", "nationality_pl": "Egipcjanin / Egipcjanka"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Polacy często pytają 'Skąd jesteś?' z ciekawości, nie z formalności.",
+    "Nazwy narodowości zapisujemy małą literą, np. 'polak', 'egipcjanin'."
+  ],
+  "audio_meta": {
+    "tracks": ["CD005", "CD006"],
+    "duration_sec": 60
+  }
+}

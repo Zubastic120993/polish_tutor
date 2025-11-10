@@ -1,0 +1,87 @@
+{
+  "id": "A1_L06",
+  "title": "Zawody i zajęcia",
+  "level": "A0",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi powiedzieć kim jest z zawodu oraz rozpoznać podstawowe profesje.",
+  "objectives": [
+    "Rozpoznawanie i nazywanie zawodów",
+    "Używanie konstrukcji 'Jestem + zawód'"
+  ],
+  "vocabulary": [
+    {"pl": "Lekarz / Lekarka", "en": "Doctor"},
+    {"pl": "Nauczyciel / Nauczycielka", "en": "Teacher"},
+    {"pl": "Kucharz / Kucharka", "en": "Cook"},
+    {"pl": "Student / Studentka", "en": "Student"},
+    {"pl": "Kierowca", "en": "Driver"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "profession_instrumental",
+      "title": "Jestem + narzędnik",
+      "content": "Po czasowniku 'być' użyj narzędnika: 'Jestem lekarzem', 'Jestem nauczycielką'."
+    },
+    {
+      "id": "profession_gender",
+      "title": "Formy męskie i żeńskie",
+      "content": "Coraz częściej używamy form żeńskich: 'lekarka', 'nauczycielka', 'kucharka'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L06_d1",
+      "tutor": "Kim jesteś?",
+      "expected": ["Jestem ..."],
+      "translation": "Who are you (by profession)?",
+      "hint": "Odpowiedź zacznij od 'Jestem ...'.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L06_d2",
+      "tutor": "Jestem nauczycielem.",
+      "expected": ["Jestem nauczycielem."],
+      "translation": "I’m a teacher.",
+      "hint": "Dla mężczyzny powiedz 'nauczycielem', dla kobiety 'nauczycielką'.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L06_d3",
+      "tutor": "A ja jestem lekarzem.",
+      "expected": ["Jestem lekarzem."],
+      "translation": "And I’m a doctor.",
+      "hint": "Zawody w narzędniku kończą się na '-em' lub '-ą'.",
+      "audio": null,
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L06_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Posłuchaj nazw zawodów i powtórz.",
+      "instruction_en": "Listen to the names of professions and repeat.",
+      "items": ["Jestem lekarzem", "Jestem nauczycielką", "Jestem studentem"]
+    },
+    {
+      "id": "A1_L06_task_match",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz zawód z obrazkiem.",
+      "instruction_en": "Match the profession with the correct picture.",
+      "pairs": [
+        {"profession_pl": "Lekarz", "description_pl": "leczy pacjentów"},
+        {"profession_pl": "Kucharz", "description_pl": "gotuje jedzenie"},
+        {"profession_pl": "Student", "description_pl": "uczy się na uniwersytecie"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce forma żeńska zawodów jest coraz częściej używana: 'lekarka', 'nauczycielka'.",
+    "Pytanie 'Kim jesteś?' można rozumieć jako pytanie o zawód lub rolę społeczną."
+  ],
+  "audio_meta": {
+    "tracks": ["CD011", "CD012"],
+    "duration_sec": 50
+  }
+}

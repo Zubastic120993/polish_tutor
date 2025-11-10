@@ -1,0 +1,87 @@
+{
+  "id": "A1_L12",
+  "title": "Przy stole",
+  "level": "A0",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi poprosić o sztućce i podziękować za posiłek.",
+  "objectives": [
+    "Nazywanie potraw i naczyń",
+    "Używanie zwrotów w restauracji"
+  ],
+  "vocabulary": [
+    {"pl": "widelec", "en": "fork"},
+    {"pl": "nóż", "en": "knife"},
+    {"pl": "łyżka", "en": "spoon"},
+    {"pl": "talerz", "en": "plate"},
+    {"pl": "szklanka", "en": "glass"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "accusative_tableware",
+      "title": "Biernik z 'poproszę'",
+      "content": "Mówimy 'Poproszę łyżkę', 'Poproszę widelec'. Rzeczowniki przechodzą w biernik."
+    },
+    {
+      "id": "restaurant_phrases",
+      "title": "Zwroty w restauracji",
+      "content": "Używaj 'Proszę rachunek', 'Dziękuję, było pyszne!'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L12_d1",
+      "tutor": "Kelnerze, poproszę łyżkę.",
+      "expected": ["Poproszę łyżkę."],
+      "translation": "Waiter, a spoon please.",
+      "hint": "Dopasuj biernik: 'łyżkę'.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L12_d2",
+      "tutor": "Proszę bardzo. Smacznego!",
+      "expected": ["Smacznego!", "Dziękuję!"],
+      "translation": "Here you are. Enjoy your meal!",
+      "hint": "Odpowiedz 'Dziękuję' lub 'Smacznego'.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L12_d3",
+      "tutor": "Dziękuję, było pyszne!",
+      "expected": ["Dziękuję, było pyszne!"],
+      "translation": "Thank you, it was delicious!",
+      "hint": "Wyraź wdzięczność po posiłku.",
+      "audio": null,
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L12_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz dialog z kelnerem.",
+      "instruction_en": "Repeat the dialogue with the waiter.",
+      "items": ["Poproszę widelec", "Proszę rachunek"]
+    },
+    {
+      "id": "A1_L12_task_match",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz naczynie z jego nazwą.",
+      "instruction_en": "Match each utensil to its name.",
+      "pairs": [
+        {"item_pl": "łyżka", "description_pl": "Do zupy"},
+        {"item_pl": "widelec", "description_pl": "Do dania głównego"},
+        {"item_pl": "szklanka", "description_pl": "Do napoju"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce zwykle mówimy 'smacznego' przed posiłkiem.",
+    "Rachunek w restauracji przynosi się dopiero na prośbę klienta."
+  ],
+  "audio_meta": {
+    "tracks": ["CD023", "CD024"],
+    "duration_sec": 55
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "id": "A1_L14",
+  "title": "U lekarza",
+  "level": "A0",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi opisać problem zdrowotny i zrozumieć proste polecenia lekarza.",
+  "objectives": [
+    "Opis problemów zdrowotnych",
+    "Prowadzenie krótkiej rozmowy u lekarza"
+  ],
+  "vocabulary": [
+    {"pl": "ból", "en": "pain"},
+    {"pl": "tabletka", "en": "pill"},
+    {"pl": "recepta", "en": "prescription"},
+    {"pl": "lekarz", "en": "doctor"},
+    {"pl": "apteka", "en": "pharmacy"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "bolec_conjugation",
+      "title": "Czasownik 'boleć'",
+      "content": "Odmiana: 'boli mnie' (jedna część ciała), 'bolą mnie' (więcej części ciała)."
+    },
+    {
+      "id": "imperative_doctor",
+      "title": "Polecenia lekarza",
+      "content": "Tryb rozkazujący: 'Proszę otworzyć usta', 'Proszę oddychać'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L14_d1",
+      "tutor": "Dzień dobry, co pani dolega?",
+      "expected": ["Boli mnie ..."],
+      "translation": "Good morning, what’s wrong?",
+      "hint": "Odpowiedz 'Boli mnie ...'.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L14_d2",
+      "tutor": "Boli mnie gardło i mam gorączkę.",
+      "expected": ["Boli mnie gardło i mam gorączkę."],
+      "translation": "My throat hurts and I have a fever.",
+      "hint": "Wymień objawy po kolei.",
+      "audio": null,
+      "options": []
+    },
+    {
+      "id": "A1_L14_d3",
+      "tutor": "Proszę otworzyć usta. Ma pani anginę.",
+      "expected": ["Proszę otworzyć usta."],
+      "translation": "Please open your mouth. You have tonsillitis.",
+      "hint": "Zapamiętaj polecenia lekarza.",
+      "audio": null,
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L14_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz dialog pacjent-lekarz.",
+      "instruction_en": "Repeat the patient–doctor dialogue.",
+      "items": ["Boli mnie głowa", "Mam gorączkę"]
+    },
+    {
+      "id": "A1_L14_task_match",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz objaw z częścią ciała.",
+      "instruction_en": "Match the symptom to the body part.",
+      "pairs": [
+        {"symptom_pl": "ból głowy", "body_pl": "głowa"},
+        {"symptom_pl": "ból gardła", "body_pl": "gardło"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce lekarz rodzinny wystawia skierowanie do specjalisty.",
+    "Apteki są otwarte zazwyczaj od 8:00 do 20:00."
+  ],
+  "audio_meta": {
+    "tracks": ["CD027", "CD028"],
+    "duration_sec": 70
+  }
+}
