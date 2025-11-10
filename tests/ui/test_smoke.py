@@ -49,3 +49,32 @@ def test_helper_buttons_present(page, app_base_url):
 
     # Settings button doubles as theme/preferences entry point
     expect(page.locator("#settings-button")).to_be_visible()
+
+
+def test_voice_flow_controls(page, app_base_url):
+    """Ensure the voice controls are accessible for voice-only practice."""
+    _goto_home(page, app_base_url)
+
+    mic = page.locator("#mic-button")
+    expect(mic).to_have_attribute("aria-label", re.compile("voice input", re.IGNORECASE))
+    expect(page.locator("#floating-hint-text")).to_contain_text("Speak or type")
+
+
+def test_text_input_flow(page, app_base_url):
+    """Simulate the text-only flow by enabling the input and typing."""
+    _goto_home(page, app_base_url)
+
+    # Enable the input/send button to simulate an active lesson
+    page.locator("#message-input").evaluate("el => el.removeAttribute('disabled')")
+    page.locator("#send-button").evaluate("el => el.removeAttribute('disabled')")
+
+    page.fill("#message-input", "To jest test.")
+    expect(page.locator("#message-input")).to_have_value("To jest test.")
+
+
+def test_branch_navigation_guidance(page, app_base_url):
+    """Verify the lesson select/branch navigation controls are visible."""
+    _goto_home(page, app_base_url)
+
+    expect(page.locator("#lesson-catalog-select")).to_be_visible()
+    expect(page.locator("#lesson-library-title")).to_have_text("Lesson Library")
