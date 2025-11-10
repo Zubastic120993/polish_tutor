@@ -292,7 +292,17 @@ class Database:
             )
             if limit:
                 query = query.limit(limit)
-            return query.all()
+            attempts = query.all()
+            for attempt in attempts:
+                # Access scalar attributes before the session closes
+                _ = attempt.id
+                _ = attempt.phrase_id
+                _ = attempt.user_input
+                _ = attempt.score
+                _ = attempt.feedback_type
+                _ = attempt.created_at
+                session.expunge(attempt)
+            return attempts
 
     def get_phrase_attempts(self, phrase_id: str, limit: Optional[int] = None) -> List[Attempt]:
         """Get all attempts for a phrase."""
@@ -302,7 +312,16 @@ class Database:
             )
             if limit:
                 query = query.limit(limit)
-            return query.all()
+            attempts = query.all()
+            for attempt in attempts:
+                _ = attempt.id
+                _ = attempt.user_id
+                _ = attempt.user_input
+                _ = attempt.score
+                _ = attempt.feedback_type
+                _ = attempt.created_at
+                session.expunge(attempt)
+            return attempts
 
     def update_attempt(self, attempt_id: int, **kwargs) -> Optional[Attempt]:
         """Update attempt."""

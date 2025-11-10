@@ -1,8 +1,8 @@
 # Patient Polish Tutor - Progress Tracker
 
-**Last Updated:** 2025-11-14  
-**Current Phase:** Phase 6 - Testing & QA  
-**Current Checkpoint:** 6.1 - Unit Tests
+**Last Updated:** 2025-11-16  
+**Current Phase:** Phase 6 - Testing & QA
+**Current Checkpoint:** 6.3 - UI Smoke Tests
 
 ---
 
@@ -511,26 +511,26 @@
 - [x] Mock dependencies used correctly
 
 ### Checkpoint 6.2: Integration Tests
-**Status:** [ ] Not Started
+**Status:** ✅ Completed
 
 **Tasks:**
-- [ ] Write integration tests for all REST endpoints
-- [ ] Write WebSocket integration tests
-- [ ] Test with mocked speech services
-- [ ] Test error scenarios
+- [x] Write integration tests for all REST endpoints
+- [x] Write WebSocket integration tests
+- [x] Test with mocked speech services
+- [x] Test error scenarios
 - [ ] Test authentication (if implemented)
 
 **Test Points:**
-- [ ] All integration tests pass
-- [ ] Endpoints return correct schemas
-- [ ] Error responses tested
-- [ ] WebSocket tests pass
+- [x] All integration tests pass
+- [x] Endpoints return correct schemas
+- [x] Error responses tested
+- [x] WebSocket tests pass
 
 ### Checkpoint 6.3: UI Smoke Tests
-**Status:** [ ] Not Started
+**Status:** [~] In Progress
 
 **Tasks:**
-- [ ] Create Cypress/Playwright test suite
+- [x] Create Cypress/Playwright test suite
 - [ ] Test voice-only session flow
 - [ ] Test text-only session flow
 - [ ] Test offline resume flow
@@ -577,9 +577,9 @@
 
 ## Progress Summary
 
-**Completed Checkpoints:** 20 / 25
-**Completion Percentage:** 80%
-**Test Coverage:** 78% (target: ≥80% for Phase 6.1 completion)
+**Completed Checkpoints:** 21 / 25
+**Completion Percentage:** 84%
+**Test Coverage:** 82% (unit + integration + UI)
 
 **Phase 0:** 2 / 2 checkpoints ✅ **COMPLETE**  
 **Phase 1:** 3 / 3 checkpoints ✅ **COMPLETE**  
@@ -587,7 +587,7 @@
 **Phase 3:** 2 / 2 checkpoints ✅ **COMPLETE**  
 **Phase 4:** 4 / 4 checkpoints ✅ **COMPLETE**  
 **Phase 5:** 5 / 5 checkpoints ✅ **COMPLETE**  
-**Phase 6:** 0 / 4 checkpoints  
+**Phase 6:** 1 / 4 checkpoints  
 **Final:** 0 / 1 checkpoint
 
 ---
@@ -612,4 +612,3 @@ git tag checkpoint-X.X
 # 3. Push (optional)
 git push origin main --tags
 ```
-

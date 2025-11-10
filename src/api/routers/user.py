@@ -27,10 +27,10 @@ async def user_stats(user_id: int = Query(..., description="User ID", gt=0)):
         
         # Get all attempts for user
         attempts = database.get_user_attempts(user_id)
-        
+
         # Calculate statistics
         total_attempts = len(attempts)
-        
+
         if total_attempts == 0:
             return {
                 "status": "success",
@@ -44,9 +44,10 @@ async def user_stats(user_id: int = Query(..., description="User ID", gt=0)):
                     "accuracy_trend": [],
                 }
             }
-        
-        # Calculate average accuracy
-        total_score = sum(attempt.score for attempt in attempts if attempt.score is not None)
+
+        # Extract scores immediately while session is active
+        attempt_scores = [attempt.score for attempt in attempts if attempt.score is not None]
+        total_score = sum(attempt_scores)
         average_accuracy = (total_score / total_attempts) * 100 if total_attempts > 0 else 0.0
         
         # Calculate study time (estimate: 1 minute per 5 attempts)

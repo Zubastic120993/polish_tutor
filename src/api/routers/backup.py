@@ -36,22 +36,25 @@ async def backup_export(
         lesson_progress = database.get_user_progresses(user_id)
         srs_memories = database.get_user_srs_memories(user_id)
         settings_list = database.get_user_settings(user_id)
-        
+
+        # Extract data while session is active
+        attempts_data = [
+            {
+                "id": a.id,
+                "phrase_id": a.phrase_id,
+                "user_input": a.user_input,
+                "score": a.score,
+                "feedback_type": a.feedback_type,
+                "created_at": a.created_at.isoformat() + "Z" if a.created_at else None,
+            }
+            for a in attempts
+        ]
+
         # Format data
         backup_data = {
             "user_id": user_id,
             "export_date": datetime.utcnow().isoformat() + "Z",
-            "attempts": [
-                {
-                    "id": a.id,
-                    "phrase_id": a.phrase_id,
-                    "user_input": a.user_input,
-                    "score": a.score,
-                    "feedback_type": a.feedback_type,
-                    "created_at": a.created_at.isoformat() + "Z" if a.created_at else None,
-                }
-                for a in attempts
-            ],
+            "attempts": attempts_data,
             "lesson_progress": [
                 {
                     "lesson_id": lp.lesson_id,

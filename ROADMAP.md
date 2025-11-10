@@ -578,17 +578,17 @@ This roadmap breaks down the Phase 1 implementation into 5 major phases with cle
 **Goal:** API endpoints tested
 
 **Tasks:**
-- [ ] Write integration tests for all REST endpoints
-- [ ] Write WebSocket integration tests
-- [ ] Test with mocked speech services
-- [ ] Test error scenarios
+- [x] Write integration tests for all REST endpoints
+- [x] Write WebSocket integration tests
+- [x] Test with mocked speech services
+- [x] Test error scenarios
 - [ ] Test authentication (if implemented)
 
 **Test Points:**
-- [ ] All integration tests pass
-- [ ] Endpoints return correct schemas
-- [ ] Error responses tested
-- [ ] WebSocket tests pass
+- [x] All integration tests pass
+- [x] Endpoints return correct schemas
+- [x] Error responses tested
+- [x] WebSocket tests pass
 
 **Acceptance Criteria:**
 - Integration tests pass (Definition of Done)
@@ -600,7 +600,7 @@ This roadmap breaks down the Phase 1 implementation into 5 major phases with cle
 **Goal:** End-to-end UI flows tested
 
 **Tasks:**
-- [ ] Create Cypress/Playwright test suite
+- [x] Create Cypress/Playwright test suite
 - [ ] Test voice-only session flow
 - [ ] Test text-only session flow
 - [ ] Test offline resume flow
@@ -701,4 +701,3 @@ This roadmap breaks down the Phase 1 implementation into 5 major phases with cle
 - **Performance:** All KPIs met (latency, response times)
 - **Usability:** One complete lesson playable end-to-end
 - **Reliability:** Settings persist, sessions resume correctly
-

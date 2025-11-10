@@ -236,6 +236,7 @@ class SRSManager:
 
                 session.commit()
                 session.refresh(existing)
+                session.expunge(existing)
 
                 logger.info(
                     f"Updated SRS memory for user {user_id}, phrase {phrase_id}: "
@@ -264,6 +265,7 @@ class SRSManager:
                 session.add(new_memory)
                 session.commit()
                 session.refresh(new_memory)
+                session.expunge(new_memory)
 
                 logger.info(
                     f"Created SRS memory for user {user_id}, phrase {phrase_id}: "
@@ -310,4 +312,3 @@ class SRSManager:
             f"Found {len(forgotten_items)} forgotten items for user {user_id}"
         )
         return forgotten_items
-
