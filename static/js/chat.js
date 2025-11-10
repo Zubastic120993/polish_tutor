@@ -15,6 +15,13 @@ class ChatUI {
         this.startButton = document.getElementById('start-lesson-button');
         this.lessonOverlay = document.getElementById('welcome-overlay');
         this.welcomeDismiss = document.getElementById('welcome-dismiss');
+        this.welcomeStartButton = document.getElementById('welcome-start');
+        this.welcomeStartIcon = this.welcomeStartButton
+            ? this.welcomeStartButton.querySelector('.welcome-card__start-icon')
+            : null;
+        this.welcomeStartText = this.welcomeStartButton
+            ? this.welcomeStartButton.querySelector('.welcome-card__start-text')
+            : null;
         this.lessonTitleEl = document.getElementById('lesson-title');
         this.lessonLevelEl = document.getElementById('lesson-level');
         this.lessonGoalEl = document.getElementById('lesson-goal');
@@ -365,6 +372,19 @@ class ChatUI {
             return;
         }
 
+        const updateOverlayStart = (text, disabled, icon = '▶') => {
+            if (this.welcomeStartButton) {
+                this.welcomeStartButton.disabled = disabled;
+                this.welcomeStartButton.dataset.state = state;
+            }
+            if (this.welcomeStartText) {
+                this.welcomeStartText.textContent = text;
+            }
+            if (this.welcomeStartIcon) {
+                this.welcomeStartIcon.textContent = icon;
+            }
+        };
+
         this.startButton.dataset.state = state;
 
         switch (state) {
@@ -377,6 +397,7 @@ class ChatUI {
                 if (this.startTooltip) {
                     this.startTooltip.style.display = 'none';
                 }
+                updateOverlayStart('Starting...', true, '⏳');
                 break;
             case 'active':
                 this.startButton.disabled = true;
@@ -387,6 +408,7 @@ class ChatUI {
                 if (this.startTooltip) {
                     this.startTooltip.style.display = 'none';
                 }
+                updateOverlayStart('Lesson in progress', true, '✅');
                 break;
             case 'select':
                 this.startButton.disabled = true;
@@ -397,16 +419,18 @@ class ChatUI {
                 if (this.startTooltip) {
                     this.startTooltip.style.display = 'inline-flex';
                 }
+                updateOverlayStart('Choose a lesson first', true, '🎯');
                 break;
             default:
                 this.startButton.disabled = false;
-                this.startButton.textContent = '▶️ Start Lesson';
+                this.startButton.textContent = '▶ Start Lesson';
                 if (this.startHintEl) {
                     this.startHintEl.textContent = 'We’ll guide you step-by-step. Click start when you’re ready.';
                 }
                 if (this.startTooltip) {
                     this.startTooltip.style.display = 'none';
                 }
+                updateOverlayStart('Start Lesson', false, '▶');
                 break;
         }
     }
@@ -998,71 +1022,58 @@ class ChatUI {
         audioContainer.style.borderRadius = 'var(--border-radius, 8px)';
         
         // Try pre-recorded audio first, fallback to TTS generation
+        const audioLabel = document.createElement('span');
+        audioLabel.style.fontSize = 'var(--font-size-small, 0.875rem)';
+        audioLabel.style.color = 'var(--color-text-muted, #666)';
+        audioLabel.style.marginLeft = 'var(--spacing-xs)';
+        audioLabel.textContent = '🔊 Loading tutor audio...';
+
+        const loadingButton = this.createLoadingAudioButton();
+        audioContainer.appendChild(loadingButton);
+        audioContainer.appendChild(audioLabel);
+        messageBubble.appendChild(audioContainer);
+
         if (dialogue.audio) {
             const preRecordedUrl = `/static/audio/native/${this.currentLessonId}/${dialogue.audio}`;
             this.getAudioUrl(dialogue, preRecordedUrl).then(audioUrl => {
                 const audioButton = this.createAudioButton(audioUrl);
-                audioContainer.appendChild(audioButton);
-                
+                audioContainer.replaceChild(audioButton, loadingButton);
+
                 // Add speed toggle
                 const speedToggle = this.createSpeedToggle();
-                audioContainer.appendChild(speedToggle);
-                
-                // Add label
-                const audioLabel = document.createElement('span');
-                audioLabel.style.fontSize = 'var(--font-size-small, 0.875rem)';
-                audioLabel.style.color = 'var(--color-text-muted, #666)';
-                audioLabel.style.marginLeft = 'var(--spacing-xs)';
+                audioContainer.insertBefore(speedToggle, audioLabel);
+
                 audioLabel.textContent = '🔊 Click to hear pronunciation';
                 audioLabel.style.cursor = 'pointer';
-                audioLabel.addEventListener('click', () => {
-                    audioButton.click();
-                });
-                audioContainer.appendChild(audioLabel);
-                
-                messageBubble.appendChild(audioContainer);
+                audioLabel.onclick = () => audioButton.click();
             }).catch(error => {
                 console.error('Failed to get audio URL:', error);
                 // Fallback: generate on-demand
                 const audioButton = this.createAudioButtonWithGeneration(tutorText, dialogue.id);
-                audioContainer.appendChild(audioButton);
-                
+                audioContainer.replaceChild(audioButton, loadingButton);
+
                 const speedToggle = this.createSpeedToggle();
-                audioContainer.appendChild(speedToggle);
-                
-                const audioLabel = document.createElement('span');
-                audioLabel.style.fontSize = 'var(--font-size-small, 0.875rem)';
-                audioLabel.style.color = 'var(--color-text-muted, #666)';
-                audioLabel.style.marginLeft = 'var(--spacing-xs)';
+                audioContainer.insertBefore(speedToggle, audioLabel);
+
                 audioLabel.textContent = '🔊 Click to hear pronunciation';
                 audioLabel.style.cursor = 'pointer';
-                audioLabel.addEventListener('click', () => {
-                    audioButton.click();
-                });
-                audioContainer.appendChild(audioLabel);
-                
-                messageBubble.appendChild(audioContainer);
+                audioLabel.onclick = () => audioButton.click();
             });
         } else if (tutorText && tutorText.trim()) {
             // No pre-recorded audio, generate on-demand
             const audioButton = this.createAudioButtonWithGeneration(tutorText, dialogue.id);
-            audioContainer.appendChild(audioButton);
-            
+            audioContainer.replaceChild(audioButton, loadingButton);
+
             const speedToggle = this.createSpeedToggle();
-            audioContainer.appendChild(speedToggle);
-            
-            const audioLabel = document.createElement('span');
-            audioLabel.style.fontSize = 'var(--font-size-small, 0.875rem)';
-            audioLabel.style.color = 'var(--color-text-muted, #666)';
-            audioLabel.style.marginLeft = 'var(--spacing-xs)';
+            audioContainer.insertBefore(speedToggle, audioLabel);
+
             audioLabel.textContent = '🔊 Click to hear pronunciation';
             audioLabel.style.cursor = 'pointer';
-            audioLabel.addEventListener('click', () => {
-                audioButton.click();
-            });
-            audioContainer.appendChild(audioLabel);
-            
-            messageBubble.appendChild(audioContainer);
+            audioLabel.onclick = () => audioButton.click();
+        } else {
+            // No audio and no text – keep placeholder but disable button
+            loadingButton.disabled = true;
+            audioLabel.textContent = 'Audio unavailable for this prompt.';
         }
         
         this.chatMessages.appendChild(messageEl);
@@ -1220,6 +1231,10 @@ class ChatUI {
         
         if (this.startButton) {
             this.startButton.addEventListener('click', () => this.handleStartLesson());
+        }
+
+        if (this.welcomeStartButton) {
+            this.welcomeStartButton.addEventListener('click', () => this.handleStartLesson());
         }
         
         if (this.welcomeDismiss) {
@@ -1906,6 +1921,22 @@ class ChatUI {
         // Initialize feather icon after adding to DOM
         setTimeout(() => feather.replace(), 0);
         
+        return button;
+    }
+    
+    createLoadingAudioButton() {
+        const button = document.createElement('button');
+        button.className = 'audio-button audio-button--loading';
+        button.setAttribute('aria-label', 'Loading audio');
+        button.setAttribute('title', 'Loading audio');
+        button.disabled = true;
+
+        const icon = document.createElement('i');
+        icon.setAttribute('data-feather', 'loader');
+        icon.className = 'audio-button__icon audio-button__icon--spinning';
+        button.appendChild(icon);
+
+        setTimeout(() => feather.replace(), 0);
         return button;
     }
     

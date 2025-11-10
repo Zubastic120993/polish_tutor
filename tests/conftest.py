@@ -1,0 +1,261 @@
+import importlib.machinery
+import sys
+import types
+from pathlib import Path
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _module_spec(name: str) -> importlib.machinery.ModuleSpec:
+    return importlib.machinery.ModuleSpec(name=name, loader=None)
+
+
+if "src" not in sys.modules:
+    src_module = types.ModuleType("src")
+    src_module.__path__ = [str(PROJECT_ROOT / "src")]
+    src_module.__spec__ = _module_spec("src")
+    sys.modules["src"] = src_module
+else:
+    src_module = sys.modules["src"]
+
+if "src.services" not in sys.modules:
+    services_module = types.ModuleType("src.services")
+    services_module.__path__ = [str(PROJECT_ROOT / "src/services")]
+    services_module.__spec__ = _module_spec("src.services")
+    sys.modules["src.services"] = services_module
+else:
+    services_module = sys.modules["src.services"]
+
+setattr(src_module, "services", services_module)
+
+if "src.core" not in sys.modules:
+    core_module = types.ModuleType("src.core")
+    core_module.__path__ = [str(PROJECT_ROOT / "src/core")]
+    core_module.__spec__ = _module_spec("src.core")
+    sys.modules["src.core"] = core_module
+else:
+    core_module = sys.modules["src.core"]
+
+setattr(src_module, "core", core_module)
+
+
+def _ensure_module(name: str) -> types.ModuleType:
+    module = types.ModuleType(name)
+    module.__spec__ = _module_spec(name)
+    sys.modules[name] = module
+    return module
+
+
+# Stub OpenAI client (avoids optional dependency requirement)
+if "openai" not in sys.modules:
+    openai_module = _ensure_module("openai")
+
+    class _DummyOpenAI:
+        def __init__(self, *_, **__):
+            self.chat = types.SimpleNamespace(completions=_DummyCompletions())
+
+    class _DummyCompletions:
+        def create(self, *_, **__):
+            message = types.SimpleNamespace(content='{"is_correct": false, "score": 0.0, "explanation": ""}')
+            return types.SimpleNamespace(choices=[types.SimpleNamespace(message=message)])
+
+    openai_module.OpenAI = _DummyOpenAI
+
+
+# Lightweight Levenshtein distance implementation
+if "Levenshtein" not in sys.modules:
+    levenshtein_module = _ensure_module("Levenshtein")
+
+    def _distance(a: str, b: str) -> int:
+        if a == b:
+            return 0
+        if not a:
+            return len(b)
+        if not b:
+            return len(a)
+        prev_row = list(range(len(b) + 1))
+        for i, char_a in enumerate(a, start=1):
+            current_row = [i]
+            for j, char_b in enumerate(b, start=1):
+                insert_cost = current_row[j - 1] + 1
+                delete_cost = prev_row[j] + 1
+                replace_cost = prev_row[j - 1] + (char_a != char_b)
+                current_row.append(min(insert_cost, delete_cost, replace_cost))
+            prev_row = current_row
+        return prev_row[-1]
+
+    levenshtein_module.distance = _distance
+
+
+# Stub phonemizer (treats phoneme conversion as identity)
+if "phonemizer" not in sys.modules:
+    phonemizer_module = _ensure_module("phonemizer")
+
+    def _phonemize(text: str, **_):
+        return text
+
+    phonemizer_module.phonemize = _phonemize
+
+    backend_module = _ensure_module("phonemizer.backend")
+
+    class EspeakBackend:
+        def __init__(self, language: str):
+            self.language = language
+
+    backend_module.EspeakBackend = EspeakBackend
+
+
+# Minimal SQLAlchemy stub for unit tests
+if "sqlalchemy" not in sys.modules:
+    sqlalchemy_module = _ensure_module("sqlalchemy")
+    orm_module = _ensure_module("sqlalchemy.orm")
+    exc_module = _ensure_module("sqlalchemy.exc")
+
+    class SQLAlchemyError(Exception):
+        pass
+
+    exc_module.SQLAlchemyError = SQLAlchemyError
+
+    def create_engine(*_, **__):
+        return object()
+
+    def listens_for(*_, **__):
+        def decorator(func):
+            return func
+
+        return decorator
+
+    class _DummyQuery:
+        def __init__(self):
+            self._result = []
+
+        def filter(self, *_, **__):
+            return self
+
+        def all(self):
+            return list(self._result)
+
+        def first(self):
+            return self._result[0] if self._result else None
+
+        def limit(self, *_):
+            return self
+
+        def order_by(self, *_):
+            return self
+
+    class _DummySession:
+        def __init__(self):
+            self._query = _DummyQuery()
+
+        def __call__(self):
+            return self
+
+        def add(self, *_):
+            pass
+
+        def commit(self):
+            pass
+
+        def rollback(self):
+            pass
+
+        def close(self):
+            pass
+
+        def flush(self):
+            pass
+
+        def refresh(self, *_):
+            pass
+
+        def expunge(self, *_):
+            pass
+
+        def query(self, *_):
+            return self._query
+
+    def sessionmaker(**_):
+        def factory():
+            return _DummySession()
+
+        return factory
+
+    def declarative_base():
+        return type("Base", (), {})
+
+    def relationship(*_, **__):
+        return None
+
+    def Column(*_, **__):
+        return None
+
+    def Index(*_, **__):
+        return None
+
+    def DateTime(*_, **__):
+        return None
+
+    def String(*_, **__):
+        return None
+
+    def Text(*_, **__):
+        return None
+
+    sqlalchemy_module.create_engine = create_engine
+    sqlalchemy_module.event = types.SimpleNamespace(listens_for=listens_for)
+    def and_(*conditions):
+        return conditions
+
+    sqlalchemy_module.Column = Column
+    sqlalchemy_module.DateTime = DateTime
+    sqlalchemy_module.Index = Index
+    sqlalchemy_module.String = String
+    sqlalchemy_module.Text = Text
+    sqlalchemy_module.and_ = and_
+
+    orm_module.sessionmaker = sessionmaker
+    orm_module.declarative_base = declarative_base
+    orm_module.relationship = relationship
+    orm_module.Session = _DummySession
+
+
+# Provide lightweight ORM models used in unit tests
+if "src.models" not in sys.modules:
+    models_module = _ensure_module("src.models")
+
+    class _DummyModel:
+        pass
+
+    models_module.Lesson = _DummyModel
+    models_module.Phrase = _DummyModel
+    models_module.Attempt = _DummyModel
+    models_module.SRSMemory = _DummyModel
+    models_module.User = _DummyModel
+    models_module.LessonProgress = _DummyModel
+    models_module.Meta = _DummyModel
+    models_module.Setting = _DummyModel
+
+
+# Stub Coqui TTS dependency to avoid heavy imports
+tts_module = sys.modules.get("TTS")
+if tts_module is None:
+    tts_module = _ensure_module("TTS")
+
+tts_api_module = types.ModuleType("TTS.api")
+tts_api_module.__spec__ = _module_spec("TTS.api")
+
+
+class _DummyTTS:
+    def __init__(self, *_, **__):
+        pass
+
+    def tts_to_file(self, *_, **__):
+        return None
+
+
+tts_api_module.TTS = _DummyTTS
+sys.modules["TTS.api"] = tts_api_module
+setattr(tts_module, "api", tts_api_module)
+

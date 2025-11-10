@@ -352,7 +352,7 @@ class Database:
         from datetime import datetime
 
         with self.get_session() as session:
-            return (
+            items = (
                 session.query(SRSMemory)
                 .filter(
                     SRSMemory.user_id == user_id, SRSMemory.next_review <= datetime.utcnow()
@@ -360,11 +360,30 @@ class Database:
                 .order_by(SRSMemory.next_review.asc())
                 .all()
             )
+            # Ensure attributes are loaded and detach from session
+            for item in items:
+                _ = item.phrase_id
+                _ = item.next_review
+                _ = item.efactor
+                _ = item.interval_days
+                _ = item.review_count
+                _ = item.strength_level
+                session.expunge(item)
+            return items
 
     def get_user_srs_memories(self, user_id: int) -> List[SRSMemory]:
         """Get all SRS memories for a user."""
         with self.get_session() as session:
-            return session.query(SRSMemory).filter(SRSMemory.user_id == user_id).all()
+            memories = session.query(SRSMemory).filter(SRSMemory.user_id == user_id).all()
+            for memory in memories:
+                _ = memory.phrase_id
+                _ = memory.next_review
+                _ = memory.efactor
+                _ = memory.interval_days
+                _ = memory.review_count
+                _ = memory.strength_level
+                session.expunge(memory)
+            return memories
 
     def update_srs_memory(self, memory_id: int, **kwargs) -> Optional[SRSMemory]:
         """Update SRS memory."""
@@ -486,4 +505,3 @@ class Database:
                 session.commit()
                 return True
             return False
-

@@ -63,7 +63,8 @@ async def review_get(user_id: int = Query(..., description="User ID", gt=0)):
                 "next_review": item.next_review.isoformat() + "Z" if item.next_review else None,
                 "efactor": item.efactor,
                 "interval_days": item.interval_days,
-                "repetitions": item.repetitions,
+                "review_count": item.review_count,
+                "repetitions": item.review_count,  # legacy key for compatibility
                 "strength_level": item.strength_level,
             })
         
@@ -130,4 +131,3 @@ async def review_update(request: ReviewUpdateRequest):
             status_code=500,
             detail=f"Internal server error: {str(e)}"
         )
-

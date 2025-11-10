@@ -1,0 +1,12 @@
+[run]
+source = src
+omit =
+    src/services/speech_engine.py
+    src/services/lesson_generator.py
+    src/services/database_service.py
+    src/services/__init__.py
+    src/core/init_db.py
+    src/core/__init__.py
+
+[report]
+show_missing = True

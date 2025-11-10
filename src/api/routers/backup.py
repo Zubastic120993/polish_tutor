@@ -66,9 +66,11 @@ async def backup_export(
                     "phrase_id": sm.phrase_id,
                     "efactor": sm.efactor,
                     "interval_days": sm.interval_days,
-                    "repetitions": sm.repetitions,
+                    "review_count": sm.review_count,
+                    "repetitions": sm.review_count,  # legacy key retained for compatibility
                     "next_review": sm.next_review.isoformat() + "Z" if sm.next_review else None,
-                    "last_reviewed": sm.last_reviewed.isoformat() + "Z" if sm.last_reviewed else None,
+                    "last_review": sm.last_review.isoformat() + "Z" if sm.last_review else None,
+                    "last_reviewed": sm.last_review.isoformat() + "Z" if sm.last_review else None,
                 }
                 for sm in srs_memories
             ],
@@ -101,4 +103,3 @@ async def backup_export(
             status_code=500,
             detail=f"Internal server error: {str(e)}"
         )
-

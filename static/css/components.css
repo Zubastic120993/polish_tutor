@@ -527,11 +527,30 @@
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
 }
 
+.audio-button--loading {
+  background: linear-gradient(135deg, #9ca3af, #6b7280);
+  box-shadow: 0 8px 18px rgba(107, 114, 128, 0.25);
+  cursor: wait;
+}
+
 .audio-button__icon {
   width: 16px;
   height: 16px;
   stroke: currentColor;
   fill: currentColor;
+}
+
+.audio-button__icon--spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Audio Progress Bar */

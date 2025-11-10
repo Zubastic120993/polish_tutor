@@ -10,37 +10,13 @@
     <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/layout.css">
     <link rel="stylesheet" href="/static/css/components.css">
+    <link rel="stylesheet" href="/static/css/tailwind.generated.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
     <script src="https://unpkg.com/feather-icons"></script>
-    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-    <script>
-        tailwind.config = {
-            darkMode: ['class', '[data-theme="dark"]'],
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'var(--font-body)', 'system-ui'],
-                        display: ['"Playfair Display"', 'serif']
-                    },
-                    colors: {
-                        'cafe-foam': '#F6EDE3',
-                        'cafe-cream': '#FCF5EC',
-                        'cafe-hazelnut': '#E6C7A5',
-                        'cafe-espresso': '#43281C',
-                        'cafe-green': '#5BA38F',
-                        'cafe-rose': '#F6C5B1'
-                    },
-                    boxShadow: {
-                        'cafe-card': '0 45px 120px rgba(92, 51, 23, 0.18)'
-                    }
-                }
-            }
-        };
-    </script>
 </head>
 <body class="font-sans text-cafe-espresso bg-cafe-foam relative min-h-screen overflow-hidden">
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -188,7 +164,13 @@
                                         <li>Tap ▶ Start Lesson.</li>
                                         <li>Reply in Polish by voice or typing.</li>
                                     </ol>
-                                    <button type="button" class="welcome-card__dismiss" id="welcome-dismiss">Got it!</button>
+                                    <div class="welcome-card__actions">
+                                        <button type="button" class="welcome-card__start" id="welcome-start">
+                                            <span class="welcome-card__start-icon">▶</span>
+                                            <span class="welcome-card__start-text">Start Lesson</span>
+                                        </button>
+                                        <button type="button" class="welcome-card__dismiss" id="welcome-dismiss">Browse lessons</button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="conversation-panel__messages flex-1 space-y-3" id="chat-messages" role="log" aria-live="polite" aria-label="Lesson dialogue">
@@ -256,6 +238,9 @@
 
         (function() {
             const themeToggle = document.getElementById('theme-toggle');
+            if (!themeToggle) {
+                return;
+            }
             const html = document.documentElement;
             const savedTheme = localStorage.getItem('theme') || 'light';
             html.setAttribute('data-theme', savedTheme);
