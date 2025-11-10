@@ -151,6 +151,51 @@ class LessonManager:
         logger.info(f"Loaded {len(lessons)} lessons")
         return lessons
 
+    def load_lesson_catalog(self) -> List[Dict]:
+        """Load and flatten lesson catalog metadata.
+
+        Returns:
+            List of catalog entries with ids, titles, module, part, and status
+        """
+        catalog_file = self.lessons_dir / 'catalog.json'
+        if not catalog_file.exists():
+            logger.debug(f"Lesson catalog not found: {catalog_file}")
+            return []
+        try:
+            with open(catalog_file, 'r', encoding='utf-8') as f:
+                catalog_data = json.load(f)
+        except Exception as exc:
+            logger.warning(f"Failed to read lesson catalog: {exc}")
+            return []
+
+        entries: List[Dict] = []
+        seen: Set[str] = set()
+
+        def push_entry(entry: Dict, part_title: Optional[str] = None, module_title: Optional[str] = None) -> None:
+            lesson_id = entry.get('id')
+            if not lesson_id or lesson_id in seen:
+                return
+            seen.add(lesson_id)
+            entries.append({
+                'id': lesson_id,
+                'title_pl': entry.get('title_pl'),
+                'title_en': entry.get('title_en'),
+                'status': entry.get('status', 'pending'),
+                'module': module_title,
+                'part': part_title
+            })
+
+        for part in catalog_data.get('parts', []):
+            part_title = part.get('title')
+            for lesson in part.get('lessons', []):
+                push_entry(lesson, part_title=part_title)
+            for module in part.get('modules', []):
+                module_title = module.get('title_pl') or module.get('title_en')
+                for lesson in module.get('lessons', []):
+                    push_entry(lesson, part_title=part_title, module_title=module_title)
+
+        return entries
+
     def save_lesson_to_db(self, lesson_id: str) -> Optional[Lesson]:
         """Load lesson from JSON and save to database.
 
@@ -226,6 +271,16 @@ class LessonManager:
         """Clear the lesson cache."""
         self._cache.clear()
         logger.info("Lesson cache cleared")
+    
+    def cache_lesson(self, lesson_id: str, lesson_data: Dict) -> None:
+        """Cache a lesson (e.g., from AI generation) without saving to file.
+        
+        Args:
+            lesson_id: Lesson identifier
+            lesson_data: Lesson data dictionary
+        """
+        self._cache[lesson_id] = lesson_data
+        logger.info(f"Lesson {lesson_id} cached in memory")
 
     def _validate_schema(self, lesson_data: Dict) -> None:
         """Validate lesson JSON against schema.

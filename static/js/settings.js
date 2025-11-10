@@ -7,6 +7,10 @@ class SettingsManager {
         this.userId = userId;
         this.currentSettings = null;
         this.modal = null;
+        this.lessonCatalog = [];
+        this.lessonCatalogLoaded = false;
+        this.lessonCatalogLoading = false;
+        this.lessonCatalogError = null;
         this.init();
     }
     
@@ -72,6 +76,7 @@ class SettingsManager {
             this.modal.classList.add('modal--active');
             this.render();
             feather.replace(); // Update icons
+            await this.populateLessonCatalog(false);
         }
     }
     
@@ -194,6 +199,33 @@ class SettingsManager {
                             <option value="hide" ${settings.translation === 'hide' ? 'selected' : ''}>Always Hide</option>
                             <option value="smart" ${settings.translation === 'smart' || !settings.translation ? 'selected' : ''}>Smart (Auto-hide after success)</option>
                         </select>
+                    </div>
+                </section>
+                
+                <!-- Lesson Library -->
+                <section class="settings__section">
+                    <h3 class="settings__section-title">Lesson Library</h3>
+                    <div class="settings__group">
+                        <label class="settings__label" for="lesson-library-search">Find a Lesson</label>
+                        <input 
+                            type="text" 
+                            class="settings__input" 
+                            id="lesson-library-search" 
+                            placeholder="Search by Polish or English title, part, or module">
+                        <small class="settings__help" style="display: block; margin-top: var(--spacing-xs); color: var(--color-text-muted); font-size: var(--font-size-small);">
+                            Pick a lesson to load it instantly in the main tutor chat.
+                        </small>
+                    </div>
+                    <div class="settings__group" style="display: flex; gap: var(--spacing-sm); align-items: center;">
+                        <button class="settings__button settings__button--secondary" id="lesson-library-reload" type="button">
+                            Reload lessons
+                        </button>
+                        <span id="lesson-library-status" class="settings__help" style="flex: 1; color: var(--color-text-muted); font-size: var(--font-size-small);">
+                            Loading lessons...
+                        </span>
+                    </div>
+                    <div class="settings__group">
+                        <ul id="lesson-library-list" class="lesson-library__list"></ul>
                     </div>
                 </section>
                 
@@ -359,6 +391,209 @@ class SettingsManager {
                     );
                 }
             });
+        }
+
+        // Lesson library search
+        const lessonSearchInput = document.getElementById('lesson-library-search');
+        if (lessonSearchInput) {
+            lessonSearchInput.addEventListener('input', (e) => {
+                this.filterLessonCatalog(e.target.value || '');
+            });
+        }
+
+        // Lesson library reload
+        const lessonReloadButton = document.getElementById('lesson-library-reload');
+        if (lessonReloadButton) {
+            lessonReloadButton.addEventListener('click', async () => {
+                await this.populateLessonCatalog(true);
+            });
+        }
+    }
+    
+    async populateLessonCatalog(force = false) {
+        const statusEl = document.getElementById('lesson-library-status');
+        const listEl = document.getElementById('lesson-library-list');
+
+        if (!statusEl || !listEl) {
+            return;
+        }
+
+        if (!force && this.lessonCatalogLoaded && this.lessonCatalog.length) {
+            statusEl.style.display = 'none';
+            this.renderLessonCatalog(this.lessonCatalog);
+            return;
+        }
+
+        statusEl.style.display = 'block';
+        statusEl.textContent = 'Loading lessons...';
+        listEl.innerHTML = '';
+
+        try {
+            const entries = await this.loadLessonCatalog(force);
+
+            if (!entries.length) {
+                statusEl.textContent = 'No lessons found yet. Add lesson JSON files to data/lessons/.';
+                return;
+            }
+
+            statusEl.style.display = 'none';
+            this.renderLessonCatalog(entries);
+        } catch (error) {
+            console.error('Error loading lesson catalog:', error);
+            this.lessonCatalogError = error;
+            statusEl.textContent = 'Failed to load lessons. Please try again.';
+        }
+    }
+
+    async loadLessonCatalog(force = false) {
+        if (!force && this.lessonCatalogLoaded && !this.lessonCatalogError) {
+            return this.lessonCatalog;
+        }
+
+        this.lessonCatalogLoading = true;
+        this.lessonCatalogError = null;
+
+        try {
+            const response = await fetch('/api/lesson/catalog');
+            if (!response.ok) {
+                throw new Error(`Failed to load catalog: ${response.status} ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            const entries = result?.data?.entries || [];
+            this.lessonCatalog = entries;
+            this.lessonCatalogLoaded = true;
+            return this.lessonCatalog;
+        } catch (error) {
+            this.lessonCatalogLoaded = false;
+            throw error;
+        } finally {
+            this.lessonCatalogLoading = false;
+        }
+    }
+
+    renderLessonCatalog(entries, options = {}) {
+        const listEl = document.getElementById('lesson-library-list');
+        const statusEl = document.getElementById('lesson-library-status');
+
+        if (!listEl || !statusEl) {
+            return;
+        }
+
+        listEl.innerHTML = '';
+        listEl.style.listStyle = 'none';
+        listEl.style.margin = '0';
+        listEl.style.padding = '0';
+
+        if (!entries || entries.length === 0) {
+            statusEl.textContent = options.filtered
+                ? 'No lessons match your search.'
+                : 'No lessons available yet.';
+            statusEl.style.display = 'block';
+            return;
+        }
+
+        statusEl.style.display = 'none';
+
+        entries.forEach((entry) => {
+            const listItem = document.createElement('li');
+            listItem.className = 'lesson-library__item';
+            listItem.dataset.lessonId = entry.id;
+            listItem.style.display = 'flex';
+            listItem.style.justifyContent = 'space-between';
+            listItem.style.alignItems = 'center';
+            listItem.style.gap = 'var(--spacing-sm)';
+            listItem.style.padding = 'var(--spacing-sm) 0';
+            listItem.style.borderBottom = '1px solid var(--color-border-muted)';
+
+            const infoContainer = document.createElement('div');
+            infoContainer.className = 'lesson-library__info';
+            infoContainer.style.display = 'flex';
+            infoContainer.style.flexDirection = 'column';
+            infoContainer.style.gap = '2px';
+
+            const titleLine = document.createElement('div');
+            titleLine.textContent = entry.title_pl || entry.id;
+            titleLine.style.fontWeight = '600';
+            infoContainer.appendChild(titleLine);
+
+            if (entry.title_en) {
+                const subtitle = document.createElement('div');
+                subtitle.textContent = entry.title_en;
+                subtitle.style.fontSize = '0.875rem';
+                subtitle.style.color = 'var(--color-text-muted)';
+                infoContainer.appendChild(subtitle);
+            }
+
+            const metaParts = [];
+            if (entry.part) metaParts.push(entry.part);
+            if (entry.module) metaParts.push(entry.module);
+            if (entry.status) metaParts.push(`Status: ${entry.status.replace(/_/g, ' ')}`);
+            if (metaParts.length) {
+                const metaLine = document.createElement('div');
+                metaLine.textContent = metaParts.join(' • ');
+                metaLine.style.fontSize = '0.75rem';
+                metaLine.style.color = 'var(--color-text-muted)';
+                infoContainer.appendChild(metaLine);
+            }
+
+            const startButton = document.createElement('button');
+            startButton.type = 'button';
+            startButton.className = 'settings__button settings__button--secondary lesson-library__start';
+            startButton.dataset.lessonId = entry.id;
+            startButton.textContent = 'Start lesson';
+            startButton.style.whiteSpace = 'nowrap';
+            startButton.addEventListener('click', () => this.startLessonFromLibrary(entry.id));
+
+            listItem.appendChild(infoContainer);
+            listItem.appendChild(startButton);
+            listEl.appendChild(listItem);
+        });
+    }
+
+    filterLessonCatalog(query) {
+        const normalized = (query || '').trim().toLowerCase();
+
+        if (!this.lessonCatalogLoaded || !this.lessonCatalog.length) {
+            return;
+        }
+
+        if (!normalized) {
+            this.renderLessonCatalog(this.lessonCatalog);
+            return;
+        }
+
+        const filtered = this.lessonCatalog.filter((entry) => {
+            return [entry.id, entry.title_pl, entry.title_en, entry.part, entry.module, entry.status]
+                .some((value) => value && value.toLowerCase().includes(normalized));
+        });
+
+        this.renderLessonCatalog(filtered, { filtered: true });
+    }
+
+    async startLessonFromLibrary(lessonId) {
+        if (!lessonId) {
+            return;
+        }
+
+        if (!window.chatUI || typeof window.chatUI.changeLesson !== 'function') {
+            this.showMessage('Tutor is not ready yet. Please wait a moment and try again.', 'error');
+            return;
+        }
+
+        try {
+            const lessonData = await window.chatUI.changeLesson(lessonId);
+
+            const catalogEntry = this.lessonCatalog.find((entry) => entry.id === lessonId);
+            const lessonTitle = catalogEntry?.title_pl || catalogEntry?.title_en || lessonId;
+
+            this.showMessage(`Lesson "${lessonTitle}" is ready!`, 'success');
+            this.close();
+
+            return lessonData;
+        } catch (error) {
+            console.error('Failed to start lesson from library:', error);
+            this.showMessage('Failed to start lesson. Please try again.', 'error');
         }
     }
     

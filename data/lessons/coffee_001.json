@@ -59,8 +59,88 @@
       "options": [
         {
           "default": true,
-          "next": "coffee_001_d3",
-          "description": "End of lesson"
+          "next": "coffee_001_d4",
+          "description": "Continue to next phrase"
+        }
+      ]
+    },
+    {
+      "id": "coffee_001_d4",
+      "tutor": "Czy mogę prosić mleko?",
+      "expected": ["Tak, oczywiście.", "Proszę bardzo."],
+      "translation": "Can I have milk?",
+      "hint": "Say 'yes, of course' or 'here you go'",
+      "grammar": "Politeness",
+      "audio": "coffee_001_d4.mp3",
+      "options": [
+        {
+          "default": true,
+          "next": "coffee_001_d5",
+          "description": "Continue"
+        }
+      ]
+    },
+    {
+      "id": "coffee_001_d5",
+      "tutor": "Ile to kosztuje?",
+      "expected": ["Dziesięć złotych.", "10 złotych."],
+      "translation": "How much does it cost?",
+      "hint": "Say the price: 10 złotych (zlotych)",
+      "grammar": "Numbers",
+      "audio": "coffee_001_d5.mp3",
+      "options": [
+        {
+          "default": true,
+          "next": "coffee_001_d6",
+          "description": "Continue"
+        }
+      ]
+    },
+    {
+      "id": "coffee_001_d6",
+      "tutor": "Czy mogę zapłacić kartą?",
+      "expected": ["Tak, możesz.", "Oczywiście."],
+      "translation": "Can I pay by card?",
+      "hint": "Say 'yes, you can' or 'of course'",
+      "grammar": "Politeness",
+      "audio": "coffee_001_d6.mp3",
+      "options": [
+        {
+          "default": true,
+          "next": "coffee_001_d7",
+          "description": "Continue"
+        }
+      ]
+    },
+    {
+      "id": "coffee_001_d7",
+      "tutor": "Smacznego!",
+      "expected": ["Dziękuję!", "Dzięki!"],
+      "translation": "Enjoy your meal!",
+      "hint": "Say 'thank you'",
+      "grammar": "Gratitude",
+      "audio": "coffee_001_d7.mp3",
+      "options": [
+        {
+          "default": true,
+          "next": "coffee_001_d8",
+          "description": "Continue"
+        }
+      ]
+    },
+    {
+      "id": "coffee_001_d8",
+      "tutor": "Do widzenia!",
+      "expected": ["Do widzenia!", "Cześć!"],
+      "translation": "Goodbye!",
+      "hint": "Say goodbye formally or casually",
+      "grammar": "Politeness",
+      "audio": "coffee_001_d8.mp3",
+      "options": [
+        {
+          "default": true,
+          "next": "coffee_001_d1",
+          "description": "Loop back to start"
         }
       ]
     }

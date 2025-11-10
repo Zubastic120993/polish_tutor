@@ -11,6 +11,8 @@ class ErrorHandler {
         this.developerMode = false;
         this.errorLog = [];
         this.maxErrorLogSize = 100;
+        this.micStartupTime = null; // Track when mic was clicked
+        this.micStartupGracePeriod = 5000; // 5 seconds grace period
         
         this.init();
     }
@@ -90,8 +92,8 @@ class ErrorHandler {
         },
         MICROPHONE_DENIED: {
             name: 'Microphone Denied',
-            message: "Microphone access denied. You can use text input instead.",
-            recovery: ['switch_to_text'],
+            message: "Microphone access denied. Click 'Grant Permission' to allow microphone access, or use text input.",
+            recovery: ['retry', 'switch_to_text', 'grant_permission'],
             severity: 'low'
         },
         UNHANDLED: {
@@ -103,9 +105,34 @@ class ErrorHandler {
     };
     
     /**
+     * Set microphone startup time (called when mic button is clicked)
+     */
+    setMicStartupTime() {
+        this.micStartupTime = Date.now();
+        console.log('[ErrorHandler] Mic startup time set, grace period active for', this.micStartupGracePeriod, 'ms');
+    }
+    
+    /**
+     * Clear microphone startup time (called when mic stops)
+     */
+    clearMicStartupTime() {
+        this.micStartupTime = null;
+        console.log('[ErrorHandler] Mic startup time cleared');
+    }
+    
+    /**
      * Handle error with category
      */
     handleError(category, error, context = {}) {
+        // CRITICAL: Block SPEECH errors in the first 5 seconds after mic button click
+        if (category === 'SPEECH' && this.micStartupTime) {
+            const timeSinceMicStart = Date.now() - this.micStartupTime;
+            if (timeSinceMicStart < this.micStartupGracePeriod) {
+                console.log('[ErrorHandler] Blocking SPEECH error during grace period (' + timeSinceMicStart + 'ms since mic start)');
+                return; // Don't show error during grace period
+            }
+        }
+        
         const errorCategory = this.ERROR_CATEGORIES[category] || this.ERROR_CATEGORIES.UNHANDLED;
         
         // Log error
@@ -174,6 +201,7 @@ class ErrorHandler {
             </div>
             ${recoveryActions.length > 0 ? `
                 <div class="error-notification__actions">
+                    ${recoveryActions.includes('grant_permission') ? '<button class="error-notification__button error-notification__button--primary" data-action="grant_permission">Grant Permission</button>' : ''}
                     ${recoveryActions.includes('retry') ? '<button class="error-notification__button" data-action="retry">Retry</button>' : ''}
                     ${recoveryActions.includes('switch_to_text') ? '<button class="error-notification__button" data-action="switch_to_text">Use Text</button>' : ''}
                     ${recoveryActions.includes('continue') ? '<button class="error-notification__button" data-action="continue">Continue</button>' : ''}
@@ -214,14 +242,26 @@ class ErrorHandler {
                 document.dispatchEvent(new CustomEvent('errorRetry'));
                 errorEl.remove();
                 break;
+            case 'grant_permission':
+                // Request microphone permission again
+                this.requestMicrophonePermission().then((granted) => {
+                    if (granted) {
+                        this.showMessage('Microphone permission granted! You can now use voice input.', 'success');
+                        errorEl.remove();
+                        // Show mic button again if it was hidden
+                        const micButton = document.getElementById('mic-button');
+                        if (micButton) {
+                            micButton.style.display = '';
+                            micButton.removeAttribute('aria-hidden');
+                        }
+                    } else {
+                        this.showMessage('Permission still denied. Please check your browser settings.', 'warning');
+                    }
+                });
+                break;
             case 'switch_to_text':
                 // Switch to text input
-                if (window.chatUI) {
-                    const micButton = document.getElementById('mic-button');
-                    if (micButton) {
-                        micButton.style.display = 'none';
-                    }
-                }
+                this.enableTextInputMode();
                 errorEl.remove();
                 break;
             case 'continue':
@@ -230,6 +270,138 @@ class ErrorHandler {
             case 'show_details':
                 this.showErrorDetails(errorEl);
                 break;
+        }
+    }
+    
+    /**
+     * Request microphone permission
+     * @returns {Promise<boolean>} True if permission granted
+     */
+    async requestMicrophonePermission() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            // Stop the stream immediately - we just needed permission
+            stream.getTracks().forEach(track => track.stop());
+            return true;
+        } catch (error) {
+            console.error('Microphone permission request failed:', error);
+            
+            // Provide helpful instructions based on error type
+            if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+                this.showPermissionInstructions();
+            }
+            
+            return false;
+        }
+    }
+    
+    /**
+     * Show instructions for granting microphone permission
+     */
+    showPermissionInstructions() {
+        const instructions = document.createElement('div');
+        instructions.className = 'error-notification error-notification--medium';
+        instructions.setAttribute('role', 'alert');
+        
+        const browser = this.detectBrowser();
+        let instructionsText = '';
+        
+        if (browser === 'chrome' || browser === 'edge') {
+            instructionsText = `
+                <strong>To enable microphone access:</strong><br>
+                1. Click the lock icon (🔒) in your browser's address bar<br>
+                2. Find "Microphone" in the permissions list<br>
+                3. Change it from "Block" to "Allow"<br>
+                4. Refresh the page
+            `;
+        } else if (browser === 'safari') {
+            instructionsText = `
+                <strong>To enable microphone access:</strong><br>
+                1. Go to Safari → Settings → Websites → Microphone<br>
+                2. Find this website and set it to "Allow"<br>
+                3. Refresh the page
+            `;
+        } else if (browser === 'firefox') {
+            instructionsText = `
+                <strong>To enable microphone access:</strong><br>
+                1. Click the shield icon in your browser's address bar<br>
+                2. Click "Permissions" → "Use the Microphone"<br>
+                3. Select "Allow" and refresh the page
+            `;
+        } else {
+            instructionsText = `
+                <strong>To enable microphone access:</strong><br>
+                1. Check your browser's address bar for a permission icon<br>
+                2. Click it and allow microphone access<br>
+                3. Refresh the page
+            `;
+        }
+        
+        instructions.innerHTML = `
+            <div class="error-notification__content">
+                <span class="error-notification__icon">🎤</span>
+                <div class="error-notification__message">${instructionsText}</div>
+            </div>
+            <button class="error-notification__button" data-action="close_instructions">Got it</button>
+        `;
+        
+        document.body.appendChild(instructions);
+        
+        instructions.querySelector('[data-action="close_instructions"]').addEventListener('click', () => {
+            instructions.remove();
+        });
+        
+        // Auto-dismiss after 15 seconds
+        setTimeout(() => {
+            if (instructions.parentNode) {
+                instructions.classList.add('error-notification--dismissing');
+                setTimeout(() => instructions.remove(), 300);
+            }
+        }, 15000);
+    }
+    
+    /**
+     * Detect browser type
+     * @returns {string} Browser name
+     */
+    detectBrowser() {
+        const userAgent = navigator.userAgent.toLowerCase();
+        if (userAgent.includes('chrome') && !userAgent.includes('edg')) {
+            return 'chrome';
+        } else if (userAgent.includes('edg')) {
+            return 'edge';
+        } else if (userAgent.includes('safari') && !userAgent.includes('chrome')) {
+            return 'safari';
+        } else if (userAgent.includes('firefox')) {
+            return 'firefox';
+        }
+        return 'unknown';
+    }
+    
+    /**
+     * Enable text input mode (hide mic button, focus text input)
+     */
+    enableTextInputMode() {
+        const micButton = document.getElementById('mic-button');
+        const messageInput = document.getElementById('message-input');
+        
+        if (micButton) {
+            micButton.style.display = 'none';
+            micButton.setAttribute('aria-hidden', 'true');
+        }
+        
+        if (messageInput) {
+            messageInput.focus();
+            messageInput.setAttribute('aria-label', 'Type your message');
+            // Update placeholder to indicate text input is available
+            if (!messageInput.value) {
+                messageInput.placeholder = 'Type your message...';
+            }
+        }
+        
+        // Also notify chatUI if available
+        if (window.chatUI && typeof window.chatUI.enableTextInputMode === 'function') {
+            window.chatUI.enableTextInputMode();
         }
     }
     
@@ -262,6 +434,10 @@ Timestamp: ${lastError.timestamp}
                     setTimeout(() => {
                         document.dispatchEvent(new CustomEvent('errorRetry'));
                     }, 2000);
+                    break;
+                case 'switch_to_text':
+                    // Don't auto-switch - let user choose to grant permission first
+                    // Only switch if they explicitly choose text input
                     break;
                 case 'queue_offline':
                     // Already handled by offline queue

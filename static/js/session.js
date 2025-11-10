@@ -235,29 +235,30 @@ class SessionManager {
      * Recover from crash (called on page load)
      */
     recoverFromCrash() {
+        // Disabled auto-resume to avoid blocking popups
+        // Users can manually resume by typing "resume" in chat
+        
         const session = this.loadLastSession();
         if (!session) {
             return;
         }
         
-        // Check if session is recent (within last hour)
+        // Check if session is recent (within last 5 minutes - crash recovery only)
         const sessionTime = new Date(session.timestamp).getTime();
         const now = Date.now();
-        const oneHour = 60 * 60 * 1000;
+        const fiveMinutes = 5 * 60 * 1000;
         
-        if (now - sessionTime < oneHour) {
-            // Offer to resume
-            const shouldResume = confirm(
-                `Found a recent session from ${new Date(session.timestamp).toLocaleString()}.\n\n` +
-                `Would you like to resume where you left off?`
-            );
+        if (now - sessionTime < fiveMinutes) {
+            // Show non-blocking notification instead of popup
+            console.log('Recent session found - type "resume" to continue where you left off');
             
-            if (shouldResume) {
-                // Wait for DOM to be ready
-                setTimeout(() => {
-                    this.resumeSession(session);
-                }, 500);
-            }
+            // Show subtle notification in UI (if chat is available)
+            setTimeout(() => {
+                if (window.chatUI) {
+                    // Don't auto-resume - let user start fresh
+                    // They can type "resume" if they want to continue
+                }
+            }, 1000);
         }
     }
     

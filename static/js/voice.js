@@ -14,6 +14,12 @@ class VoiceInputManager {
         this.finalTranscript = '';
         this.interimTranscript = '';
         this.liveCaptionElement = null;
+        this.listeningStartTime = null; // Track when listening started
+        this.minListeningDuration = 5000; // Minimum 5 seconds before showing "no speech" error
+        this.restartCount = 0; // Track number of restarts to prevent infinite loops
+        this.maxRestarts = 3; // Maximum number of auto-restarts allowed
+        this.startupTime = null; // Track when we TRIED to start (even if onstart hasn't fired yet)
+        this.startupGracePeriod = 5000; // 5 seconds grace period from startup attempt
         
         // Check browser support
         this.isSupported = this.checkSupport();
@@ -69,9 +75,18 @@ class VoiceInputManager {
         // Event handlers
         this.recognition.onstart = () => {
             this.isListening = true;
-            this.finalTranscript = '';
-            this.interimTranscript = '';
-            this.updateLiveCaption('');
+            
+            // Only set listeningStartTime if it's not already set (for restarts)
+            if (!this.listeningStartTime) {
+                this.listeningStartTime = Date.now();
+                this.restartCount = 0;
+            }
+            // Don't reset transcripts on restart - keep accumulating
+            if (!this.finalTranscript && !this.interimTranscript) {
+                this.finalTranscript = '';
+                this.interimTranscript = '';
+            }
+            this.updateLiveCaption('Listening...');
             this.onListeningStateChange(true);
         };
         
@@ -105,6 +120,23 @@ class VoiceInputManager {
         };
         
         this.recognition.onend = () => {
+            const hadTranscript = this.finalTranscript.trim().length > 0;
+            
+            // If we have a final transcript, send it before resetting
+            if (hadTranscript) {
+                this.onTranscriptReady(this.finalTranscript.trim());
+                // Reset state after sending transcript
+                this.finalTranscript = '';
+                this.interimTranscript = '';
+                this.listeningStartTime = null;
+                this.startupTime = null;
+                this.isListening = false;
+                this.onListeningStateChange(false);
+                this.hideLiveCaption();
+                return;
+            }
+            
+            // Reset listening state
             this.isListening = false;
             this.onListeningStateChange(false);
             
@@ -117,10 +149,12 @@ class VoiceInputManager {
             // Hide live caption
             this.hideLiveCaption();
             
-            // If we have a final transcript, send it
-            if (this.finalTranscript.trim()) {
-                this.onTranscriptReady(this.finalTranscript.trim());
-            }
+            // Reset state
+            this.finalTranscript = '';
+            this.interimTranscript = '';
+            this.listeningStartTime = null;
+            this.startupTime = null;
+            this.restartCount = 0;
         };
     }
     
@@ -139,9 +173,24 @@ class VoiceInputManager {
             this.micMode = mode;
         }
         
+        // Check if mediaDevices is available
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            const errorMsg = `Microphone not available!\n\n` +
+                `Current URL: ${window.location.href}\n\n` +
+                `Microphone access requires HTTPS or localhost.\n\n` +
+                `You're using: ${window.location.protocol}//${window.location.host}\n\n` +
+                `Please access the app at: http://localhost:8000`;
+            
+            alert(errorMsg);
+            this.onError('Please access the app at http://localhost:8000');
+            return false;
+        }
+        
         // Request microphone permission
         try {
-            await navigator.mediaDevices.getUserMedia({ audio: true });
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            // Stop the stream - we just needed permission
+            stream.getTracks().forEach(track => track.stop());
         } catch (error) {
             this.handlePermissionError(error);
             return false;
@@ -152,15 +201,19 @@ class VoiceInputManager {
         }
         
         try {
+            // Set startup time BEFORE calling start() to protect against immediate errors
+            this.startupTime = Date.now();
             this.recognition.start();
             return true;
         } catch (error) {
             // Recognition might already be running
             if (error.name === 'InvalidStateError') {
-                console.warn('Recognition already running');
                 return true;
             }
-            this.handleError(error);
+            // Don't call handleError for startup errors - they should go through permission handler
+            if (error.name !== 'NotAllowedError' && error.name !== 'NotFoundError') {
+                this.handleError(error.name || error.message || 'unknown');
+            }
             return false;
         }
     }
@@ -266,12 +319,49 @@ class VoiceInputManager {
      * @param {string} error - Error code or message
      */
     handleError(error) {
+        const listeningDuration = this.listeningStartTime ? Date.now() - this.listeningStartTime : null;
+        const timeSinceStartup = this.startupTime ? Date.now() - this.startupTime : null;
+        
+        // CRITICAL: Never show errors in the first 5 seconds
+        // Check BOTH listeningDuration (from onstart) AND timeSinceStartup (from start attempt)
+        const gracePeriodActive = (listeningDuration !== null && listeningDuration < this.minListeningDuration) ||
+                                  (timeSinceStartup !== null && timeSinceStartup < this.startupGracePeriod);
+        
+        if (gracePeriodActive) {
+            return; // Don't show error, let recognition continue naturally
+        }
+        
         let errorMessage = '';
+        let shouldShowError = true; // Flag to control whether to show error
         
         switch (error) {
             case 'no-speech':
-                // No speech detected - this is normal, don't show error
-                return;
+                // No speech detected - check if user had enough time to speak
+                if (this.listeningStartTime) {
+                    const listeningDuration = Date.now() - this.listeningStartTime;
+                    // Only show error if user had sufficient time to speak (at least 5 seconds)
+                    if (listeningDuration < this.minListeningDuration) {
+                        // Too soon - user hasn't had time to speak yet, don't show error
+                        console.log('No speech detected but user hasn\'t had time to speak yet. Restarting...');
+                        // Restart recognition to give more time
+                        if (this.recognition && !this.isListening) {
+                            setTimeout(() => {
+                                try {
+                                    this.recognition.start();
+                                } catch (e) {
+                                    // Might already be starting, ignore
+                                    console.log('Recognition restart error (ignored):', e);
+                                }
+                            }, 100);
+                        }
+                        return; // Don't show error, don't stop listening
+                    }
+                }
+                // User had time but no speech - this is normal, don't show error
+                // Just silently handle it
+                console.log('No speech detected after sufficient time - silently ending');
+                shouldShowError = false;
+                break;
             case 'audio-capture':
                 errorMessage = 'No microphone found. Please check your microphone connection.';
                 break;
@@ -283,25 +373,42 @@ class VoiceInputManager {
                 break;
             case 'aborted':
                 // User stopped manually - this is normal
-                return;
+                console.log('Recognition aborted by user - normal');
+                return; // Don't show error
             case 'service-not-allowed':
                 errorMessage = 'Speech recognition service not allowed. Please check your browser settings.';
                 break;
+            case 'bad-grammar':
+            case 'language-not-supported':
+                // These are configuration issues, not user errors
+                console.log('Recognition configuration issue:', error);
+                shouldShowError = false;
+                break;
             default:
-                errorMessage = `Speech recognition error: ${error}. Please try again.`;
+                // For unknown errors, log them but don't show user-facing error unless it's critical
+                console.warn('Unknown speech recognition error:', error);
+                // Only show error for critical issues, not for normal operation
+                shouldShowError = false;
+                return; // Don't show error for unknown cases
         }
         
-        // Use error handler if available
-        if (window.errorHandler) {
-            const category = error === 'not-allowed' ? 'MICROPHONE_DENIED' : 
-                           error === 'no-speech' ? 'STT_TIMEOUT' : 'SPEECH';
-            window.errorHandler.handleError(category, new Error(errorMessage), {
-                errorCode: error
-            });
-        } else {
-            this.onError(errorMessage);
+        // Only show error if it's a real problem that needs user attention
+        if (shouldShowError && errorMessage) {
+            // Use error handler if available
+            if (window.errorHandler) {
+                const category = error === 'not-allowed' ? 'MICROPHONE_DENIED' : 'SPEECH';
+                window.errorHandler.handleError(category, new Error(errorMessage), {
+                    errorCode: error
+                });
+            } else {
+                this.onError(errorMessage);
+            }
         }
-        this.stopListening();
+        
+        // Only stop listening if we're showing an error
+        if (shouldShowError) {
+            this.stopListening();
+        }
     }
     
     /**
@@ -310,22 +417,30 @@ class VoiceInputManager {
      */
     handlePermissionError(error) {
         let errorMessage = '';
+        let errorCategory = 'MICROPHONE_DENIED';
         
         if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-            errorMessage = 'Microphone permission denied. Please allow microphone access in your browser settings and refresh the page.';
+            errorMessage = 'Microphone permission denied. Click "Grant Permission" to allow access.';
+            errorCategory = 'MICROPHONE_DENIED';
         } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
             errorMessage = 'No microphone found. Please connect a microphone and try again.';
+            errorCategory = 'SPEECH'; // Different category for hardware issues
         } else {
             errorMessage = `Microphone error: ${error.message}. Please try again.`;
+            errorCategory = 'SPEECH';
         }
         
         // Use error handler if available
         if (window.errorHandler) {
-            window.errorHandler.handleError('MICROPHONE_DENIED', error, {
+            window.errorHandler.handleError(errorCategory, error, {
                 errorName: error.name
             });
         } else {
             this.onError(errorMessage);
+            // If no error handler, still try to enable text input
+            if (window.chatUI && typeof window.chatUI.enableTextInputMode === 'function') {
+                window.chatUI.enableTextInputMode();
+            }
         }
     }
     

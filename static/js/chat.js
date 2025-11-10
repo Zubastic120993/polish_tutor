@@ -12,6 +12,45 @@ class ChatUI {
         this.messageInput = document.getElementById('message-input');
         this.sendButton = document.getElementById('send-button');
         this.micButton = document.getElementById('mic-button');
+        this.startButton = document.getElementById('start-lesson-button');
+        this.lessonOverlay = document.getElementById('welcome-overlay');
+        this.welcomeDismiss = document.getElementById('welcome-dismiss');
+        this.lessonTitleEl = document.getElementById('lesson-title');
+        this.lessonLevelEl = document.getElementById('lesson-level');
+        this.lessonGoalEl = document.getElementById('lesson-goal');
+        this.lessonDurationEl = document.getElementById('lesson-duration');
+        this.lessonFocusEl = document.getElementById('lesson-focus');
+        this.startHintEl = document.getElementById('start-lesson-hint');
+        this.progressTitleEl = document.getElementById('lesson-progress-title');
+        this.progressValueEl = document.getElementById('lesson-progress-value');
+        this.progressMeter = document.getElementById('lesson-progress-meter');
+        this.progressStepEl = document.getElementById('lesson-progress-step');
+        this.lessonCatalogPanel = document.getElementById('lesson-catalog-panel');
+        this.lessonCatalogSelect = document.getElementById('lesson-catalog-select');
+        this.lessonCatalogEmptyState = document.getElementById('lesson-catalog-empty');
+        this.lessonCatalogPreview = document.getElementById('lesson-catalog-preview');
+        this.lessonCatalogPreviewId = document.getElementById('lesson-preview-id');
+        this.lessonCatalogPreviewTitle = document.getElementById('lesson-preview-title');
+        this.lessonCatalogPreviewSubtitle = document.getElementById('lesson-preview-subtitle');
+        this.lessonCatalogPreviewMeta = document.getElementById('lesson-preview-meta');
+        this.lessonCatalogRefreshButton = document.getElementById('lesson-catalog-refresh');
+        this.lessonLibraryCollapsedView = document.getElementById('lesson-library-collapsed');
+        this.lessonLibraryToggleButton = document.getElementById('lesson-library-toggle');
+        this.activeLessonLabel = document.getElementById('active-lesson-label');
+        this.micIndicator = document.getElementById('mic-indicator');
+        this.feedbackDeck = document.getElementById('feedback-deck');
+        this.feedbackCards = {
+            success: document.getElementById('feedback-success'),
+            coach: document.getElementById('feedback-coach'),
+            retry: document.getElementById('feedback-retry')
+        };
+        this.supportButtons = {
+            repeat: document.getElementById('support-repeat'),
+            hint: document.getElementById('support-hint'),
+            slow: document.getElementById('support-slow'),
+            topic: document.getElementById('support-topic'),
+            culture: document.getElementById('support-culture')
+        };
         
         this.chatMessages = document.getElementById('chat-messages');
         this.connectionStatus = document.getElementById('connection-status');
@@ -21,6 +60,15 @@ class ChatUI {
         this.successfulPhrases = new Set(); // Track phrases that were answered correctly
         this.lessonScenarioShown = false;
         this.hasShownFirstPromptGuide = false;
+        this.isLessonActive = false;
+        this.defaultLessonId = 'coffee_001';
+        this.isSlowMode = false;
+        this.hasShownStartReminder = false;
+        this.lessonCatalogEntries = [];
+        this.selectedLessonEntry = null;
+        this.chatPlaceholder = document.getElementById('chat-placeholder');
+        this.floatingHintText = document.getElementById('floating-hint-text');
+        this.startTooltip = document.getElementById('start-tooltip');
         
         // Load translation setting from localStorage
         const savedSettings = localStorage.getItem('userSettings');
@@ -43,20 +91,20 @@ class ChatUI {
             }
         });
         
+        this.disableInteraction();
+        this.resetFeedbackDeck();
+        this.resetLessonProgressIndicator();
+        this.setMicIndicatorState(false);
+        this.setStartButtonState('select');
+        this.showPlaceholderMessage();
+        
         this.init();
         this.initVoiceInput();
     }
     
     init() {
         console.log('[Chat] Initializing...');
-        
-        // Show immediate feedback
-        if (this.chatMessages) {
-            const loadingMsg = this.createInfoMessage('Initializing Patient Polish Tutor...');
-            this.chatMessages.appendChild(loadingMsg);
-        }
-        
-        // Initialize WebSocket client
+
         this.initWebSocket();
         
         // Set up event listeners
@@ -64,40 +112,218 @@ class ChatUI {
         
         // Initialize lesson flow
         this.initLessonFlow();
+        
+        // Load lesson catalog so learner can choose a lesson
+        this.loadLessonCatalog();
     }
     
     async initLessonFlow() {
         // Wait for lesson flow manager to be available
-        setTimeout(async () => {
+        setTimeout(() => {
             if (typeof window.lessonFlowManager === 'undefined') {
                 console.warn('LessonFlowManager not loaded. Lesson flow will not be available.');
-                // Fallback to placeholder values
-                this.currentLessonId = 'coffee_001';
-                this.currentDialogueId = 'coffee_001_d1';
                 return;
             }
             
-            // Start default lesson
-            try {
-                console.log('[Chat] Starting lesson coffee_001...');
-                await this.startLesson('coffee_001');
-                console.log('[Chat] Lesson started successfully');
-            } catch (error) {
-                console.error('[Chat] Failed to start lesson:', error);
-                if (window.errorHandler) {
-                    window.errorHandler.handleError('LESSON_DATA', error, {
-                        lessonId: 'coffee_001'
-                    });
-                } else {
-                    this.showErrorMessage('Failed to load lesson. Please refresh the page.');
-                }
-                // Fallback to placeholder values
-                this.currentLessonId = 'coffee_001';
-                this.currentDialogueId = 'coffee_001_d1';
-                // Show welcome message anyway
-                this.showInfoMessage('Welcome! Type a message to start learning Polish.');
+            this.currentDialogueId = null;
+            console.log('[Chat] Lesson manager ready. Waiting for learner to select a lesson.');
+        }, 300);
+    }
+
+    async loadLessonCatalog(force = false) {
+        if (!this.lessonCatalogSelect) {
+            return;
+        }
+
+        if (!this.lessonCatalogEntries.length || force) {
+            if (this.lessonCatalogEmptyState) {
+                this.lessonCatalogEmptyState.hidden = false;
+                this.lessonCatalogEmptyState.textContent = 'Loading lessons...';
             }
-        }, 500); // Increased delay to ensure all scripts are loaded
+            this.lessonCatalogSelect.disabled = true;
+            this.lessonCatalogSelect.innerHTML = '<option value="">Loading lessons...</option>';
+        }
+
+        try {
+            const response = await fetch('/api/lesson/catalog');
+            if (!response.ok) {
+                throw new Error(`Failed to fetch catalog: ${response.status}`);
+            }
+            const payload = await response.json();
+            const entries = payload?.data?.entries || [];
+            this.lessonCatalogEntries = entries;
+            this.renderLessonCatalog();
+        } catch (error) {
+            console.error('[Chat] Failed to load lesson catalog:', error);
+            if (this.lessonCatalogEmptyState) {
+                this.lessonCatalogEmptyState.hidden = false;
+                this.lessonCatalogEmptyState.textContent = 'Unable to load lessons. Tap refresh to try again.';
+            }
+            // Allow fallback to default lesson if available
+            if (!this.currentLessonId && this.defaultLessonId) {
+                this.currentLessonId = this.defaultLessonId;
+                this.setStartButtonState('ready');
+            }
+        }
+    }
+
+    renderLessonCatalog() {
+        if (!this.lessonCatalogSelect) {
+            return;
+        }
+
+        const previousValue = this.lessonCatalogSelect.value;
+        this.lessonCatalogSelect.innerHTML = '';
+
+        if (!this.lessonCatalogEntries.length) {
+            if (this.lessonCatalogEmptyState) {
+                this.lessonCatalogEmptyState.hidden = false;
+                this.lessonCatalogEmptyState.textContent = 'No lessons available yet.';
+            }
+            if (this.lessonCatalogPreview) {
+                this.lessonCatalogPreview.hidden = true;
+            }
+            this.lessonCatalogSelect.disabled = true;
+            return;
+        }
+
+        if (this.lessonCatalogEmptyState) {
+            this.lessonCatalogEmptyState.hidden = true;
+        }
+        this.lessonCatalogSelect.disabled = false;
+
+        const placeholderOption = document.createElement('option');
+        placeholderOption.value = '';
+        placeholderOption.textContent = 'Select a lesson';
+        placeholderOption.disabled = true;
+        placeholderOption.selected = !this.currentLessonId;
+        this.lessonCatalogSelect.appendChild(placeholderOption);
+
+        this.lessonCatalogEntries.forEach((entry) => {
+            const option = document.createElement('option');
+            option.value = entry.id;
+            const title = entry.title_pl || entry.title_en || entry.id;
+            const detail = entry.title_en && entry.title_en !== title ? ` – ${entry.title_en}` : '';
+            option.textContent = `${title}${detail ? detail : ''} (${entry.id})`;
+            this.lessonCatalogSelect.appendChild(option);
+        });
+
+        const hasPrevious = this.lessonCatalogEntries.some((entry) => entry.id === previousValue);
+        if (hasPrevious && previousValue) {
+            this.lessonCatalogSelect.value = previousValue;
+            const entry = this.lessonCatalogEntries.find((item) => item.id === previousValue);
+            if (entry) {
+                this.handleLessonSelection(entry);
+            }
+        } else if (this.currentLessonId) {
+            this.lessonCatalogSelect.value = this.currentLessonId;
+            const entry = this.lessonCatalogEntries.find((item) => item.id === this.currentLessonId);
+            if (entry) {
+                this.handleLessonSelection(entry);
+            }
+        }
+    }
+
+    handleLessonSelection(entry) {
+        if (!entry) {
+            return;
+        }
+
+        this.currentLessonId = entry.id;
+        this.selectedLessonEntry = entry;
+
+        if (this.isLessonActive) {
+            this.resetActiveLessonSession('Switched to a new lesson. Press ▶ Start when ready.');
+        }
+
+        this.previewSelectedLesson(entry);
+        this.setStartButtonState('ready');
+        this.updateFloatingHint('Great choice! Press ▶ Start Lesson to begin.');
+    }
+
+    previewSelectedLesson(entry) {
+        if (!entry) {
+            return;
+        }
+        const derivedLevel = this.deriveLevelFromLessonId(entry.id);
+        const tags = [entry.part, entry.module].filter(Boolean);
+        const previewLesson = {
+            title: entry.title_pl || entry.title_en || entry.id,
+            level: derivedLevel,
+            tags,
+            cefr_goal: entry.title_en ? `Practice: ${entry.title_en}` : undefined,
+        };
+        this.updateLessonOverviewCard(previewLesson);
+        if (this.lessonFocusEl && entry.title_en) {
+            this.lessonFocusEl.textContent = entry.title_en;
+        }
+        this.updateLessonPreviewDetails(entry, derivedLevel, tags);
+    }
+
+    deriveLevelFromLessonId(lessonId) {
+        if (!lessonId) {
+            return 'A0';
+        }
+        const match = lessonId.match(/([A-C]\d)/i);
+        return match ? match[1].toUpperCase() : 'A0';
+    }
+
+    updateLessonPreviewDetails(entry, level, tags) {
+        if (!this.lessonCatalogPreview) {
+            return;
+        }
+
+        const title = entry.title_pl || entry.title_en || entry.id;
+        const subtitle = entry.title_en && entry.title_en !== title ? entry.title_en : entry.part;
+        const metaBits = [
+            level ? `Level ${level}` : null,
+            entry.module ? this.formatLabel(entry.module) : null,
+            entry.status ? this.formatLabel(entry.status) : null,
+        ].filter(Boolean);
+
+        if (this.lessonCatalogPreviewId) {
+            this.lessonCatalogPreviewId.textContent = entry.id;
+        }
+        if (this.lessonCatalogPreviewTitle) {
+            this.lessonCatalogPreviewTitle.textContent = title;
+        }
+        if (this.lessonCatalogPreviewSubtitle) {
+            this.lessonCatalogPreviewSubtitle.textContent = subtitle || '';
+            this.lessonCatalogPreviewSubtitle.hidden = !subtitle;
+        }
+        if (this.lessonCatalogPreviewMeta) {
+            this.lessonCatalogPreviewMeta.textContent = metaBits.join(' • ');
+        }
+
+        this.lessonCatalogPreview.hidden = false;
+    }
+
+    async handleStartLesson() {
+        if (this.isLessonActive) {
+            return;
+        }
+
+        const lessonId = this.currentLessonId || null;
+        if (!lessonId) {
+            this.showInfoMessage('Choose a lesson from the library on the left to begin.');
+            this.setStartButtonState('select');
+            return;
+        }
+
+        this.setStartButtonState('loading');
+
+        try {
+            await this.startLesson(lessonId);
+        } catch (error) {
+            console.error('[Chat] Failed to start lesson:', error);
+            this.isLessonActive = false;
+            this.setStartButtonState('ready');
+            this.resetLessonProgressIndicator();
+            if (window.errorHandler) {
+                window.errorHandler.handleError('LESSON_DATA', error, { lessonId });
+            }
+            this.showErrorMessage('Failed to start the lesson. Please try again in a moment.');
+        }
     }
     
     async startLesson(lessonId) {
@@ -105,21 +331,496 @@ class ChatUI {
             throw new Error('LessonFlowManager not available');
         }
         
+        this.resetLessonProgressIndicator();
         const lessonData = await window.lessonFlowManager.startLesson(lessonId);
         
         this.hasShownFirstPromptGuide = false;
         this.lessonScenarioShown = false;
-
+        this.isLessonActive = true;
+        this.hasShownStartReminder = false;
         this.currentLessonId = lessonData.lesson.id;
         this.currentDialogueId = lessonData.dialogue.id;
         
+        this.enableInteraction();
+        this.dismissWelcomeOverlay();
+        this.setStartButtonState('active');
+        this.collapseLessonLibrary();
+        this.hidePlaceholderMessage();
+        this.updateFloatingHint('Tutor is listening. Answer in Polish and get instant feedback.');
+        this.updateLessonOverviewCard(lessonData.lesson);
+        this.resetFeedbackDeck();
+
         // Show intro message
         this.renderLessonScenarioCard(lessonData);
 
         // Show first tutor message
         this.renderTutorDialogue(lessonData.dialogue);
+        this.updateLessonProgressIndicator();
         
         return lessonData;
+    }
+
+    setStartButtonState(state) {
+        if (!this.startButton) {
+            return;
+        }
+
+        this.startButton.dataset.state = state;
+
+        switch (state) {
+            case 'loading':
+                this.startButton.disabled = true;
+                this.startButton.textContent = '⏳ Starting...';
+                if (this.startHintEl) {
+                    this.startHintEl.textContent = 'Loading your lesson. Hang tight!';
+                }
+                if (this.startTooltip) {
+                    this.startTooltip.style.display = 'none';
+                }
+                break;
+            case 'active':
+                this.startButton.disabled = true;
+                this.startButton.textContent = '✅ Lesson in progress';
+                if (this.startHintEl) {
+                    this.startHintEl.textContent = 'Jump back in any time. Try the helper buttons if you need support.';
+                }
+                if (this.startTooltip) {
+                    this.startTooltip.style.display = 'none';
+                }
+                break;
+            case 'select':
+                this.startButton.disabled = true;
+                this.startButton.textContent = 'Choose a lesson';
+                if (this.startHintEl) {
+                    this.startHintEl.textContent = 'Pick any lesson card from the library to enable the tutor.';
+                }
+                if (this.startTooltip) {
+                    this.startTooltip.style.display = 'inline-flex';
+                }
+                break;
+            default:
+                this.startButton.disabled = false;
+                this.startButton.textContent = '▶️ Start Lesson';
+                if (this.startHintEl) {
+                    this.startHintEl.textContent = 'We’ll guide you step-by-step. Click start when you’re ready.';
+                }
+                if (this.startTooltip) {
+                    this.startTooltip.style.display = 'none';
+                }
+                break;
+        }
+    }
+
+    disableInteraction() {
+        if (this.messageInput) {
+            this.messageInput.disabled = true;
+            this.messageInput.placeholder = 'Tap ▶ Start Lesson to reply…';
+        }
+        if (this.sendButton) {
+            this.sendButton.disabled = true;
+        }
+        if (this.micButton) {
+            this.micButton.disabled = true;
+        }
+        Object.entries(this.supportButtons).forEach(([action, button]) => {
+            if (!button) return;
+            button.disabled = true;
+            button.classList.remove('is-active');
+            if (action === 'slow') {
+                button.textContent = '🐢 Slow Polish';
+            }
+        });
+        if (window.audioManager) {
+            window.audioManager.setSpeed(1.0);
+        }
+        this.isSlowMode = false;
+        this.setMicIndicatorState(false);
+    }
+
+    enableInteraction() {
+        if (this.messageInput) {
+            this.messageInput.disabled = false;
+            this.messageInput.placeholder = '💬 Type or dictate your reply…';
+            setTimeout(() => this.messageInput.focus({ preventScroll: true }), 150);
+        }
+        if (this.sendButton) {
+            this.sendButton.disabled = false;
+        }
+        if (this.micButton) {
+            this.micButton.disabled = false;
+        }
+        Object.values(this.supportButtons).forEach((button) => {
+            if (!button) return;
+            button.disabled = false;
+        });
+        this.setMicIndicatorState(false);
+    }
+
+    dismissWelcomeOverlay() {
+        if (this.lessonOverlay) {
+            this.lessonOverlay.classList.add('is-hidden');
+        }
+    }
+
+    updateLessonOverviewCard(lesson) {
+        if (!lesson) {
+            return;
+        }
+
+        if (this.lessonTitleEl && lesson.title) {
+            this.lessonTitleEl.textContent = lesson.title;
+        }
+        if (this.progressTitleEl && lesson.title) {
+            this.progressTitleEl.textContent = lesson.title;
+        }
+
+        if (this.lessonLevelEl) {
+            const level = (lesson.level || 'A0').toUpperCase();
+            const focusLabel = lesson.tags && lesson.tags.length
+                ? lesson.tags.map((tag) => this.formatLabel(tag)).join(' • ')
+                : (lesson.theme ? this.formatLabel(lesson.theme) : 'Beginner');
+            this.lessonLevelEl.textContent = `Level ${level} • ${focusLabel}`;
+        }
+
+        if (this.lessonGoalEl) {
+            const goal = lesson.cefr_goal || lesson.goal || this.lessonGoalEl.textContent;
+            this.lessonGoalEl.textContent = goal;
+        }
+
+        if (this.lessonDurationEl) {
+            if (lesson.estimated_minutes) {
+                this.lessonDurationEl.textContent = `${lesson.estimated_minutes} minutes`;
+            } else {
+                this.lessonDurationEl.textContent = '3 minutes';
+            }
+        }
+
+        if (this.lessonFocusEl) {
+            if (lesson.tags && lesson.tags.length) {
+                this.lessonFocusEl.textContent = lesson.tags.map((tag) => this.formatLabel(tag)).join(', ');
+            } else if (lesson.theme) {
+                this.lessonFocusEl.textContent = this.formatLabel(lesson.theme);
+            }
+        }
+    }
+
+    handleLessonComplete() {
+        this.isLessonActive = false;
+        this.expandLessonLibrary();
+        this.setStartButtonState('ready');
+        this.updateFloatingHint('Lesson complete! Choose another lesson to keep practicing.');
+        this.showPlaceholderMessage();
+    }
+
+    formatLabel(value) {
+        if (!value) return '';
+        const human = value.replace(/[_-]+/g, ' ');
+        return human.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+    }
+
+    updateFloatingHint(message) {
+        if (this.floatingHintText && message) {
+            this.floatingHintText.textContent = message;
+        }
+    }
+
+    collapseLessonLibrary() {
+        if (this.lessonCatalogPanel) {
+            this.lessonCatalogPanel.classList.add('is-collapsed');
+        }
+        if (this.lessonLibraryCollapsedView) {
+            if (this.activeLessonLabel && this.lessonTitleEl) {
+                this.activeLessonLabel.textContent = this.lessonTitleEl.textContent || this.currentLessonId || 'Lesson';
+            }
+            this.lessonLibraryCollapsedView.hidden = false;
+        }
+    }
+
+    expandLessonLibrary() {
+        if (this.lessonCatalogPanel) {
+            this.lessonCatalogPanel.classList.remove('is-collapsed');
+        }
+        if (this.lessonLibraryCollapsedView) {
+            this.lessonLibraryCollapsedView.hidden = true;
+        }
+    }
+
+    resetActiveLessonSession(reason = '') {
+        if (window.lessonFlowManager && typeof window.lessonFlowManager.reset === 'function') {
+            window.lessonFlowManager.reset();
+        }
+        this.isLessonActive = false;
+        this.currentDialogueId = null;
+        this.disableInteraction();
+        this.resetLessonProgressIndicator();
+        this.resetFeedbackDeck();
+        this.expandLessonLibrary();
+        this.setStartButtonState(this.currentLessonId ? 'ready' : 'select');
+        this.showPlaceholderMessage();
+        if (reason) {
+            this.showInfoMessage(reason);
+        }
+        this.updateFloatingHint('Pick a lesson to begin, then press ▶ Start.');
+    }
+
+    hidePlaceholderMessage() {
+        if (this.chatPlaceholder) {
+            this.chatPlaceholder.hidden = true;
+        }
+    }
+
+    showPlaceholderMessage() {
+        if (this.chatPlaceholder) {
+            this.chatPlaceholder.hidden = false;
+        }
+    }
+
+    resetLessonProgressIndicator() {
+        if (this.progressMeter) {
+            this.progressMeter.style.width = '0%';
+            if (this.progressMeter.parentElement) {
+                this.progressMeter.parentElement.setAttribute('aria-valuenow', '0');
+                this.progressMeter.parentElement.setAttribute('aria-valuetext', '0 percent complete');
+            }
+        }
+        if (this.progressValueEl) {
+            this.progressValueEl.textContent = '0% complete';
+        }
+        if (this.progressStepEl) {
+            this.progressStepEl.textContent = 'Waiting to begin';
+        }
+    }
+
+    updateLessonProgressIndicator() {
+        if (!this.progressMeter || !window.lessonFlowManager) {
+            return;
+        }
+
+        if (typeof window.lessonFlowManager.getLessonSummary !== 'function') {
+            return;
+        }
+
+        const summary = window.lessonFlowManager.getLessonSummary();
+        if (!summary) {
+            return;
+        }
+
+        const total = summary.totalDialogues || 0;
+        const completedUnique = summary.uniqueDialogues || 0;
+        const percent = total > 0 ? Math.min(100, Math.round((completedUnique / total) * 100)) : 0;
+
+        this.progressMeter.style.width = `${percent}%`;
+        if (this.progressMeter.parentElement) {
+            this.progressMeter.parentElement.setAttribute('aria-valuenow', String(percent));
+            this.progressMeter.parentElement.setAttribute('aria-valuetext', `${percent} percent complete`);
+        }
+        if (this.progressValueEl) {
+            this.progressValueEl.textContent = `${percent}% complete`;
+        }
+        if (this.progressStepEl) {
+            if (total > 0) {
+                const step = Math.max(1, Math.min(completedUnique || 1, total));
+                this.progressStepEl.textContent = `Step ${step} of ${total}`;
+            } else {
+                this.progressStepEl.textContent = 'In progress';
+            }
+        }
+    }
+
+    setMicIndicatorState(isActive) {
+        if (!this.micIndicator) {
+            return;
+        }
+        if (isActive) {
+            this.micIndicator.hidden = false;
+            this.micIndicator.classList.add('is-active');
+        } else {
+            this.micIndicator.classList.remove('is-active');
+            this.micIndicator.hidden = true;
+        }
+    }
+
+    resetFeedbackDeck() {
+        Object.values(this.feedbackCards).forEach((card) => {
+            if (!card) return;
+            card.hidden = true;
+            const textEl = card.querySelector('.feedback-card__text');
+            if (textEl) {
+                textEl.textContent = '';
+            }
+        });
+    }
+
+    updateFeedbackDeck(data) {
+        if (!this.feedbackDeck) {
+            return;
+        }
+
+        const type = data?.feedback_type;
+        if (!type) {
+            this.resetFeedbackDeck();
+            return;
+        }
+
+        const mapping = {
+            high: 'success',
+            medium: 'coach',
+            low: 'retry'
+        };
+
+        const cardKey = mapping[type];
+        if (!cardKey || !this.feedbackCards[cardKey]) {
+            this.resetFeedbackDeck();
+            return;
+        }
+
+        Object.values(this.feedbackCards).forEach((card) => {
+            if (card) card.hidden = true;
+        });
+
+        const card = this.feedbackCards[cardKey];
+        const textEl = card.querySelector('.feedback-card__text');
+        if (textEl) {
+            const message = data.feedback_summary || data.reply_text || '';
+            textEl.textContent = message.trim();
+        }
+        card.hidden = false;
+    }
+
+    handleSupportAction(action) {
+        if (!this.isLessonActive && action !== 'slow') {
+            this.handleStartLesson();
+            return;
+        }
+
+        switch (action) {
+            case 'repeat':
+                this.handleRepeat();
+                break;
+            case 'hint':
+                this.sendCommand('hint');
+                break;
+            case 'topic':
+                this.sendCommand('change topic');
+                break;
+            case 'culture':
+                this.sendCommand('teach me about coffee');
+                break;
+            case 'slow':
+                this.toggleSlowMode();
+                break;
+            default:
+                console.warn('[Chat] Unknown support action:', action);
+        }
+    }
+
+    toggleSlowMode() {
+        const slowButton = this.supportButtons.slow;
+        if (!window.audioManager) {
+            this.showInfoMessage('Audio controls are still loading. Try again in a moment.');
+            return;
+        }
+
+        this.isSlowMode = !this.isSlowMode;
+        const newSpeed = this.isSlowMode ? 0.75 : 1.0;
+        window.audioManager.setSpeed(newSpeed);
+
+        if (slowButton) {
+            slowButton.classList.toggle('is-active', this.isSlowMode);
+            slowButton.textContent = this.isSlowMode ? '🐢 Slow Polish ON' : '🐢 Slow Polish';
+        }
+
+        if (this.isSlowMode) {
+            this.showInfoMessage('Playing tutor audio at 0.75× speed. Tap again to return to normal.');
+        } else {
+            this.showInfoMessage('Back to normal pace. You can slow it down anytime.');
+        }
+    }
+
+    sendCommand(commandText) {
+        if (!commandText) {
+            return;
+        }
+
+        if (!this.wsClient || !this.wsClient.isConnected()) {
+            this.showErrorMessage('Not connected. Please wait...');
+            return;
+        }
+
+        this.resetFeedbackDeck();
+        this.lastUserMessage = commandText;
+        this.renderLearnerMessage(commandText);
+        this.setMicIndicatorState(false);
+
+        try {
+            this.wsClient.sendMessage(
+                commandText,
+                this.currentLessonId,
+                this.currentDialogueId,
+                window.audioManager ? window.audioManager.getSpeed() : 1.0,
+                null
+            );
+        } catch (error) {
+            console.error('Error sending command:', error);
+            if (window.errorHandler) {
+                window.errorHandler.handleError('NETWORK', error, {
+                    action: 'send_command'
+                });
+            } else {
+                this.showErrorMessage('Failed to send command. Please try again.');
+            }
+        }
+    }
+
+    async changeLesson(lessonId) {
+        if (!lessonId) {
+            return;
+        }
+
+        if (!window.lessonFlowManager) {
+            throw new Error('LessonFlowManager not available');
+        }
+
+        let loadingMessage = null;
+
+        // Clear existing lesson context
+        try {
+            if (window.lessonFlowManager.reset) {
+                window.lessonFlowManager.reset();
+            }
+
+            if (this.chatMessages) {
+                this.chatMessages.innerHTML = '';
+            }
+            this.resetLessonProgressIndicator();
+
+            if (this.chatMessages) {
+                loadingMessage = this.createInfoMessage(`Loading lesson ${lessonId}...`);
+            }
+
+            if (this.chatMessages) {
+                this.chatMessages.appendChild(loadingMessage);
+                this.scrollToBottom();
+            }
+
+            const lessonData = await this.startLesson(lessonId);
+
+            if (loadingMessage && loadingMessage.parentElement) {
+                loadingMessage.remove();
+            }
+
+            const lessonTitle = lessonData?.lesson?.title || lessonId;
+            this.showInfoMessage(`Now practicing: ${lessonTitle}`);
+
+            return lessonData;
+        } catch (error) {
+            console.error('[Chat] Failed to change lesson:', error);
+            if (loadingMessage && loadingMessage.parentElement) {
+                loadingMessage.remove();
+            }
+            this.showErrorMessage(`Failed to load lesson "${lessonId}". Please try again.`);
+            throw error;
+        }
     }
     
     /**
@@ -151,71 +852,76 @@ class ChatUI {
         const level = lesson.level ? lesson.level.toUpperCase() : 'A0';
         const goal = lesson.cefr_goal || lessonData?.intro || 'Practice speaking naturally.';
 
-        const card = document.createElement('div');
-        card.className = 'message message--info lesson-scenario';
-        card.setAttribute('role', 'article');
-        card.setAttribute('aria-label', 'Lesson introduction');
+        const { messageDiv, bubbleDiv } = this.buildMessageStructure('info', {
+            avatarType: 'info',
+            avatar: '☕',
+            ariaLabel: 'Lesson introduction',
+            includeMeta: false
+        });
+        messageDiv.classList.add('lesson-scenario');
 
-        const bubble = document.createElement('div');
-        bubble.className = 'message__bubble';
-        bubble.innerHTML = `<div style="font-size: 1rem; font-weight: 600;">☕ Welcome! Imagine you're stepping into a cozy Polish café.</div>` +
-            `<div style="margin-top: 0.75rem;">Today we're working on <strong>${title}</strong> (Level ${level}).</div>` +
-            `<div style="color: var(--color-text-muted, #4b5563); margin-top: 0.35rem;">🎯 Goal: ${goal}</div>` +
-            `<div style="margin-top: 1rem; font-weight: 500;">Here's how to begin:</div>` +
-            `<ol style="margin: 0.5rem 0 0; padding-left: 1.4rem; display: grid; gap: 0.35rem; text-align: left;">` +
-            `<li><strong>Listen</strong> — tap the green play button to hear the tutor.</li>` +
-            `<li><strong>Reply</strong> — speak with the microphone or type your answer.</li>` +
-            `<li><strong>Need help?</strong> — try “repeat”, “hint”, or “change topic”.</li>` +
-            `</ol>` +
-            `<div style="margin-top: 0.85rem; font-weight: 500;">Quick commands:</div>`;
+        const wrapper = document.createElement('div');
+        wrapper.style.display = 'grid';
+        wrapper.style.gap = '0.75rem';
+        wrapper.style.color = 'rgba(68, 40, 26, 0.95)';
 
-        const chips = document.createElement('div');
-        chips.style.display = 'flex';
-        chips.style.flexWrap = 'wrap';
-        chips.style.gap = '0.5rem';
-        chips.style.marginTop = '0.5rem';
+        const heading = document.createElement('div');
+        heading.style.fontWeight = '700';
+        heading.style.fontSize = '1.05rem';
+        heading.textContent = `Welcome to ${title}! (Level ${level})`;
+        wrapper.appendChild(heading);
 
-        const commands = ['repeat', 'hint', 'change topic', 'teach me about coffee'];
-        commands.forEach((cmd) => {
+        const goalBox = document.createElement('div');
+        goalBox.style.background = 'rgba(248, 225, 196, 0.5)';
+        goalBox.style.borderRadius = '16px';
+        goalBox.style.padding = '0.75rem 1rem';
+        goalBox.style.fontWeight = '500';
+        goalBox.innerHTML = `<span style="display:block; font-size:0.85rem; letter-spacing:0.08em; text-transform:uppercase; color:rgba(124,58,18,0.75);">Goal</span><span>🎯 ${goal}</span>`;
+        wrapper.appendChild(goalBox);
+
+        const steps = document.createElement('div');
+        steps.style.display = 'grid';
+        steps.style.gap = '0.45rem';
+        steps.innerHTML = [
+            `<div><strong>1.</strong> Tap <span style="white-space:nowrap;">🔊 Play</span> to hear your tutor.</div>`,
+            `<div><strong>2.</strong> Speak or type your reply — Polish or English is fine.</div>`,
+            `<div><strong>3.</strong> Use the helper buttons when you need a boost.</div>`
+        ].join('');
+        wrapper.appendChild(steps);
+
+        const chipRow = document.createElement('div');
+        chipRow.style.display = 'flex';
+        chipRow.style.flexWrap = 'wrap';
+        chipRow.style.gap = '0.5rem';
+        chipRow.style.marginTop = '0.5rem';
+
+        const chipConfigs = [
+            { label: '🔁 Repeat', action: 'repeat' },
+            { label: '💡 Hint', action: 'hint' },
+            { label: '🐢 Slow Polish', action: 'slow' },
+            { label: '☕ Change topic', action: 'topic' }
+        ];
+
+        chipConfigs.forEach(({ label, action }) => {
             const chip = document.createElement('button');
             chip.type = 'button';
-            chip.textContent = cmd;
-            chip.style.border = '1px solid var(--color-border, rgba(148, 163, 184, 0.35))';
-            chip.style.background = 'transparent';
-            chip.style.color = 'var(--color-text)';
-            chip.style.borderRadius = '999px';
-            chip.style.padding = '0.35rem 0.75rem';
-            chip.style.fontSize = '0.85rem';
-            chip.style.cursor = 'pointer';
-            chip.style.transition = 'background 0.2s ease, color 0.2s ease';
-
-            chip.addEventListener('mouseenter', () => {
-                chip.style.background = 'var(--color-primary-muted, rgba(59,130,246,0.15))';
-            });
-            chip.addEventListener('mouseleave', () => {
-                chip.style.background = 'transparent';
-            });
-
-            chip.addEventListener('click', () => {
-                if (this.messageInput) {
-                    this.messageInput.value = cmd;
-                    this.messageInput.focus();
-                }
-            });
-
-            chips.appendChild(chip);
+            chip.className = 'scenario-chip';
+            chip.textContent = label;
+            chip.addEventListener('click', () => this.handleSupportAction(action));
+            chipRow.appendChild(chip);
         });
 
-        bubble.appendChild(chips);
-        card.appendChild(bubble);
-        this.chatMessages.appendChild(card);
+        wrapper.appendChild(chipRow);
+        bubbleDiv.appendChild(wrapper);
+        this.chatMessages.appendChild(messageDiv);
         this.scrollToBottom();
-
+        
         this.lessonScenarioShown = true;
     }
 
     renderTutorDialogue(dialogue) {
         if (!dialogue) return;
+        this.hidePlaceholderMessage();
         
         const tutorText = dialogue.tutor || '';
         const translation = dialogue.translation || '';
@@ -361,6 +1067,7 @@ class ChatUI {
         
         this.chatMessages.appendChild(messageEl);
         this.scrollToBottom();
+        this.updateLessonProgressIndicator();
     }
     
     initVoiceInput() {
@@ -428,6 +1135,7 @@ class ChatUI {
         
         // Update feather icon
         feather.replace();
+        this.setMicIndicatorState(isListening);
     }
     
     initWebSocket() {
@@ -480,18 +1188,27 @@ class ChatUI {
     }
     
     setupEventListeners() {
-        // Send button click
-        this.sendButton.addEventListener('click', () => {
-            this.sendMessage();
-        });
-        
-        // Enter key to send (Shift+Enter for new line)
-        this.messageInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
+        if (this.sendButton) {
+            // Send button click
+            this.sendButton.addEventListener('click', () => {
                 this.sendMessage();
-            }
-        });
+            });
+        }
+        
+        if (this.messageInput) {
+            // Enter key to send (Shift+Enter for new line)
+            this.messageInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.sendMessage();
+                }
+            });
+            
+            // Auto-resize textarea
+            this.messageInput.addEventListener('input', () => {
+                this.autoResizeTextarea();
+            });
+        }
         
         // Mic button
         if (this.micButton) {
@@ -501,16 +1218,59 @@ class ChatUI {
             });
         }
         
-        // Auto-resize textarea
-        this.messageInput.addEventListener('input', () => {
-            this.autoResizeTextarea();
+        if (this.startButton) {
+            this.startButton.addEventListener('click', () => this.handleStartLesson());
+        }
+        
+        if (this.welcomeDismiss) {
+            this.welcomeDismiss.addEventListener('click', () => this.dismissWelcomeOverlay());
+        }
+        
+        if (this.lessonCatalogRefreshButton) {
+            this.lessonCatalogRefreshButton.addEventListener('click', () => this.loadLessonCatalog(true));
+        }
+
+        if (this.lessonCatalogSelect) {
+            this.lessonCatalogSelect.addEventListener('change', (event) => {
+                const selectedId = event.target.value;
+                const entry = this.lessonCatalogEntries.find((item) => item.id === selectedId);
+                if (entry) {
+                    this.handleLessonSelection(entry);
+                }
+            });
+        }
+
+        if (this.lessonLibraryToggleButton) {
+            this.lessonLibraryToggleButton.addEventListener('click', () => {
+                this.expandLessonLibrary();
+                this.updateFloatingHint('Pick another lesson and press ▶ Start to continue.');
+                this.setStartButtonState('ready');
+            });
+        }
+        
+        Object.entries(this.supportButtons).forEach(([action, button]) => {
+            if (!button) return;
+            button.addEventListener('click', () => this.handleSupportAction(action));
         });
     }
     
     sendMessage() {
+        if (!this.messageInput) {
+            return;
+        }
+        
         const text = this.messageInput.value.trim();
         
         if (!text) {
+            return;
+        }
+
+        if (!this.isLessonActive) {
+            if (!this.hasShownStartReminder) {
+                this.showInfoMessage('Tap ▶️ Start Lesson to meet your tutor.');
+                this.hasShownStartReminder = true;
+            }
+            this.setMicIndicatorState(false);
             return;
         }
         
@@ -528,14 +1288,17 @@ class ChatUI {
         // Clear input
         this.messageInput.value = '';
         this.autoResizeTextarea();
+        this.resetFeedbackDeck();
+        this.setMicIndicatorState(false);
         
         // Send via WebSocket
         try {
+            const playbackSpeed = window.audioManager ? window.audioManager.getSpeed() : 1.0;
             this.wsClient.sendMessage(
                 text,
                 this.currentLessonId,
                 this.currentDialogueId,
-                1.0, // speed
+                playbackSpeed,
                 null  // confidence (will be from settings later)
             );
         } catch (error) {
@@ -583,6 +1346,10 @@ class ChatUI {
         summaryEl.appendChild(bubble);
         
         this.chatMessages.appendChild(summaryEl);
+        this.isLessonActive = false;
+        this.setStartButtonState('ready');
+        this.disableInteraction();
+        this.updateLessonProgressIndicator();
         this.scrollToBottom();
         
         // Reset lesson state (but keep summary visible)
@@ -604,6 +1371,10 @@ class ChatUI {
     renderTutorMessage(data, metadata) {
         // Debug: Log received data
         console.log('[Chat] Tutor message data:', data);
+        this.hidePlaceholderMessage();
+        this.updateFeedbackDeck(data);
+        const phraseId = data.dialogue_id || this.currentDialogueId;
+        const translation = data.translation || data.expected_translation || '';
         
         // HANDLE COMMANDS FIRST
         if (data.command) {
@@ -639,6 +1410,19 @@ class ChatUI {
                                 this.renderTutorDialogue(dialogue);
                             }
                         }, 1000);
+                    }
+                    return;
+                
+                case 'load_lesson':
+                    if (data.lesson_id) {
+                        setTimeout(async () => {
+                            try {
+                                await this.changeLesson(data.lesson_id);
+                            } catch (error) {
+                                console.error('[Chat] Failed to change lesson:', error);
+                                this.showErrorMessage(`Failed to load lesson "${data.lesson_id}". Please try again.`);
+                            }
+                        }, 500);
                     }
                     return;
                 
@@ -755,6 +1539,7 @@ class ChatUI {
                     // Show lesson summary
                     setTimeout(() => {
                         this.showLessonSummary();
+                        this.handleLessonComplete();
                     }, 1000);
                 } else if (nextDialogue) {
                     // Show next dialogue after a short delay
@@ -806,8 +1591,8 @@ class ChatUI {
             phraseText.className = 'tutor-phrase__text';
             phraseText.textContent = tutorPhrase;
             phraseCard.appendChild(phraseText);
-
-            if (translation && this.shouldShowTranslation(dialogue.id)) {
+            
+            if (translation && this.shouldShowTranslation(phraseId)) {
                 const translationEl = document.createElement('div');
                 translationEl.className = 'tutor-phrase__translation';
                 translationEl.textContent = translation;
@@ -820,7 +1605,7 @@ class ChatUI {
             phraseCard.appendChild(helperRow);
 
             bubble.appendChild(phraseCard);
-        } else if (translation && this.shouldShowTranslation(dialogue.id)) {
+        } else if (translation && this.shouldShowTranslation(phraseId)) {
             const translationEl = document.createElement('div');
             translationEl.className = 'tutor-phrase__translation';
             translationEl.textContent = translation;
@@ -834,8 +1619,8 @@ class ChatUI {
                 bubble.appendChild(scoreEl);
             }
             
-            if (this.translationMode === 'smart' && this.currentDialogueId && data.score >= 0.85) {
-                this.successfulPhrases.add(this.currentDialogueId);
+            if (this.translationMode === 'smart' && phraseId && data.score >= 0.85) {
+                this.successfulPhrases.add(phraseId);
             }
             
             if (window.sessionManager) {
@@ -981,35 +1766,115 @@ class ChatUI {
         }
         
         this.chatMessages.appendChild(messageEl);
+        this.updateLessonProgressIndicator();
         this.scrollToBottom();
     }
     
-    createMessageElement(type, text) {
+    getAvatarForType(type) {
+        switch (type) {
+            case 'tutor':
+                return '☕';
+            case 'learner':
+                return '🧑';
+            case 'hint':
+                return '💡';
+            case 'error':
+                return '⚠️';
+            case 'info':
+            default:
+                return 'ℹ️';
+        }
+    }
+
+    buildMessageStructure(type, options = {}) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message message--${type}`;
         messageDiv.setAttribute('role', 'article');
-        messageDiv.setAttribute('aria-label', `${type === 'tutor' ? 'Tutor' : 'Your'} message`);
-        
+        messageDiv.setAttribute('aria-label', options.ariaLabel || (type === 'tutor' ? 'Tutor message' : type === 'learner' ? 'Your message' : 'Message'));
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'message__wrapper';
+
+        const avatarType = options.avatarType || type;
+        const avatar = document.createElement('div');
+        avatar.className = `message__avatar message__avatar--${avatarType}`;
+        avatar.textContent = options.avatar || this.getAvatarForType(avatarType);
+
         const bubbleDiv = document.createElement('div');
         bubbleDiv.className = 'message__bubble';
-        
-        const textP = document.createElement('p');
-        textP.textContent = text;
-        bubbleDiv.appendChild(textP);
-        
-        messageDiv.appendChild(bubbleDiv);
-        
-        const metaDiv = document.createElement('div');
-        metaDiv.className = 'message__meta';
-        
-        const timeEl = document.createElement('time');
-        timeEl.setAttribute('datetime', new Date().toISOString());
-        timeEl.textContent = 'Just now';
-        metaDiv.appendChild(timeEl);
-        
-        messageDiv.appendChild(metaDiv);
-        
+
+        wrapper.appendChild(avatar);
+        wrapper.appendChild(bubbleDiv);
+        messageDiv.appendChild(wrapper);
+
+        let metaDiv = null;
+        if (options.includeMeta !== false && (type === 'tutor' || type === 'learner')) {
+            metaDiv = document.createElement('div');
+            metaDiv.className = 'message__meta';
+            const timeEl = document.createElement('time');
+            timeEl.setAttribute('datetime', new Date().toISOString());
+            timeEl.textContent = 'Just now';
+            metaDiv.appendChild(timeEl);
+            messageDiv.appendChild(metaDiv);
+        }
+
+        return { messageDiv, bubbleDiv, metaDiv };
+    }
+
+    createMessageElement(type, text) {
+        const { messageDiv, bubbleDiv } = this.buildMessageStructure(type);
+        bubbleDiv.innerHTML = this.formatMessageText(text);
         return messageDiv;
+    }
+
+    formatMessageText(text) {
+        const escapeHtml = (unsafe) =>
+            unsafe
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+
+        if (!text || typeof text !== 'string') {
+            return '<p></p>';
+        }
+
+        const lines = text.split(/\n+/);
+        const htmlParts = [];
+        let listItems = [];
+
+        const flushList = () => {
+            if (listItems.length > 0) {
+                htmlParts.push(`<ul class="message__list">${listItems.join('')}</ul>`);
+                listItems = [];
+            }
+        };
+
+        for (const line of lines) {
+            const trimmed = line.trim();
+
+            if (!trimmed) {
+                flushList();
+                continue;
+            }
+
+            if (trimmed.startsWith('•')) {
+                const itemText = escapeHtml(trimmed.replace(/^•\s*/, ''));
+                listItems.push(`<li>${itemText}</li>`);
+            } else {
+                flushList();
+                htmlParts.push(`<p>${escapeHtml(trimmed)}</p>`);
+            }
+        }
+
+        flushList();
+
+        if (htmlParts.length === 0) {
+            htmlParts.push(`<p>${escapeHtml(text)}</p>`);
+        }
+
+        return htmlParts.join('');
     }
     
     createScoreIndicator(score, feedbackType) {
@@ -1181,30 +2046,25 @@ class ChatUI {
     }
     
     createHintMessage(hint) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = 'message message--hint';
-        messageDiv.setAttribute('role', 'article');
-        messageDiv.setAttribute('aria-label', 'Hint');
-        
-        const bubbleDiv = document.createElement('div');
-        bubbleDiv.className = 'message__bubble';
-        bubbleDiv.textContent = `💡 ${hint}`;
-        
-        messageDiv.appendChild(bubbleDiv);
+        const { messageDiv, bubbleDiv } = this.buildMessageStructure('hint', {
+            avatarType: 'hint',
+            avatar: '💡',
+            ariaLabel: 'Hint',
+            includeMeta: false
+        });
+        bubbleDiv.textContent = hint.startsWith('💡') ? hint : `💡 ${hint}`;
+        messageDiv.classList.add('message--info');
         return messageDiv;
     }
     
     createInfoMessage(info) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = 'message message--info';
-        messageDiv.setAttribute('role', 'article');
-        messageDiv.setAttribute('aria-label', 'Information');
-        
-        const bubbleDiv = document.createElement('div');
-        bubbleDiv.className = 'message__bubble';
-        bubbleDiv.textContent = `📚 ${info}`;
-        
-        messageDiv.appendChild(bubbleDiv);
+        const { messageDiv, bubbleDiv } = this.buildMessageStructure('info', {
+            avatarType: 'info',
+            avatar: '📚',
+            ariaLabel: 'Information',
+            includeMeta: false
+        });
+        bubbleDiv.textContent = info.startsWith('📚') ? info : `📚 ${info}`;
         return messageDiv;
     }
     
@@ -1236,18 +2096,17 @@ class ChatUI {
     }
     
     showErrorMessage(message) {
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'message message--info';
-        errorDiv.setAttribute('role', 'alert');
-        
-        const bubbleDiv = document.createElement('div');
-        bubbleDiv.className = 'message__bubble';
-        bubbleDiv.textContent = `⚠️ ${message}`;
+        const { messageDiv, bubbleDiv } = this.buildMessageStructure('info', {
+            avatarType: 'error',
+            avatar: '⚠️',
+            ariaLabel: 'Error message',
+            includeMeta: false
+        });
+        messageDiv.classList.add('message--error');
+        bubbleDiv.textContent = message.startsWith('⚠️') ? message : `⚠️ ${message}`;
         bubbleDiv.style.backgroundColor = 'var(--color-error)';
         bubbleDiv.style.color = 'white';
-        
-        errorDiv.appendChild(bubbleDiv);
-        this.chatMessages.appendChild(errorDiv);
+        this.chatMessages.appendChild(messageDiv);
         this.scrollToBottom();
     }
     
@@ -1325,6 +2184,7 @@ class ChatUI {
             this.micButton.style.display = 'none';
             this.micButton.setAttribute('aria-hidden', 'true');
         }
+        this.setMicIndicatorState(false);
         
         if (this.messageInput) {
             // Ensure input is enabled
@@ -1349,24 +2209,7 @@ class ChatUI {
     }
     
     handleRepeat() {
-        // Get the last tutor message and repeat it
-        const tutorMessages = this.chatMessages.querySelectorAll('.message--tutor');
-        if (tutorMessages.length > 0) {
-            const lastMessage = tutorMessages[tutorMessages.length - 1];
-            const text = lastMessage.querySelector('.message__bubble p').textContent;
-            this.renderLearnerMessage(text);
-            
-            // Send repeat request (same text as tutor's last message)
-            if (this.wsClient && this.wsClient.isConnected()) {
-                this.wsClient.sendMessage(
-                    text,
-                    this.currentLessonId,
-                    this.currentDialogueId,
-                    1.0,
-                    null
-                );
-            }
-        }
+        this.sendCommand('repeat');
     }
     
     handleExplainWhy(data) {
@@ -1487,8 +2330,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.chatUI && window.chatUI.chatMessages) {
                 const messages = window.chatUI.chatMessages.querySelectorAll('.message');
                 if (messages.length === 0) {
-                    // No messages yet, show loading message
-                    window.chatUI.showInfoMessage('Loading lesson... Please wait.');
+                    // No messages yet, encourage lesson selection
+                    window.chatUI.showInfoMessage('Browse the lesson library on the left and pick a lesson to begin.');
                 }
             }
         }, 1000);
@@ -1504,4 +2347,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
-

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Test</title>
+</head>
+<body>
+    <h1>Debug Test</h1>
+    <div id="status">Loading...</div>
+    
+    <script>
+        console.log('Test script loaded!');
+        document.getElementById('status').textContent = 'JavaScript is working!';
+        
+        // Test if chat elements exist
+        setTimeout(() => {
+            fetch('/api/lesson/get?lesson_id=coffee_001')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('status').textContent = 
+                        'API Working! Lesson: ' + data.data.title;
+                })
+                .catch(err => {
+                    document.getElementById('status').textContent = 
+                        'API Error: ' + err.message;
+                });
+        }, 100);
+    </script>
+</body>
+</html>
+

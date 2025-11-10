@@ -4,9 +4,9 @@ An AI-assisted conversational tutor for learning spoken Polish (A0 → A1 level)
 
 ## 📋 Project Status
 
-**Phase:** Integration & Polish (Phase 5)  
-**Current Checkpoint:** 5.2 - Settings & Personalization  
-**Progress:** 64% (16/25 checkpoints complete)
+**Phase:** Testing & QA (Phase 6)  
+**Current Checkpoint:** 6.1 - Unit Tests  
+**Progress:** 80% (20/25 checkpoints complete)
 
 See [PROGRESS.md](PROGRESS.md) for detailed tracking.
 
@@ -192,4 +192,3 @@ See [ROADMAP.md](ROADMAP.md) for planned features and checkpoints.
 **Phase 3:** Complete (2/2 checkpoints)  
 **Phase 4:** Complete (4/4 checkpoints)  
 **Phase 5:** In Progress (1/5 checkpoints)
-

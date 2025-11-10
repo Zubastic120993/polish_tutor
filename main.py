@@ -1,6 +1,5 @@
 """Main FastAPI application entry point."""
 import logging
-import os
 from pathlib import Path
 
 from fastapi import FastAPI, Request, WebSocket, status

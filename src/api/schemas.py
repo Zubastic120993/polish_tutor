@@ -55,6 +55,26 @@ class LessonOptionsResponse(APIResponse):
     data: Optional[dict] = Field(None, description="Branch options for current dialogue")
 
 
+class LessonCatalogEntry(BaseModel):
+    """Single lesson catalog entry."""
+    id: str = Field(..., description="Lesson identifier")
+    title_pl: Optional[str] = Field(None, description="Polish lesson title")
+    title_en: Optional[str] = Field(None, description="English lesson title")
+    status: Optional[str] = Field(None, description="Lesson status (draft, in_progress, complete)")
+    module: Optional[str] = Field(None, description="Module title (if applicable)")
+    part: Optional[str] = Field(None, description="Part title (if applicable)")
+
+
+class LessonCatalogData(BaseModel):
+    """Lesson catalog payload."""
+    entries: List[LessonCatalogEntry] = Field(default_factory=list, description="Flattened lesson catalog entries")
+
+
+class LessonCatalogResponse(APIResponse):
+    """Response schema for GET /lesson/catalog."""
+    data: Optional[LessonCatalogData] = None
+
+
 # Review endpoints
 class ReviewUpdateRequest(BaseModel):
     """Request schema for POST /review/update."""

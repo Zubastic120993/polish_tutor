@@ -5,33 +5,38 @@
 
 :root {
   /* Colors - Light Mode */
-  --color-bg: #f4f5f7;
+  --color-bg: #fef9f4;
   --color-bg-dark: #10131a;
   --color-surface: #ffffff;
   --color-surface-dark: #1a1d26;
-  --color-text: #2d3748;
-  --color-text-dark: #e2e8f0;
-  --color-text-muted: #718096;
-  --color-text-muted-dark: #a0aec0;
+  --color-text: #3b2f2a;
+  --color-text-dark: #f7fafc;
+  --color-text-muted: #8b6a5a;
+  --color-text-muted-dark: #cbd5f5;
   
   /* Accent Colors */
-  --color-accent: #e63946;
-  --color-accent-hover: #d62839;
-  --color-success: #2a9d8f;
-  --color-success-hover: #21867a;
-  --color-warning: #f77f00;
-  --color-error: #d62839;
-  --color-info: #457b9d;
+  --color-accent: #f59e0b;
+  --color-accent-hover: #d97706;
+  --color-success: #22c55e;
+  --color-success-hover: #16a34a;
+  --color-warning: #f97316;
+  --color-error: #dc2626;
+  --color-info: #2563eb;
+  --color-soft-amber: #f8e1c4;
+  --color-soft-espresso: #b08b73;
+  --color-soft-blue: #cfe4f9;
+  --color-soft-cream: #fff8eb;
+  --color-soft-green: #d1f5da;
   
   /* Chat Colors */
-  --color-chat-tutor-bg: #ffffff;
+  --color-chat-tutor-bg: #fdf3e7;
   --color-chat-tutor-bg-dark: #2d3748;
-  --color-chat-learner-bg: #e63946;
-  --color-chat-learner-bg-dark: #c1121f;
-  --color-chat-hint-bg: #fff3cd;
-  --color-chat-hint-bg-dark: #856404;
-  --color-chat-info-bg: #d1ecf1;
-  --color-chat-info-bg-dark: #0c5460;
+  --color-chat-learner-bg: #dbeafe;
+  --color-chat-learner-bg-dark: #1d4ed8;
+  --color-chat-hint-bg: #fef3c7;
+  --color-chat-hint-bg-dark: #854d0e;
+  --color-chat-info-bg: #ede9fe;
+  --color-chat-info-bg-dark: #3730a3;
   
   /* Typography */
   --font-body: 'Atkinson Hyperlegible', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -61,8 +66,8 @@
   
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 18px 30px rgba(124, 58, 18, 0.12);
+  --shadow-lg: 0 22px 45px rgba(124, 58, 18, 0.18);
   
   /* Transitions */
   --transition-fast: 150ms ease-in-out;

@@ -5,122 +5,226 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Patient Polish Tutor - AI-assisted conversational tutor for learning spoken Polish">
     <title>Patient Polish Tutor</title>
-    
-    <!-- CSS Files -->
+
     <link rel="stylesheet" href="/static/css/variables.css">
     <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/layout.css">
     <link rel="stylesheet" href="/static/css/components.css">
-    
-    <!-- Preconnect for external fonts (if using Google Fonts for Atkinson Hyperlegible) -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
-    <!-- Feather Icons (via CDN for now, can be self-hosted later) -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
     <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script>
+        tailwind.config = {
+            darkMode: ['class', '[data-theme="dark"]'],
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'var(--font-body)', 'system-ui'],
+                        display: ['"Playfair Display"', 'serif']
+                    },
+                    colors: {
+                        'cafe-foam': '#F6EDE3',
+                        'cafe-cream': '#FCF5EC',
+                        'cafe-hazelnut': '#E6C7A5',
+                        'cafe-espresso': '#43281C',
+                        'cafe-green': '#5BA38F',
+                        'cafe-rose': '#F6C5B1'
+                    },
+                    boxShadow: {
+                        'cafe-card': '0 45px 120px rgba(92, 51, 23, 0.18)'
+                    }
+                }
+            }
+        };
+    </script>
 </head>
-<body>
-    <!-- Skip Link for Accessibility -->
+<body class="font-sans text-cafe-espresso bg-cafe-foam relative min-h-screen overflow-hidden">
     <a href="#main-content" class="skip-link">Skip to main content</a>
-    
-    <!-- Header -->
-    <header class="header" role="banner">
-        <h1 class="header__title">🇵🇱 Patient Polish Tutor</h1>
-        <div class="header__actions">
-            <button 
-                class="header__button" 
-                id="review-button"
-                aria-label="Open review queue"
-                title="Review Queue"
-            >
-                <i data-feather="refresh-cw" class="header__button-icon"></i>
-            </button>
-            <button 
-                class="header__button" 
-                id="settings-button"
-                aria-label="Open settings"
-                title="Settings"
-            >
-                <i data-feather="settings" class="header__button-icon"></i>
-            </button>
-            <button 
-                class="theme-toggle" 
-                id="theme-toggle"
-                aria-label="Toggle dark mode"
-                title="Toggle dark mode"
-            >
-                <i data-feather="moon" class="theme-toggle__icon"></i>
-            </button>
-        </div>
-    </header>
-    
-    <!-- Connection Status Banner -->
-    <div 
-        class="connection-status" 
-        id="connection-status"
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-    >
-        <span class="sr-only">Connection status: </span>
-        <span id="connection-status-text">Connecting...</span>
-    </div>
-    
-    <!-- Main Content -->
-    <main class="main" id="main-content" role="main">
-        <div class="container">
-            <div class="chat-container">
-                <!-- Chat Messages Container -->
-                <div 
-                    class="chat-messages" 
-                    id="chat-messages"
-                    role="log"
-                    aria-live="polite"
-                    aria-label="Chat messages"
-                >
-                    <!-- Messages will be dynamically inserted here -->
-                </div>
-                
-                <!-- Input Bar -->
-                <div class="input-bar" role="region" aria-label="Message input">
-                    <button 
-                        class="input-bar__button input-bar__button--secondary" 
-                        id="mic-button"
-                        aria-label="Start voice input"
-                        title="Click to speak – I will transcribe it"
-                        type="button"
-                    >
-                        <i data-feather="mic" class="input-bar__button-icon"></i>
-                    </button>
-                    
-                    <textarea 
-                        class="input-bar__input" 
-                        id="message-input"
-                        placeholder="🎙️ Say it or type your answer..."
-                        rows="1"
-                        aria-label="Message input"
-                        aria-describedby="input-help"
-                    ></textarea>
-                    
-                    <span id="input-help" class="sr-only">
-                        Press Enter to send, Shift+Enter for new line
-                    </span>
-                    
-                    <button 
-                        class="input-bar__button" 
-                        id="send-button"
-                        aria-label="Send message"
-                        title="Send message"
-                        type="submit"
-                    >
-                        <i data-feather="send" class="input-bar__button-icon"></i>
-                    </button>
-                </div>
+
+    <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.85),_rgba(247,233,217,0.6))]"></div>
+    <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_bottom,_rgba(235,197,165,0.2),_rgba(255,255,255,0))]"></div>
+
+    <div class="relative z-10 flex flex-col h-screen">
+        <header class="px-6 lg:px-10 py-5 flex items-center justify-between gap-6">
+            <div>
+                <p class="text-[0.45rem] tracking-[0.5em] uppercase text-cafe-mocha/70 font-semibold">Patient Polish Tutor</p>
+                <h1 class="font-display text-3xl text-cafe-mocha">Practice your Polish</h1>
+                <p class="text-sm text-cafe-espresso/75">Choose a lesson, press start, and chat with your friendly tutor. Voice + text ready.</p>
             </div>
+            <div class="flex items-center gap-3">
+                <div id="connection-status" class="surface-card flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold">
+                    <span class="inline-flex w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true"></span>
+                    <span id="connection-status-text">Connecting...</span>
+                </div>
+                <button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/80 hover:bg-white transition" id="review-button" aria-label="Open review queue" title="Review Queue">
+                    <i data-feather="refresh-cw"></i>
+                </button>
+                <button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/80 hover:bg-white transition" id="settings-button" aria-label="Open settings" title="Settings">
+                    <i data-feather="settings"></i>
+                </button>
+            </div>
+        </header>
+
+        <div id="floating-hint" class="hint-bar text-xs flex items-center gap-2 px-6 lg:px-10">
+            <span class="hint-bar__icon">💡</span>
+            <span id="floating-hint-text">Step 1: Pick a lesson · Step 2: Press ▶ Start · Step 3: Speak or type your reply</span>
         </div>
-    </main>
-    
-    <!-- Settings Modal -->
+
+        <main class="flex-1 px-6 lg:px-10 pb-6" id="main-content">
+            <div class="grid grid-cols-[280px_minmax(0,1fr)] gap-5 h-full">
+                <aside class="flex flex-col gap-4 h-full">
+                    <section class="surface-card rounded-3xl p-5 space-y-3">
+                        <h2 class="text-lg font-display text-cafe-mocha">Welcome 👋</h2>
+                        <ol class="space-y-2 text-xs text-cafe-espresso/80">
+                            <li><strong>1.</strong> Pick a lesson topic.</li>
+                            <li><strong>2.</strong> Press ▶ Start Lesson.</li>
+                            <li><strong>3.</strong> Answer in Polish (voice or text).</li>
+                        </ol>
+                        <p class="text-[0.75rem] text-cafe-espresso/60">Need help? Try the helper buttons below.</p>
+                    </section>
+
+                    <section class="lesson-library surface-card" id="lesson-catalog-panel" aria-labelledby="lesson-library-title">
+                        <div class="lesson-library__header">
+                            <div>
+                                <p class="lesson-library__eyebrow">Pick your scene</p>
+                                <h3 class="lesson-library__title" id="lesson-library-title">Lesson Library</h3>
+                            </div>
+                            <button type="button" class="lesson-library__refresh" id="lesson-catalog-refresh">
+                                <i data-feather="refresh-ccw" aria-hidden="true"></i>
+                                <span>Refresh</span>
+                            </button>
+                        </div>
+                        <div class="grid gap-2">
+                            <label class="lesson-library__label" for="lesson-catalog-select">Choose a lesson to begin</label>
+                            <div class="lesson-library__select-wrapper">
+                                <select id="lesson-catalog-select" class="lesson-library__select" disabled>
+                                    <option value="">Loading lessons...</option>
+                                </select>
+                                <i data-feather="chevron-down" aria-hidden="true" class="lesson-library__select-icon"></i>
+                            </div>
+                        </div>
+                        <p class="lesson-library__empty" id="lesson-catalog-empty">Loading lessons...</p>
+                        <div class="lesson-library__details" id="lesson-catalog-preview" hidden>
+                            <p class="lesson-library__details-id" id="lesson-preview-id"></p>
+                            <p class="lesson-library__details-title" id="lesson-preview-title"></p>
+                            <p class="lesson-library__details-subtitle" id="lesson-preview-subtitle"></p>
+                            <p class="lesson-library__details-meta" id="lesson-preview-meta"></p>
+                        </div>
+                    </section>
+
+                    <section class="lesson-library-collapsed surface-card" id="lesson-library-collapsed" hidden>
+                        <p class="text-[0.7rem] text-cafe-espresso/70">Current lesson</p>
+                        <p class="text-base font-semibold" id="active-lesson-label">—</p>
+                        <button type="button" class="control-button text-xs justify-center" id="lesson-library-toggle">
+                            🔄 Change lesson
+                        </button>
+                    </section>
+
+                    <section class="surface-card rounded-3xl p-4 space-y-3">
+                        <p class="text-xs font-semibold text-cafe-espresso/70 uppercase tracking-wide">Helper buttons</p>
+                        <div class="grid gap-2">
+                            <button class="control-button text-xs justify-center" type="button" data-action="repeat" id="support-repeat" title="Replay the last tutor prompt">🔁 Repeat</button>
+                            <button class="control-button text-xs justify-center" type="button" data-action="hint" id="support-hint" title="Show an English hint">💡 Hint</button>
+                            <button class="control-button text-xs justify-center" type="button" data-action="slow" id="support-slow" title="Hear the tutor at a slower pace">🐢 Slow Polish</button>
+                            <button class="control-button text-xs justify-center" type="button" data-action="topic" id="support-topic" title="Switch to another lesson topic">📚 Topic</button>
+                            <button class="control-button text-xs justify-center" type="button" data-action="culture" id="support-culture" title="Get a cultural bite-sized tip">🍩 Culture</button>
+                        </div>
+                    </section>
+                </aside>
+
+                <section class="surface-card rounded-[34px] p-6 flex flex-col h-full gap-4">
+                    <header class="flex items-center justify-between gap-4">
+                        <div>
+                            <p class="text-[0.65rem] tracking-[0.3em] uppercase text-cafe-mocha/70 font-semibold">Current lesson</p>
+                            <h2 class="text-2xl font-display text-cafe-mocha" id="lesson-title">In the Café</h2>
+                            <p class="text-xs text-cafe-espresso/70" id="lesson-level">Level A0 • Beginner</p>
+                        </div>
+                        <div class="text-right space-y-1">
+                            <div class="start-tooltip" id="start-tooltip">Choose a lesson, then press start!</div>
+                            <button id="start-lesson-button" type="button" data-state="select" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cafe-green to-emerald-500 px-5 py-2.5 text-white text-sm font-semibold shadow-lg disabled:opacity-60">
+                                ▶ Start Lesson
+                            </button>
+                            <p class="text-[0.65rem] text-cafe-espresso/60 mt-1" id="start-lesson-hint">Pick a lesson to enable the tutor.</p>
+                        </div>
+                    </header>
+
+                    <div class="grid grid-cols-3 gap-3 text-xs font-semibold text-cafe-espresso/80">
+                        <div class="rounded-2xl bg-cafe-cream/60 p-3 surface-card">
+                            <p class="text-[0.55rem] uppercase tracking-[0.2em] text-cafe-espresso/60">Goal</p>
+                            <p class="text-base text-cafe-mocha" id="lesson-goal">Order a drink politely</p>
+                        </div>
+                        <div class="rounded-2xl bg-cafe-cream/60 p-3 surface-card">
+                            <p class="text-[0.55rem] uppercase tracking-[0.2em] text-cafe-espresso/60">Est. Time</p>
+                            <p class="text-base text-cafe-mocha" id="lesson-duration">3 minutes</p>
+                        </div>
+                        <div class="rounded-2xl bg-cafe-cream/60 p-3 surface-card">
+                            <p class="text-[0.55rem] uppercase tracking-[0.2em] text-cafe-espresso/60">Focus</p>
+                            <p class="text-base text-cafe-mocha" id="lesson-focus">Polite café phrases</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1 text-xs text-cafe-espresso/70">
+                        <div class="flex items-center justify-between">
+                            <span id="lesson-progress-title">Warm-up</span>
+                            <span id="lesson-progress-value">0% complete</span>
+                        </div>
+                        <div class="w-full bg-cafe-cream rounded-full h-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                            <div class="h-full rounded-full bg-gradient-to-r from-cafe-green to-emerald-500 transition-all duration-500" style="width:0%" id="lesson-progress-meter"></div>
+                        </div>
+                        <p id="lesson-progress-step">Waiting to begin</p>
+                    </div>
+
+                    <div class="flex-1 flex gap-4">
+                        <div class="flex-1 rounded-3xl border border-cafe-hazelnut/20 bg-white/80 backdrop-blur relative overflow-hidden surface-card flex flex-col">
+                            <div class="conversation-panel__overlay rounded-3xl" id="welcome-overlay" role="dialog" aria-modal="false">
+                                <div class="welcome-card text-center">
+                                    <h2>Ready to start?</h2>
+                                    <ol>
+                                        <li>Pick a lesson on the left.</li>
+                                        <li>Tap ▶ Start Lesson.</li>
+                                        <li>Reply in Polish by voice or typing.</li>
+                                    </ol>
+                                    <button type="button" class="welcome-card__dismiss" id="welcome-dismiss">Got it!</button>
+                                </div>
+                            </div>
+                            <div class="conversation-panel__messages flex-1 space-y-3" id="chat-messages" role="log" aria-live="polite" aria-label="Lesson dialogue">
+                                <div id="chat-placeholder" class="message message--tutor">
+                                    <div class="message__wrapper">
+                                        <div class="message__avatar message__avatar--tutor">🧑‍🏫</div>
+                                        <div class="message__bubble">
+                                            Cześć! I’m your tutor. Choose a lesson and press ▶ to begin.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-48 surface-card rounded-3xl p-3 text-xs space-y-2">
+                            <p class="font-semibold text-cafe-espresso/75">Session stats</p>
+                            <p id="session-time">Today: 0 min</p>
+                            <p id="session-streak">Streak: 0 days</p>
+                            <p id="session-mode">Mode: Offline-ready</p>
+                        </div>
+                    </div>
+
+                    <div class="input-bar input-bar--conversation flex items-center gap-3 surface-card" role="region" aria-label="Reply to tutor">
+                        <button class="input-bar__button input-bar__button--secondary rounded-2xl border border-cafe-hazelnut/50 bg-white/80 hover:bg-white transition" id="mic-button" aria-label="Start voice input" title="Click to speak – I will transcribe it" type="button" disabled>
+                            <i data-feather="mic" class="input-bar__button-icon"></i>
+                        </button>
+                        <textarea class="input-bar__input flex-1 bg-transparent text-sm placeholder:text-cafe-espresso/50 resize-none" id="message-input" placeholder="Type or dictate your reply…" rows="1" aria-label="Message input" aria-describedby="input-help" disabled></textarea>
+                        <span id="input-help" class="sr-only">Press Enter to send, Shift+Enter for new line</span>
+                        <button class="input-bar__button rounded-2xl bg-gradient-to-r from-cafe-mocha to-amber-500 text-white px-4 py-2.5 text-sm font-semibold shadow-lg hover:shadow-xl transition disabled:opacity-60" id="send-button" aria-label="Send message" title="Send message" type="submit" disabled>
+                            <i data-feather="send" class="input-bar__button-icon"></i>
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
     <div class="modal" id="settings-modal" role="dialog" aria-labelledby="settings-modal-title" aria-hidden="true">
         <div class="modal__overlay" id="settings-modal-overlay"></div>
         <div class="modal__content modal__content--large">
@@ -130,13 +234,10 @@
                     <i data-feather="x"></i>
                 </button>
             </div>
-            <div class="modal__body" id="settings-content">
-                <!-- Settings content will be dynamically inserted here -->
-            </div>
+            <div class="modal__body" id="settings-content"></div>
         </div>
     </div>
-    
-    <!-- Review Modal -->
+
     <div class="modal" id="review-modal" role="dialog" aria-labelledby="review-modal-title" aria-hidden="true">
         <div class="modal__overlay" id="review-modal-overlay"></div>
         <div class="modal__content modal__content--large">
@@ -146,27 +247,20 @@
                     <i data-feather="x"></i>
                 </button>
             </div>
-            <div class="modal__body" id="review-content">
-                <!-- Review content will be dynamically inserted here -->
-            </div>
+            <div class="modal__body" id="review-content"></div>
         </div>
     </div>
-    
-    <!-- JavaScript Files -->
+
     <script>
-        // Initialize Feather Icons
         feather.replace();
-        
-        // Theme Toggle Functionality
+
         (function() {
             const themeToggle = document.getElementById('theme-toggle');
             const html = document.documentElement;
-            
-            // Get saved theme or default to light
             const savedTheme = localStorage.getItem('theme') || 'light';
             html.setAttribute('data-theme', savedTheme);
             updateThemeIcon(savedTheme);
-            
+
             themeToggle.addEventListener('click', function() {
                 const currentTheme = html.getAttribute('data-theme');
                 const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -174,7 +268,7 @@
                 localStorage.setItem('theme', newTheme);
                 updateThemeIcon(newTheme);
             });
-            
+
             function updateThemeIcon(theme) {
                 const icon = themeToggle.querySelector('i');
                 if (icon) {
@@ -183,8 +277,7 @@
                 }
             }
         })();
-        
-        // Auto-resize textarea
+
         (function() {
             const textarea = document.getElementById('message-input');
             if (textarea) {
@@ -195,8 +288,7 @@
             }
         })();
     </script>
-    
-    <!-- WebSocket Client, Audio Manager, Voice Input, Lesson Flow, and Chat UI -->
+
     <script src="/static/js/websocket_client_example.js"></script>
     <script src="/static/js/audio.js"></script>
     <script src="/static/js/voice.js"></script>
@@ -208,4 +300,3 @@
     <script src="/static/js/chat.js"></script>
 </body>
 </html>
-

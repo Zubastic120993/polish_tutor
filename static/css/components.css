@@ -6,8 +6,66 @@
 .message {
   display: flex;
   flex-direction: column;
-  max-width: 75%;
+  max-width: 82%;
   animation: fadeIn var(--transition-base);
+  gap: var(--spacing-xs);
+}
+
+.message__wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+}
+
+.message--learner .message__wrapper {
+  flex-direction: row-reverse;
+}
+
+.message__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  box-shadow: 0 12px 24px rgba(124, 58, 18, 0.18);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(203, 138, 79, 0.25);
+}
+
+.message__avatar--tutor {
+  background: rgba(253, 243, 231, 0.95);
+}
+
+.message__avatar--learner {
+  background: rgba(219, 234, 254, 0.95);
+  border-color: rgba(37, 99, 235, 0.18);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.18);
+}
+
+.message__avatar--info {
+  background: rgba(237, 233, 254, 0.92);
+  border-color: rgba(167, 139, 250, 0.25);
+  box-shadow: 0 12px 28px rgba(147, 112, 219, 0.18);
+}
+
+.message__avatar--hint {
+  background: rgba(254, 243, 199, 0.92);
+  border-color: rgba(245, 158, 11, 0.25);
+  box-shadow: 0 12px 28px rgba(245, 158, 11, 0.18);
+}
+
+.message__avatar--error {
+  background: rgba(254, 226, 226, 0.92);
+  border-color: rgba(220, 38, 38, 0.3);
+  box-shadow: 0 12px 28px rgba(220, 38, 38, 0.2);
+  color: #991b1b;
+}
+
+.message--error .message__bubble {
+  background: rgba(220, 38, 38, 0.92);
+  color: #fff;
 }
 
 @keyframes fadeIn {
@@ -41,21 +99,44 @@
 
 .message__bubble {
   padding: var(--spacing-md) var(--spacing-lg);
-  border-radius: var(--radius-pill);
+  border-radius: 22px;
   word-wrap: break-word;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 18px 30px rgba(139, 92, 51, 0.12);
+  line-height: 1.55;
+  position: relative;
+  max-width: min(520px, 100%);
+}
+
+.message__bubble p {
+  margin: 0 0 var(--spacing-sm);
+}
+
+.message__bubble p:last-of-type {
+  margin-bottom: 0;
+}
+
+.message__bubble .message__list {
+  margin: var(--spacing-sm) 0 var(--spacing-sm) var(--spacing-lg);
+  padding-left: var(--spacing-lg);
+  list-style: disc;
+}
+
+.message__bubble .message__list li {
+  margin-bottom: var(--spacing-xs);
 }
 
 .message--tutor .message__bubble {
-  background-color: var(--color-chat-tutor-bg);
-  color: var(--color-text);
-  border-bottom-left-radius: var(--radius-sm);
+  background: rgba(253, 243, 231, 0.95);
+  color: rgba(68, 40, 26, 0.95);
+  border-bottom-left-radius: 8px;
+  border: 1px solid rgba(203, 138, 79, 0.25);
 }
 
 .message--learner .message__bubble {
-  background-color: var(--color-chat-learner-bg);
-  color: white;
-  border-bottom-right-radius: var(--radius-sm);
+  background: rgba(219, 234, 254, 0.95);
+  color: #1d4ed8;
+  border-bottom-right-radius: 8px;
+  border: 1px solid rgba(37, 99, 235, 0.2);
 }
 
 .message--hint .message__bubble {
@@ -63,6 +144,49 @@
   color: var(--color-text);
   border-radius: var(--radius-md);
   font-style: italic;
+}
+
+.message--info .message__wrapper,
+.message--hint .message__wrapper {
+  flex-direction: row;
+}
+
+.message--info .message__avatar,
+.message--hint .message__avatar {
+  margin-top: 4px;
+}
+
+.lesson-scenario .message__bubble {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(203, 138, 79, 0.35);
+}
+
+.lesson-scenario .message__avatar {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(203, 138, 79, 0.35);
+}
+
+.scenario-chip {
+  border: 1px solid rgba(203, 138, 79, 0.4);
+  background: rgba(255, 255, 255, 0.85);
+  color: rgba(91, 61, 43, 0.95);
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 10px 24px rgba(124, 58, 18, 0.12);
+}
+
+.scenario-chip:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(124, 58, 18, 0.18);
+}
+
+.scenario-chip:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
 }
 
 
@@ -155,21 +279,25 @@
   color: var(--color-primary, #2563eb);
 }
 .message--info .message__bubble {
-  background-color: var(--color-chat-info-bg);
-  color: var(--color-text);
-  border-radius: var(--radius-md);
+  background: rgba(237, 233, 254, 0.92);
+  color: rgba(91, 61, 43, 0.9);
+  border-radius: 18px;
+  border: 1px solid rgba(167, 139, 250, 0.25);
 }
 
 .message__meta {
-  font-size: var(--font-size-small);
-  color: var(--color-text-muted);
-  margin-top: var(--spacing-xs);
+  font-size: 0.75rem;
+  color: rgba(91, 61, 43, 0.5);
+  margin-top: 0;
   padding: 0 var(--spacing-sm);
+  display: flex;
+  justify-content: flex-start;
 }
 
 .message--learner .message__meta {
   text-align: right;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(37, 99, 235, 0.55);
+  justify-content: flex-end;
 }
 
 .message__actions {
@@ -227,28 +355,46 @@
 .input-bar__input {
   flex: 1;
   min-height: var(--min-tap-target);
-  border-radius: var(--radius-pill);
+  border-radius: 18px;
   padding: var(--spacing-sm) var(--spacing-lg);
   font-size: var(--font-size-base);
   resize: none;
   max-height: 120px;
+  border: 1px solid rgba(203, 138, 79, 0.35);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--color-text);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.input-bar__input:focus {
+  outline: none;
+  border-color: rgba(226, 119, 40, 0.55);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+}
+
+.input-bar__input:disabled {
+  cursor: not-allowed;
+  background: rgba(248, 225, 196, 0.45);
+  color: rgba(91, 61, 43, 0.6);
 }
 
 .input-bar__button {
   min-width: var(--min-tap-target);
   min-height: var(--min-tap-target);
   border-radius: var(--radius-full);
-  background-color: var(--color-accent);
+  background: linear-gradient(135deg, #f97316, #f59e0b);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: background-color var(--transition-fast), transform var(--transition-fast);
+  border: none;
+  box-shadow: 0 12px 30px rgba(226, 119, 40, 0.28);
 }
 
 .input-bar__button:hover:not(:disabled) {
-  background-color: var(--color-accent-hover);
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
   transform: scale(1.05);
 }
 
@@ -257,14 +403,22 @@
 }
 
 .input-bar__button--secondary {
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  border: 1px solid var(--color-text-muted);
+  background: rgba(255, 255, 255, 0.9);
+  color: rgba(91, 61, 43, 0.9);
+  border: 1px solid rgba(203, 138, 79, 0.35);
+  box-shadow: none;
 }
 
 .input-bar__button--secondary:hover:not(:disabled) {
-  background-color: var(--color-bg);
-  border-color: var(--color-accent);
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(226, 119, 40, 0.45);
+}
+
+.input-bar__button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .input-bar__button-icon {
@@ -287,22 +441,25 @@
 
 .quick-action {
   padding: var(--spacing-xs) var(--spacing-md);
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-text-muted);
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(203, 138, 79, 0.35);
   border-radius: var(--radius-pill);
   font-size: var(--font-size-small);
-  color: var(--color-text);
+  color: rgba(91, 61, 43, 0.9);
   cursor: pointer;
   transition: all var(--transition-fast);
   min-height: var(--min-tap-target);
   display: flex;
   align-items: center;
+  box-shadow: 0 8px 18px rgba(124, 58, 18, 0.15);
 }
 
 .quick-action:hover {
-  background-color: var(--color-bg);
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+  background-color: rgba(255, 255, 255, 1);
+  border-color: rgba(226, 119, 40, 0.45);
+  color: rgba(226, 119, 40, 1);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(124, 58, 18, 0.22);
 }
 
 .quick-action:focus {
@@ -315,19 +472,22 @@
   min-width: var(--min-tap-target);
   min-height: var(--min-tap-target);
   border-radius: var(--radius-full);
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-text-muted);
-  color: var(--color-text);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(203, 138, 79, 0.35);
+  color: rgba(91, 61, 43, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all var(--transition-fast);
+  box-shadow: 0 8px 20px rgba(124, 58, 18, 0.12);
 }
 
 .theme-toggle:hover {
-  background-color: var(--color-bg);
-  border-color: var(--color-accent);
+  background-color: rgba(255, 255, 255, 1);
+  border-color: rgba(226, 119, 40, 0.45);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(124, 58, 18, 0.18);
 }
 
 .theme-toggle__icon {
@@ -343,7 +503,7 @@
   min-width: var(--min-tap-target);
   min-height: var(--min-tap-target);
   border-radius: var(--radius-full);
-  background-color: var(--color-success);
+  background: linear-gradient(135deg, #22c55e, #16a34a);
   color: white;
   display: inline-flex;
   align-items: center;
@@ -352,18 +512,19 @@
   transition: background-color var(--transition-fast);
   margin-left: var(--spacing-xs);
   position: relative;
+  box-shadow: 0 10px 24px rgba(34, 197, 94, 0.25);
 }
 
 .audio-button:hover {
-  background-color: var(--color-success-hover);
+  background: linear-gradient(135deg, #16a34a, #15803d);
 }
 
 .audio-button--playing {
-  background-color: var(--color-warning);
+  background: linear-gradient(135deg, #f97316, #f59e0b);
 }
 
 .audio-button--paused {
-  background-color: var(--color-info);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
 }
 
 .audio-button__icon {
@@ -407,10 +568,13 @@
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-md);
   transition: background-color var(--transition-fast);
+  border: 1px solid transparent;
 }
 
 .audio-speed-toggle:hover {
-  background-color: var(--color-bg);
+  background-color: rgba(248, 225, 196, 0.45);
+  color: rgba(91, 61, 43, 0.9);
+  border-color: rgba(226, 119, 40, 0.3);
 }
 
 .audio-speed-toggle__label {
