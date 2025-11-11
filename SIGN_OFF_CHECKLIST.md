@@ -26,6 +26,6 @@ All future changes require version increment (v1.x → v1.x+1) and corresponding
 
 Once all checkboxes are ☑, export this file as PDF and archive under:
 
-``
+```
 docs/archive/2025-11-16_signoff.pdf
-``
+```
