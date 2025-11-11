@@ -32,10 +32,7 @@ jobs:
           pip install playwright pytest-playwright
 
       - name: 🌐 Install Playwright browsers
-        uses: microsoft/playwright-github-action@v1
-        with:
-          with-deps: true
-          cache: true
+        run: python -m playwright install --with-deps
 
       - name: 🧪 Run tests
         run: pytest -v
