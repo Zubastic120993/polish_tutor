@@ -19,10 +19,17 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: ⚙️ Set up Node.js (needed for Playwright browsers)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
       - name: 📦 Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          # Ensure Playwright Python package is present
+          pip install playwright pytest-playwright
 
       - name: 🌐 Install Playwright browsers
         run: |
