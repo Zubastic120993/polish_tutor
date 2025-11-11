@@ -14,6 +14,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
+    password_hash = Column(String, nullable=True)  # Nullable for backward compatibility during migration
     profile_template = Column(String, default="adult")
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
