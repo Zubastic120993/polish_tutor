@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Patient Polish Tutor{% endblock %}
+
+{% block head %}
+<!-- Dashboard-specific head content -->
+{% endblock %}
+
+{% block content %}
+<!-- Main Application Container -->
+<div id="app" class="relative z-10 min-h-screen">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div class="text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-cafe-espresso mx-auto mb-4"></div>
+            <p class="text-cafe-espresso">Loading Patient Polish Tutor...</p>
+        </div>
+    </div>
+
+    <!-- Welcome Overlay -->
+    <div id="welcome-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center hidden">
+        <div class="welcome-card bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-cafe-espresso mb-2">Welcome to Patient Polish Tutor</h2>
+                <p class="text-cafe-mocha">Your AI assistant for learning spoken Polish</p>
+            </div>
+
+            <div class="space-y-4 mb-6">
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0 w-6 h-6 bg-cafe-latte rounded-full flex items-center justify-center mt-0.5">
+                        <span class="text-cafe-espresso text-sm font-semibold">1</span>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-cafe-espresso">Listen & Learn</h3>
+                        <p class="text-sm text-cafe-mocha">Click the play button to hear native Polish pronunciation</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0 w-6 h-6 bg-cafe-latte rounded-full flex items-center justify-center mt-0.5">
+                        <span class="text-cafe-espresso text-sm font-semibold">2</span>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-cafe-espresso">Reply in Polish</h3>
+                        <p class="text-sm text-cafe-mocha">Practice by responding to the tutor's questions</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0 w-6 h-6 bg-cafe-latte rounded-full flex items-center justify-center mt-0.5">
+                        <span class="text-cafe-espresso text-sm font-semibold">3</span>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-cafe-espresso">Get Help</h3>
+                        <p class="text-sm text-cafe-mocha">Type "help" or click the help button for guidance</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-3">
+                <button id="welcome-dismiss" class="flex-1 px-4 py-2 border border-cafe-mocha text-cafe-mocha rounded-lg hover:bg-cafe-mocha hover:text-white transition-colors">
+                    Skip Tutorial
+                </button>
+                <button id="welcome-start" class="flex-1 px-4 py-2 bg-cafe-espresso text-white rounded-lg hover:bg-cafe-mocha transition-colors">
+                    <span class="welcome-card__start-icon">🎯</span>
+                    <span class="welcome-card__start-text">Start Learning</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-cafe-latte">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-4">
+                    <h1 class="text-2xl font-bold text-cafe-espresso">Patient Polish Tutor</h1>
+                    <span class="text-sm text-cafe-mocha bg-cafe-latte px-2 py-1 rounded">A0 → A1</span>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <!-- Settings Button -->
+                    <button id="settings-button" class="p-2 text-cafe-mocha hover:text-cafe-espresso transition-colors" title="Settings">
+                        <i data-feather="settings" class="w-5 h-5"></i>
+                    </button>
+
+                    <!-- User Menu -->
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-cafe-latte rounded-full flex items-center justify-center">
+                            <span class="text-cafe-espresso text-sm font-semibold">U</span>
+                        </div>
+                        <span class="text-cafe-espresso text-sm">User</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <!-- Current Lesson Card -->
+                <div id="current-lesson-card" class="bg-white rounded-lg shadow-sm border border-cafe-latte p-4 mb-6 hidden">
+                    <h3 class="font-semibold text-cafe-espresso mb-3">Current Lesson</h3>
+                    <div class="current-lesson-meta-card bg-cafe-foam rounded p-3">
+                        <h4 id="lesson-title" class="font-medium text-cafe-espresso mb-1"></h4>
+                        <p id="lesson-level" class="text-sm text-cafe-mocha mb-1"></p>
+                        <p id="lesson-goal" class="text-sm text-cafe-mocha"></p>
+                        <div class="mt-3">
+                            <div class="flex justify-between text-xs text-cafe-mocha mb-1">
+                                <span id="lesson-progress-title">Progress</span>
+                                <span id="lesson-progress-value">0%</span>
+                            </div>
+                            <div class="w-full bg-cafe-latte rounded-full h-2">
+                                <div id="lesson-progress-meter" class="bg-cafe-espresso h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <p id="lesson-progress-step" class="text-xs text-cafe-mocha mt-1"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lesson Catalog -->
+                <div class="bg-white rounded-lg shadow-sm border border-cafe-latte p-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold text-cafe-espresso">Lessons</h3>
+                        <button id="lesson-catalog-refresh" class="p-1 text-cafe-mocha hover:text-cafe-espresso transition-colors" title="Refresh">
+                            <i data-feather="refresh-cw" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- Search -->
+                    <div class="mb-4">
+                        <input type="text" id="lesson-search-input" placeholder="Search lessons..." class="w-full px-3 py-2 border border-cafe-latte rounded-lg focus:outline-none focus:ring-2 focus:ring-cafe-espresso">
+                    </div>
+
+                    <!-- Lesson List -->
+                    <div id="lesson-catalog-list" class="space-y-2 max-h-96 overflow-y-auto">
+                        <!-- Lessons will be loaded here -->
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="lesson-catalog-empty" class="text-center py-8 text-cafe-mocha hidden">
+                        <i data-feather="book-open" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                        <p>No lessons found</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Chat Area -->
+            <div class="lg:col-span-3">
+                <!-- Chat Container -->
+                <div id="chat-container" class="bg-white rounded-lg shadow-sm border border-cafe-latte min-h-96 flex flex-col">
+                    <!-- Messages Area -->
+                    <div id="messages-container" class="flex-1 p-4 space-y-4 overflow-y-auto min-h-0">
+                        <!-- Messages will be loaded here -->
+                    </div>
+
+                    <!-- Input Area -->
+                    <div class="border-t border-cafe-latte p-4">
+                        <div class="flex space-x-2">
+                            <input type="text" id="message-input" placeholder="Type your message in Polish..." class="flex-1 px-4 py-2 border border-cafe-latte rounded-lg focus:outline-none focus:ring-2 focus:ring-cafe-espresso">
+                            <button id="mic-button" class="px-4 py-2 bg-cafe-latte text-cafe-espresso rounded-lg hover:bg-cafe-mocha hover:text-white transition-colors" title="Voice Input">
+                                <i data-feather="mic" class="w-5 h-5"></i>
+                            </button>
+                            <button id="send-button" class="px-6 py-2 bg-cafe-espresso text-white rounded-lg hover:bg-cafe-mocha transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                <i data-feather="send" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <button id="start-lesson-button" class="px-4 py-2 bg-cafe-espresso text-white rounded-lg hover:bg-cafe-mocha transition-colors hidden">
+                        <i data-feather="play" class="w-4 h-4 mr-2"></i>
+                        Start Lesson
+                    </button>
+                    <button id="help-button" class="px-4 py-2 border border-cafe-mocha text-cafe-mocha rounded-lg hover:bg-cafe-mocha hover:text-white transition-colors">
+                        <i data-feather="help-circle" class="w-4 h-4 mr-2"></i>
+                        Help
+                    </button>
+                    <button id="review-button" class="px-4 py-2 border border-cafe-mocha text-cafe-mocha rounded-lg hover:bg-cafe-mocha hover:text-white transition-colors">
+                        <i data-feather="book" class="w-4 h-4 mr-2"></i>
+                        Review
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="settings-panel" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden">
+        <div class="absolute right-0 top-0 h-full w-96 bg-white shadow-xl">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-cafe-espresso">Settings</h2>
+                    <button id="settings-close" class="p-2 text-cafe-mocha hover:text-cafe-espresso transition-colors">
+                        <i data-feather="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Settings content will be loaded here -->
+                <div id="settings-content">
+                    <!-- Settings will be dynamically loaded -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- API Client -->
+<script type="module" src="/static/js/api.js"></script>
+
+<!-- Core modules -->
+<script src="/static/js/error_handler.js"></script>
+<script src="/static/js/audio.js"></script>
+<script src="/static/js/lesson.js"></script>
+<script src="/static/js/chat.js"></script>
+<script src="/static/js/settings.js"></script>
+<script src="/static/js/review.js"></script>
+<script src="/static/js/voice.js"></script>
+<script src="/static/js/session.js"></script>
+<script src="/static/js/onboarding.js"></script>
+
+<!-- Initialize feather icons -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
+    });
+</script>
+{% endblock %}
