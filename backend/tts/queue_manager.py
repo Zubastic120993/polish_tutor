@@ -14,13 +14,6 @@ from rq.registry import FailedJobRegistry
 
 from backend.tts.audio_cache import AudioCacheManager
 from src.core.app_context import app_context
-from src.core.metrics import (
-    record_tts_job_submitted,
-    record_tts_job_completed,
-    record_tts_job_failed,
-    record_cache_hit,
-    record_cache_miss
-)
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +108,12 @@ class TTSQueueManager:
         # Check for existing cached result
         if self.cache_manager.is_cached(dedup_key, kwargs.get("format", "mp3")):
             logger.info(f"Audio already cached for key: {dedup_key}")
-            record_cache_hit()
+            # Record cache hit (lazy import to avoid circular dependency)
+            try:
+                from src.core.metrics import record_cache_hit
+                record_cache_hit()
+            except ImportError:
+                pass
             # Return a dummy job ID indicating cached result
             return f"cached_{dedup_key}"
 
@@ -155,7 +153,12 @@ class TTSQueueManager:
         self._store_dedup_mapping(dedup_key, job.id)
 
         # Record metrics
-        record_tts_job_submitted(priority=priority, user_id=user_id)
+        # Record job submission (lazy import to avoid circular dependency)
+        try:
+            from src.core.metrics import record_tts_job_submitted
+            record_tts_job_submitted(priority=priority, user_id=user_id)
+        except ImportError:
+            pass
 
         logger.info(f"Submitted TTS job {job.id} to queue {queue.name} with dedup key {dedup_key}")
         return job.id

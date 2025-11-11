@@ -7,7 +7,8 @@ from fastapi.responses import JSONResponse
 from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from backend.tts.queue_manager import get_queue_manager
+# Lazy import to avoid circular dependency
+# from backend.tts.queue_manager import get_queue_manager
 from src.core.app_context import app_context
 
 
@@ -202,6 +203,8 @@ class MetricsMiddleware(BaseHTTPMiddleware):
 def update_queue_metrics():
     """Update TTS queue metrics from current queue state."""
     try:
+        # Lazy import to avoid circular dependency
+        from backend.tts.queue_manager import get_queue_manager
         queue_manager = get_queue_manager()
         stats = queue_manager.get_queue_stats()
 

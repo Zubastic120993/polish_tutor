@@ -12,7 +12,6 @@ from rq.job import Job
 from .murf_client import MurfClient
 from .audio_cache import AudioCacheManager
 from src.core.logging_config import get_logger, set_request_id, set_correlation_id
-from src.core.metrics import record_tts_job_completed, record_tts_job_failed
 
 logger = get_logger(__name__)
 
@@ -187,8 +186,12 @@ def synthesize_speech_task(
             "duration_seconds": round(job_duration, 2),
         })
 
-        # Record metrics
-        record_tts_job_completed(duration_seconds=job_duration)
+        # Record metrics (lazy import to avoid circular dependency)
+        try:
+            from src.core.metrics import record_tts_job_completed
+            record_tts_job_completed(duration_seconds=job_duration)
+        except ImportError:
+            pass
 
         return {
             "status": "completed",
@@ -210,8 +213,12 @@ def synthesize_speech_task(
             "duration_seconds": round(job_duration, 2),
         }, exc_info=True)
 
-        # Record metrics
-        record_tts_job_failed(error_type=type(e).__name__)
+        # Record metrics (lazy import to avoid circular dependency)
+        try:
+            from src.core.metrics import record_tts_job_failed
+            record_tts_job_failed(error_type=type(e).__name__)
+        except ImportError:
+            pass
 
         job.meta["error"] = str(e)
         job.meta["progress"] = "failed"
