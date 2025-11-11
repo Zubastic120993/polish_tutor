@@ -3,7 +3,8 @@ import logging
 from typing import Dict, Optional, Any
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 
-from backend.tts import MurfClient, AudioCacheManager, get_queue, get_job_status, cancel_job
+from backend.tts import MurfClient, AudioCacheManager
+from backend.tts.queue_manager import get_queue_manager
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +19,7 @@ async def speak_text(
     style: str = "conversational",
     format: str = "mp3",
     speed: float = 1.0,
+    priority: str = "normal",
     background_tasks: BackgroundTasks = None,
 ) -> Dict[str, Any]:
     """Start asynchronous text-to-speech synthesis.
@@ -67,26 +69,27 @@ async def speak_text(
                 }
             }
 
-        # Submit job to queue
-        queue = get_queue()
-        job = queue.enqueue(
-            "backend.tts.tasks.synthesize_speech_task",
+        # Submit job using enhanced queue manager
+        queue_manager = get_queue_manager()
+        job_id = queue_manager.submit_job(
             text=text,
             voice_id=voice_id,
-            cache_key=cache_key,
+            priority=priority,
             language=language,
             style=style,
             format=format,
             speed=speed,
+            request_id=request.state.request_id,
+            correlation_id=request.state.correlation_id,
         )
 
-        logger.info(f"Queued TTS job {job.id} for cache key {cache_key}")
+        logger.info(f"Queued TTS job {job_id} for cache key {cache_key}")
 
         return {
             "status": "queued",
             "message": "TTS synthesis job queued",
             "data": {
-                "job_id": job.id,
+                "job_id": job_id,
                 "cache_key": cache_key,
                 "estimated_time": "30-60 seconds",
             }
@@ -110,7 +113,8 @@ async def get_tts_status(job_id: str) -> Dict[str, Any]:
         Job status information
     """
     try:
-        status = get_job_status(job_id)
+        queue_manager = get_queue_manager()
+        status = queue_manager.get_job_status(job_id)
 
         if status is None:
             raise HTTPException(status_code=404, detail="Job not found")
@@ -139,7 +143,8 @@ async def cancel_tts_job(job_id: str) -> Dict[str, Any]:
         Cancellation result
     """
     try:
-        cancelled = cancel_job(job_id)
+        queue_manager = get_queue_manager()
+        cancelled = queue_manager.cancel_job(job_id)
 
         if cancelled:
             return {
@@ -259,3 +264,54 @@ async def clear_cache(confirm: bool = False) -> Dict[str, Any]:
     except Exception as e:
         logger.error(f"Failed to clear cache: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to clear cache: {str(e)}")
+
+
+@router.get("/health")
+async def tts_health_check() -> Dict[str, Any]:
+    """TTS service health check.
+
+    Returns:
+        Health status information
+    """
+    try:
+        queue_manager = get_queue_manager()
+        health = queue_manager.get_health_status()
+
+        # Return appropriate HTTP status
+        status_code = 200 if health["status"] == "healthy" else 503
+
+        return {
+            "status": "success",
+            "message": f"TTS service is {health['status']}",
+            "data": health
+        }
+
+    except Exception as e:
+        logger.error(f"Health check failed: {e}")
+        return {
+            "status": "error",
+            "message": "TTS health check failed",
+            "data": {"error": str(e)}
+        }
+
+
+@router.get("/stats")
+async def get_queue_stats() -> Dict[str, Any]:
+    """Get TTS queue statistics.
+
+    Returns:
+        Queue statistics
+    """
+    try:
+        queue_manager = get_queue_manager()
+        stats = queue_manager.get_queue_stats()
+
+        return {
+            "status": "success",
+            "message": "Queue statistics retrieved",
+            "data": stats
+        }
+
+    except Exception as e:
+        logger.error(f"Failed to get queue stats: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get queue stats: {str(e)}")

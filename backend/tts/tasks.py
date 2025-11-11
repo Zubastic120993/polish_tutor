@@ -1,5 +1,6 @@
 """TTS job queue tasks using RQ (Redis Queue)."""
 import logging
+import time
 from typing import Dict, Optional, Any
 import os
 from pathlib import Path
@@ -10,8 +11,10 @@ from rq.job import Job
 
 from .murf_client import MurfClient
 from .audio_cache import AudioCacheManager
+from src.core.logging_config import get_logger, set_request_id, set_correlation_id
+from src.core.metrics import record_tts_job_completed, record_tts_job_failed
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 def get_queue(connection: Optional[Redis] = None) -> Queue:
@@ -37,6 +40,8 @@ def synthesize_speech_task(
     language: str = "pl",
     style: str = "conversational",
     format: str = "mp3",
+    request_id: Optional[str] = None,
+    correlation_id: Optional[str] = None,
     **kwargs
 ) -> Dict[str, Any]:
     """RQ task to synthesize speech using Murf API.
@@ -48,6 +53,8 @@ def synthesize_speech_task(
         language: Language code
         style: Voice style
         format: Audio format
+        request_id: Request ID from the original API call
+        correlation_id: Correlation ID for tracing
         **kwargs: Additional parameters
 
     Returns:
@@ -55,14 +62,38 @@ def synthesize_speech_task(
     """
     job = get_current_job()
 
+    # Set up logging context
+    if request_id:
+        set_request_id(request_id)
+    if correlation_id:
+        set_correlation_id(correlation_id)
+
+    # Create job-specific logger with job ID context
+    job_logger = get_logger(__name__)
+    # Add job_id to all log records for this job
+    job_logger.extra.update({'job_id': job.id})
+
+    job_start_time = time.time()
+
     try:
+        job_logger.info("Starting TTS synthesis task", extra={
+            "cache_key": cache_key,
+            "text_length": len(text),
+            "voice_id": voice_id,
+            "language": language,
+            "format": format,
+        })
+
         # Initialize clients
         murf_client = MurfClient()
         cache_manager = AudioCacheManager()
 
         # Check if already cached
         if cache_manager.is_cached(cache_key, format):
-            logger.info(f"Audio already cached for key: {cache_key}")
+            job_logger.info("Audio already cached, returning existing result", extra={
+                "cache_key": cache_key,
+                "format": format,
+            })
             audio_url = cache_manager.get_audio_url(cache_key, format)
             return {
                 "status": "completed",
@@ -75,6 +106,11 @@ def synthesize_speech_task(
         # Update job progress
         job.meta["progress"] = "submitting_to_murf"
         job.save_meta()
+
+        job_logger.info("Submitting synthesis job to Murf API", extra={
+            "cache_key": cache_key,
+            "text_preview": text[:100] + "..." if len(text) > 100 else text,
+        })
 
         # Submit synthesis job to Murf
         synthesis_result = murf_client.synthesize_speech(
@@ -91,9 +127,17 @@ def synthesize_speech_task(
         job.meta["progress"] = "waiting_for_murf"
         job.save_meta()
 
-        logger.info(f"Submitted Murf job {murf_job_id} for cache key {cache_key}")
+        job_logger.info("Murf job submitted successfully", extra={
+            "murf_job_id": murf_job_id,
+            "cache_key": cache_key,
+        })
 
         # Wait for completion
+        job_logger.info("Waiting for Murf job completion", extra={
+            "murf_job_id": murf_job_id,
+            "max_wait_time": 300,
+        })
+
         final_status = murf_client.wait_for_completion(
             murf_job_id,
             poll_interval=2.0,
@@ -102,6 +146,11 @@ def synthesize_speech_task(
 
         job.meta["progress"] = "downloading_audio"
         job.save_meta()
+
+        job_logger.info("Murf job completed, downloading audio", extra={
+            "murf_job_id": murf_job_id,
+            "cache_key": cache_key,
+        })
 
         # Download audio
         cache_path = cache_manager.get_cache_path(cache_key, format)
@@ -123,13 +172,23 @@ def synthesize_speech_task(
         }
 
         cache_manager.store_audio(audio_data, cache_key, format, metadata)
-
         audio_url = cache_manager.get_audio_url(cache_key, format)
 
         job.meta["progress"] = "completed"
         job.save_meta()
 
-        logger.info(f"Successfully synthesized and cached audio for key: {cache_key}")
+        job_duration = time.time() - job_start_time
+
+        job_logger.info("TTS synthesis completed successfully", extra={
+            "cache_key": cache_key,
+            "audio_url": audio_url,
+            "file_size": len(audio_data),
+            "murf_job_id": murf_job_id,
+            "duration_seconds": round(job_duration, 2),
+        })
+
+        # Record metrics
+        record_tts_job_completed(duration_seconds=job_duration)
 
         return {
             "status": "completed",
@@ -142,7 +201,18 @@ def synthesize_speech_task(
         }
 
     except Exception as e:
-        logger.error(f"TTS synthesis failed for cache key {cache_key}: {e}")
+        job_duration = time.time() - job_start_time
+
+        job_logger.error("TTS synthesis failed", extra={
+            "cache_key": cache_key,
+            "error_type": type(e).__name__,
+            "error_message": str(e),
+            "duration_seconds": round(job_duration, 2),
+        }, exc_info=True)
+
+        # Record metrics
+        record_tts_job_failed(error_type=type(e).__name__)
+
         job.meta["error"] = str(e)
         job.meta["progress"] = "failed"
         job.save_meta()
