@@ -1,0 +1,261 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Polish Tutor - TTS Queue Monitoring",
+    "tags": ["polish-tutor", "tts", "queue"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "TTS Queue Overview",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(tts_queue_length)",
+            "legendFormat": "Total Queued Jobs"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "orange", "value": 20},
+                {"color": "red", "value": 50}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Queue Depth by Type",
+        "type": "bargauge",
+        "targets": [
+          {
+            "expr": "tts_queue_length",
+            "legendFormat": "{{queue_name}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "orange", "value": 10},
+                {"color": "red", "value": 25}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Job Throughput",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(tts_jobs_submitted_total[5m])",
+            "legendFormat": "Jobs Submitted/min"
+          },
+          {
+            "expr": "rate(tts_jobs_completed_total[5m])",
+            "legendFormat": "Jobs Completed/min"
+          },
+          {
+            "expr": "rate(tts_jobs_failed_total[5m])",
+            "legendFormat": "Jobs Failed/min"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8}
+      },
+      {
+        "id": 4,
+        "title": "Job Success Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "(rate(tts_jobs_completed_total[1h]) / rate(tts_jobs_submitted_total[1h])) * 100",
+            "legendFormat": "Success Rate %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "orange", "value": 90},
+                {"color": "green", "value": 95}
+              ]
+            },
+            "unit": "percent"
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 16}
+      },
+      {
+        "id": 5,
+        "title": "Job Duration (95th percentile)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(tts_job_duration_seconds_bucket[10m]))",
+            "legendFormat": "95th percentile"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "orange", "value": 300},
+                {"color": "red", "value": 600}
+              ]
+            },
+            "unit": "s"
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 8, "y": 16}
+      },
+      {
+        "id": 6,
+        "title": "Active Workers",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "tts_active_workers",
+            "legendFormat": "Active Workers"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "orange", "value": 1},
+                {"color": "green", "value": 2}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 16, "y": 16}
+      },
+      {
+        "id": 7,
+        "title": "Job Duration Distribution",
+        "type": "heatmap",
+        "targets": [
+          {
+            "expr": "rate(tts_job_duration_seconds_bucket[5m])",
+            "legendFormat": "{{le}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+      },
+      {
+        "id": 8,
+        "title": "Cache Performance",
+        "type": "bargauge",
+        "targets": [
+          {
+            "expr": "rate(tts_cache_hits_total[5m]) / (rate(tts_cache_hits_total[5m]) + rate(tts_cache_misses_total[5m])) * 100",
+            "legendFormat": "Cache Hit Rate %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "orange", "value": 50},
+                {"color": "green", "value": 80}
+              ]
+            },
+            "unit": "percent"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24}
+      },
+      {
+        "id": 9,
+        "title": "Job Failures by Type",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "rate(tts_jobs_failed_total[1h])",
+            "legendFormat": "{{error_type}}",
+            "instant": true
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 32}
+      },
+      {
+        "id": 10,
+        "title": "API Performance",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{endpoint=~\"/api/.*\"}[5m]))",
+            "legendFormat": "API P95 Latency"
+          },
+          {
+            "expr": "rate(http_requests_total{status_code=~\"5..\", endpoint=~\"/api/.*\"}[5m])",
+            "legendFormat": "API 5xx Errors/min"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 32}
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "timepicker": {},
+    "templating": {
+      "list": []
+    },
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": "-- Grafana --",
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "refresh": "30s",
+    "schemaVersion": 27,
+    "version": 0,
+    "links": []
+  }
+}
