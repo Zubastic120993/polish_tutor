@@ -1,9 +1,9 @@
 # Hybrid Architecture Plan
 
 > Version: v1.0.1  
-> Last updated: 2025-11-16 — Maintainer: @vzub  
+> Last updated: 2025-11-16  
 > Status: Approved — Hybrid Architecture Rollout Phase 1 (Kickoff)
-
+> Maintainer: @vzub
 ## Current Architecture Audit
 
 ### Backend & API
