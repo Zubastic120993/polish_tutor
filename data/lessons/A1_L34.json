@@ -1,0 +1,75 @@
+{
+  "id": "A1_L34",
+  "title": "Obiad w restauracji",
+  "level": "A1",
+  "module": "M4 – Smacznego",
+  "cefr_goal": "Potrafi zamawiać dania w restauracji oraz używać form grzecznościowych i nazw potraw.",
+  "objectives": [
+    "Zamawianie dań w restauracji",
+    "Używanie form grzecznościowych i nazw potraw"
+  ],
+  "vocabulary": [
+    {"pl": "zupa", "en": "soup"},
+    {"pl": "drugie danie", "en": "main course"},
+    {"pl": "deser", "en": "dessert"},
+    {"pl": "kelner / kelnerka", "en": "waiter / waitress"},
+    {"pl": "rachunek", "en": "bill"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "restaurant_questions",
+      "title": "Pytania w restauracji",
+      "content": "Pytania: 'Co pan/pani poleca?', 'Czy mogę prosić rachunek?'."
+    },
+    {
+      "id": "meal_course_phrases",
+      "title": "Zwroty dotyczące dań",
+      "content": "Zwroty: 'Na pierwsze danie', 'Na drugie danie', 'Na deser'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L34_d1",
+      "tutor": "Dzień dobry, co pan poleca na obiad?",
+      "expected": ["Polecam zupę pomidorową i kotleta schabowego."],
+      "translation": "Good afternoon, what do you recommend for lunch? / I recommend tomato soup and pork cutlet.",
+      "hint": "Odpowiedz jako kelner z rekomendacją dań.",
+      "audio": "CD067",
+      "options": []
+    },
+    {
+      "id": "A1_L34_d2",
+      "tutor": "Świetnie, poproszę to.",
+      "expected": ["Czy mogę prosić rachunek?"],
+      "translation": "Great, I'll take that. / May I have the bill?",
+      "hint": "Poproś o rachunek po posiłku.",
+      "audio": "CD068",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L34_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz dialog z kelnerem.",
+      "instruction_en": "Repeat the waiter–customer dialogue.",
+      "items": ["Co pan poleca na obiad?", "Polecam zupę pomidorową", "Poproszę to", "Czy mogę prosić rachunek?"]
+    },
+    {
+      "id": "A1_L34_task_match_pairs",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz danie z jego nazwą.",
+      "instruction_en": "Match each dish with its name.",
+      "pairs": [
+        {"item": "pierwsze danie", "match": "zupa"},
+        {"item": "drugie danie", "match": "kotlet schabowy"},
+        {"item": "deser", "match": "lody"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Polski obiad składa się z zupy i drugiego dania.",
+    "W restauracjach napiwek (ok. 10%) jest mile widziany, ale nieobowiązkowy."
+  ],
+  "audio_meta": {"tracks": ["CD067", "CD068"], "duration_sec": 65}
+}

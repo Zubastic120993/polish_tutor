@@ -1,0 +1,74 @@
+{
+  "id": "A1_L47",
+  "title": "Gdzie byłeś wczoraj?",
+  "level": "A1",
+  "module": "M7 – Poproszę bilet do Wrocławia",
+  "cefr_goal": "Potrafi mówić o przeszłych wydarzeniach oraz używać czasu przeszłego czasownika 'być'.",
+  "objectives": [
+    "Mówienie o przeszłych wydarzeniach",
+    "Używanie czasu przeszłego czasownika 'być'"
+  ],
+  "vocabulary": [
+    {"pl": "wczoraj", "en": "yesterday"},
+    {"pl": "być", "en": "to be"},
+    {"pl": "dworzec", "en": "station"},
+    {"pl": "kino", "en": "cinema"},
+    {"pl": "muzeum", "en": "museum"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "past_tense_byc",
+      "title": "Czas przeszły czasownika 'być'",
+      "content": "Czas przeszły czasownika 'być': byłem / byłam, byłeś / byłaś."
+    },
+    {
+      "id": "past_sentences",
+      "title": "Zdania w czasie przeszłym",
+      "content": "Zdania: 'Wczoraj byłem w kinie.'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L47_d1",
+      "tutor": "Gdzie byłeś wczoraj?",
+      "expected": ["Byłem w muzeum z kolegą."],
+      "translation": "Where were you yesterday? / I was at the museum with a friend.",
+      "hint": "Odpowiedz używając czasu przeszłego czasownika 'być'.",
+      "audio": "CD093",
+      "options": []
+    },
+    {
+      "id": "A1_L47_d2",
+      "tutor": "Podobało ci się?",
+      "expected": ["Tak, bardzo!"],
+      "translation": "Did you like it? / Yes, very much!",
+      "hint": "Odpowiedz na pytanie o opinię.",
+      "audio": "CD094",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L47_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz zdania w czasie przeszłym.",
+      "instruction_en": "Repeat sentences in past tense.",
+      "items": ["Byłem w kinie", "Byłaś w muzeum", "Byliśmy na dworcu", "Były w restauracji"]
+    },
+    {
+      "id": "A1_L47_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Wczoraj byłem / byłam w ...'",
+      "instruction_en": "Complete: 'Yesterday I was at ...'",
+      "blanks": [
+        {"sentence_pl": "Wczoraj byłem w ___.", "answer_pl": "kinie"},
+        {"sentence_en": "Yesterday I was at ___.", "answer_en": "the cinema"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W polskim języku forma przeszła zależy od rodzaju: męski (byłem), żeński (byłam).",
+    "W muzeach często obowiązuje bilet ulgowy dla studentów."
+  ],
+  "audio_meta": {"tracks": ["CD093", "CD094"], "duration_sec": 65}
+}

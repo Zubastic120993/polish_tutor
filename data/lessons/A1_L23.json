@@ -1,0 +1,74 @@
+{
+  "id": "A1_L23",
+  "title": "Mieszkam w…",
+  "level": "A1",
+  "module": "M1 – Poznajmy się",
+  "cefr_goal": "Potrafi mówić o miejscu zamieszkania, stosując przyimek 'w' z miejscownikiem.",
+  "objectives": [
+    "Mówienie o miejscu zamieszkania",
+    "Stosowanie przyimka 'w + miejscownik'"
+  ],
+  "vocabulary": [
+    {"pl": "miasto", "en": "city"},
+    {"pl": "ulica", "en": "street"},
+    {"pl": "dom", "en": "house"},
+    {"pl": "blok", "en": "apartment building"},
+    {"pl": "pokój", "en": "room"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "preposition_w_locative",
+      "title": "Przyimek 'w' z miejscownikiem",
+      "content": "Przyimek 'w' + miejscownik: 'w Warszawie', 'w domu'."
+    },
+    {
+      "id": "verb_mieszkac",
+      "title": "Czasownik 'mieszkać'",
+      "content": "Czasownik 'mieszkać' – odmiana: mieszkam, mieszkasz, mieszka."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L23_d1",
+      "tutor": "Gdzie mieszkasz?",
+      "expected": ["Mieszkam w Krakowie, na ulicy Długiej."],
+      "translation": "Where do you live? / I live in Kraków, on Długa Street.",
+      "hint": "Odpowiedz podając miasto i ulicę z przyimkiem 'w'.",
+      "audio": "CD045",
+      "options": []
+    },
+    {
+      "id": "A1_L23_d2",
+      "tutor": "Ja mieszkam w Warszawie.",
+      "expected": ["Ja mieszkam w Warszawie."],
+      "translation": "I live in Warsaw.",
+      "hint": "Podaj swoje miasto zamieszkania.",
+      "audio": "CD046",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L23_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz zdania z 'mieszkam w ...'",
+      "instruction_en": "Repeat sentences with 'I live in ...'",
+      "items": ["Mieszkam w Warszawie", "Mieszkam w Krakowie", "Mieszkam w domu", "Mieszkam w bloku"]
+    },
+    {
+      "id": "A1_L23_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij nazwę miasta: 'Mieszkam w ...'",
+      "instruction_en": "Complete the city name: 'I live in ...'",
+      "blanks": [
+        {"sentence_pl": "Mieszkam w ___.", "answer_pl": "Warszawie"},
+        {"sentence_en": "I live in ___.", "answer_en": "Kraków"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Polskie miasta mają różne końcówki miejscownika: 'w Warszawie', 'w Poznaniu'.",
+    "Adresy zapisuje się zawsze z ulicą i numerem (np. ul. Długa 5)."
+  ],
+  "audio_meta": {"tracks": ["CD045", "CD046"], "duration_sec": 65}
+}

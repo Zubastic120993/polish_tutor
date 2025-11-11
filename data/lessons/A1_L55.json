@@ -1,0 +1,74 @@
+{
+  "id": "A1_L55",
+  "title": "Jakie ma pan doświadczenie?",
+  "level": "A1",
+  "module": "M9 – Szukam pracy",
+  "cefr_goal": "Potrafi prowadzić rozmowę kwalifikacyjną oraz używać pytań formalnych i opisu doświadczenia zawodowego.",
+  "objectives": [
+    "Prowadzenie rozmowy kwalifikacyjnej",
+    "Używanie pytań formalnych i opisu doświadczenia zawodowego"
+  ],
+  "vocabulary": [
+    {"pl": "doświadczenie", "en": "experience"},
+    {"pl": "pracować jako", "en": "to work as"},
+    {"pl": "firma", "en": "company"},
+    {"pl": "stanowisko", "en": "position"},
+    {"pl": "referencje", "en": "references"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "formal_questions",
+      "title": "Pytania formalne",
+      "content": "Pytania formalne: 'Jakie ma pan/pani doświadczenie?'."
+    },
+    {
+      "id": "past_tense_pracowac",
+      "title": "Czas przeszły 'pracować'",
+      "content": "Czas przeszły z 'pracować': 'Pracowałem w firmie...'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L55_d1",
+      "tutor": "Jakie ma pan doświadczenie?",
+      "expected": ["Pracowałem dwa lata jako kelner."],
+      "translation": "What experience do you have? / I worked for two years as a waiter.",
+      "hint": "Odpowiedz używając czasu przeszłego i podając stanowisko.",
+      "audio": "CD109",
+      "options": []
+    },
+    {
+      "id": "A1_L55_d2",
+      "tutor": "Ma pan referencje?",
+      "expected": ["Tak, proszę bardzo."],
+      "translation": "Do you have references? / Yes, here you are.",
+      "hint": "Potwierdź posiadanie referencji i zaproponuj pokazanie.",
+      "audio": "CD110",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L55_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz pytania z rozmowy kwalifikacyjnej.",
+      "instruction_en": "Repeat job interview questions.",
+      "items": ["Jakie ma pan doświadczenie?", "Pracowałem dwa lata jako kelner", "Ma pan referencje?", "Tak, proszę bardzo"]
+    },
+    {
+      "id": "A1_L55_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Pracowałem jako ...'",
+      "instruction_en": "Complete: 'I worked as ...'",
+      "blanks": [
+        {"sentence_pl": "Pracowałem jako ___.", "answer_pl": "kelner"},
+        {"sentence_en": "I worked as ___.", "answer_en": "a waiter"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Rozmowy kwalifikacyjne w Polsce są zwykle formalne – należy mówić 'pan' / 'pani'.",
+    "Często wymagane jest CV i list motywacyjny."
+  ],
+  "audio_meta": {"tracks": ["CD109", "CD110"], "duration_sec": 75}
+}

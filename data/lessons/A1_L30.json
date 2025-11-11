@@ -1,0 +1,74 @@
+{
+  "id": "A1_L30",
+  "title": "Proszę chleb i bułkę",
+  "level": "A1",
+  "module": "M3 – Robię zakupy",
+  "cefr_goal": "Potrafi zamawiać produkty w sklepie spożywczym, używając form grzecznościowych.",
+  "objectives": [
+    "Zamawianie produktów w sklepie spożywczym",
+    "Używanie form grzecznościowych"
+  ],
+  "vocabulary": [
+    {"pl": "chleb", "en": "bread"},
+    {"pl": "bułka", "en": "roll"},
+    {"pl": "mleko", "en": "milk"},
+    {"pl": "ser", "en": "cheese"},
+    {"pl": "masło", "en": "butter"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "poprosze_construction",
+      "title": "Konstrukcja 'Poproszę'",
+      "content": "Konstrukcja: 'Poproszę + biernik (chleb, mleko)'."
+    },
+    {
+      "id": "polite_phrases",
+      "title": "Zwroty grzecznościowe",
+      "content": "Zwroty grzecznościowe: 'Proszę', 'Dziękuję', 'Ile płacę?'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L30_d1",
+      "tutor": "Dzień dobry. Poproszę chleb i dwie bułki.",
+      "expected": ["Proszę bardzo. Coś jeszcze?"],
+      "translation": "Good morning. Bread and two rolls, please. / Here you are. Anything else?",
+      "hint": "Odpowiedz jako sprzedawca, używając formy grzecznościowej.",
+      "audio": "CD059",
+      "options": []
+    },
+    {
+      "id": "A1_L30_d2",
+      "tutor": "Nie, dziękuję. Ile płacę?",
+      "expected": ["Razem dziesięć złotych."],
+      "translation": "No, thank you. How much? / Ten zloty altogether.",
+      "hint": "Podaj sumę do zapłaty.",
+      "audio": "CD060",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L30_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz zwroty używane w sklepie.",
+      "instruction_en": "Repeat polite phrases used in a shop.",
+      "items": ["Poproszę chleb", "Poproszę mleko", "Proszę bardzo", "Coś jeszcze?", "Nie, dziękuję", "Ile płacę?"]
+    },
+    {
+      "id": "A1_L30_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Poproszę ... i ...'",
+      "instruction_en": "Complete: 'Please ... and ...'",
+      "blanks": [
+        {"sentence_pl": "Poproszę ___ i ___.", "answer_pl": "chleb, bułkę"},
+        {"sentence_en": "Please ___ and ___.", "answer_en": "bread, rolls"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce mówi się 'dzień dobry' wchodząc do sklepu i 'do widzenia' wychodząc.",
+    "Słowo 'poproszę' jest uniwersalne i grzeczne w każdej sytuacji handlowej."
+  ],
+  "audio_meta": {"tracks": ["CD059", "CD060"], "duration_sec": 60}
+}

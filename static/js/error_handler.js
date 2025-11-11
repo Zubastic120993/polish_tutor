@@ -192,11 +192,13 @@ class ErrorHandler {
         errorEl.className = `error-notification error-notification--${severity}`;
         errorEl.setAttribute('role', 'alert');
         
-        const icon = severity === 'high' ? '⚠️' : severity === 'medium' ? '⚡' : 'ℹ️';
+        const iconName = severity === 'high' ? 'alert-triangle' : severity === 'medium' ? 'zap' : 'info';
         
         errorEl.innerHTML = `
             <div class="error-notification__content">
-                <span class="error-notification__icon">${icon}</span>
+                <span class="error-notification__icon" aria-hidden="true">
+                    <i data-feather="${iconName}"></i>
+                </span>
                 <span class="error-notification__message">${this.escapeHtml(message)}</span>
             </div>
             ${recoveryActions.length > 0 ? `
@@ -214,6 +216,9 @@ class ErrorHandler {
         
         // Add to page
         document.body.appendChild(errorEl);
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
         
         // Auto-dismiss after 5 seconds (unless high severity)
         if (severity !== 'high') {
@@ -309,7 +314,7 @@ class ErrorHandler {
         if (browser === 'chrome' || browser === 'edge') {
             instructionsText = `
                 <strong>To enable microphone access:</strong><br>
-                1. Click the lock icon (🔒) in your browser's address bar<br>
+                1. Click the lock icon in your browser's address bar<br>
                 2. Find "Microphone" in the permissions list<br>
                 3. Change it from "Block" to "Allow"<br>
                 4. Refresh the page
@@ -339,13 +344,18 @@ class ErrorHandler {
         
         instructions.innerHTML = `
             <div class="error-notification__content">
-                <span class="error-notification__icon">🎤</span>
+                <span class="error-notification__icon" aria-hidden="true">
+                    <i data-feather="mic-off"></i>
+                </span>
                 <div class="error-notification__message">${instructionsText}</div>
             </div>
             <button class="error-notification__button" data-action="close_instructions">Got it</button>
         `;
         
         document.body.appendChild(instructions);
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
         
         instructions.querySelector('[data-action="close_instructions"]').addEventListener('click', () => {
             instructions.remove();
@@ -751,4 +761,3 @@ if (document.readyState === 'loading') {
     errorHandler = new ErrorHandler(1);
     window.errorHandler = errorHandler;
 }
-

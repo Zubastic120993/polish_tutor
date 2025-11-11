@@ -1,0 +1,76 @@
+{
+  "id": "A1_L40",
+  "title": "Okolica",
+  "level": "A1",
+  "module": "M5 – Moje mieszkanie",
+  "cefr_goal": "Potrafi opisywać okolicę swojego miejsca zamieszkania, używając przymiotników i przyimków miejsca.",
+  "objectives": [
+    "Opisywanie okolicy swojego miejsca zamieszkania",
+    "Używanie przymiotników i przyimków miejsca"
+  ],
+  "vocabulary": [
+    {"pl": "park", "en": "park"},
+    {"pl": "sklep", "en": "shop"},
+    {"pl": "szkoła", "en": "school"},
+    {"pl": "przystanek", "en": "bus stop"},
+    {"pl": "kościół", "en": "church"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "descriptive_adjectives",
+      "title": "Przymiotniki opisowe",
+      "content": "Przymiotniki opisujące miejsce: 'spokojny', 'zielony', 'duży', 'czysty'."
+    },
+    {
+      "id": "neighborhood_sentences",
+      "title": "Zdania o okolicy",
+      "content": "Zdania: 'W mojej okolicy jest park i szkoła.'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L40_d1",
+      "tutor": "Gdzie jest twój dom?",
+      "expected": ["W spokojnej okolicy, obok parku."],
+      "translation": "Where is your home? / In a quiet area, next to the park.",
+      "hint": "Opisz swoją okolicę używając przymiotników i przyimków.",
+      "audio": "CD079",
+      "options": []
+    },
+    {
+      "id": "A1_L40_d2",
+      "tutor": "To ładna okolica!",
+      "expected": ["To ładna okolica!"],
+      "translation": "That's a nice area! / That's a nice area!",
+      "hint": "Zgódź się z opinią rozmówcy.",
+      "audio": "CD080",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L40_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz opis okolicy.",
+      "instruction_en": "Repeat the neighbourhood description.",
+      "items": ["spokojna okolica", "obok parku", "w centrum miasta", "blisko szkoły"]
+    },
+    {
+      "id": "A1_L40_task_match_pairs",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz miejsce z przymiotnikiem.",
+      "instruction_en": "Match each place with an adjective.",
+      "pairs": [
+        {"item": "park", "match": "zielony"},
+        {"item": "sklep", "match": "duży"},
+        {"item": "szkoła", "match": "nowa"},
+        {"item": "kościół", "match": "stary"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Polacy często wybierają mieszkania blisko zieleni i komunikacji miejskiej.",
+    "W wielu miastach w niedzielę obowiązuje cisza – sklepy są zamknięte."
+  ],
+  "audio_meta": {"tracks": ["CD079", "CD080"], "duration_sec": 55}
+}

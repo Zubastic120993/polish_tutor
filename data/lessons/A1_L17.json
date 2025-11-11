@@ -1,0 +1,74 @@
+{
+  "id": "A1_L17",
+  "title": "Mieszkanie",
+  "level": "A1",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi opisać pomieszczenia w domu i używać przyimków miejsca.",
+  "objectives": [
+    "Opisywanie pomieszczeń w domu",
+    "Używanie przyimków miejsca"
+  ],
+  "vocabulary": [
+    {"pl": "pokój", "en": "room"},
+    {"pl": "kuchnia", "en": "kitchen"},
+    {"pl": "łazienka", "en": "bathroom"},
+    {"pl": "okno", "en": "window"},
+    {"pl": "drzwi", "en": "door"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "location_prepositions",
+      "title": "Przyimki miejsca",
+      "content": "Przyimki miejsca: 'na', 'pod', 'przed', 'obok', 'między'."
+    },
+    {
+      "id": "location_constructions",
+      "title": "Konstrukcje z lokalizacją",
+      "content": "Konstrukcje: 'W kuchni jest stół.', 'Na ścianie jest obraz.'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L17_d1",
+      "tutor": "Masz duże mieszkanie?",
+      "expected": ["Tak, trzy pokoje i balkon."],
+      "translation": "Do you have a big apartment? / Yes, three rooms and a balcony.",
+      "hint": "Odpowiedz na pytanie o mieszkanie.",
+      "audio": "CD033",
+      "options": []
+    },
+    {
+      "id": "A1_L17_d2",
+      "tutor": "W kuchni jest lodówka i stół.",
+      "expected": ["W kuchni jest lodówka i stół."],
+      "translation": "There's a fridge and a table in the kitchen.",
+      "hint": "Zwróć uwagę na przyimek 'w' z miejscownikiem.",
+      "audio": "CD034",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L17_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Posłuchaj nazw pomieszczeń.",
+      "instruction_en": "Listen to the names of rooms and repeat.",
+      "items": ["pokój", "kuchnia", "łazienka", "okno", "drzwi"]
+    },
+    {
+      "id": "A1_L17_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'W ... jest ...'.",
+      "instruction_en": "Complete: 'In the ... there is ...'.",
+      "blanks": [
+        {"sentence_pl": "W ___ jest lodówka.", "answer_pl": "kuchni"},
+        {"sentence_en": "In the ___ there is a bed.", "answer_en": "bedroom"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Typowe polskie mieszkanie ma osobną kuchnię i łazienkę.",
+    "W wielu budynkach nie ma windy – warto znać słowo 'parter'."
+  ],
+  "audio_meta": {"tracks": ["CD033", "CD034"], "duration_sec": 60}
+}

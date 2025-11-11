@@ -1,0 +1,76 @@
+{
+  "id": "A1_L38",
+  "title": "Meble",
+  "level": "A1",
+  "module": "M5 – Moje mieszkanie",
+  "cefr_goal": "Potrafi nazywać podstawowe meble i sprzęty domowe oraz używać przyimków miejsca.",
+  "objectives": [
+    "Nazywanie podstawowych mebli i sprzętów domowych",
+    "Używanie przyimków miejsca"
+  ],
+  "vocabulary": [
+    {"pl": "stół", "en": "table"},
+    {"pl": "krzesło", "en": "chair"},
+    {"pl": "łóżko", "en": "bed"},
+    {"pl": "szafa", "en": "wardrobe"},
+    {"pl": "lampa", "en": "lamp"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "location_prepositions_furniture",
+      "title": "Przyimki miejsca",
+      "content": "Przyimki miejsca: 'na', 'pod', 'obok', 'przed', 'za'."
+    },
+    {
+      "id": "furniture_sentences",
+      "title": "Zdania o lokalizacji mebli",
+      "content": "Zdania: 'Lampa jest na stole.', 'Szafa stoi obok łóżka.'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L38_d1",
+      "tutor": "Gdzie jest lampa?",
+      "expected": ["Na stole."],
+      "translation": "Where is the lamp? / On the table.",
+      "hint": "Odpowiedz używając przyimka 'na' + miejscownik.",
+      "audio": "CD075",
+      "options": []
+    },
+    {
+      "id": "A1_L38_d2",
+      "tutor": "A krzesło?",
+      "expected": ["Obok stołu."],
+      "translation": "And the chair? / Next to the table.",
+      "hint": "Użyj przyimka 'obok' + dopełniacz.",
+      "audio": "CD076",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L38_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz nazwy mebli.",
+      "instruction_en": "Repeat the names of furniture.",
+      "items": ["stół", "krzesło", "łóżko", "szafa", "lampa"]
+    },
+    {
+      "id": "A1_L38_task_match_pairs",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz mebel z jego lokalizacją.",
+      "instruction_en": "Match each furniture item to its location.",
+      "pairs": [
+        {"item": "lampa", "match": "na stole"},
+        {"item": "krzesło", "match": "obok stołu"},
+        {"item": "szafa", "match": "obok łóżka"},
+        {"item": "łóżko", "match": "w pokoju"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W polskich mieszkaniach popularne są meble z IKEA.",
+    "Słowo 'meblościanka' oznacza dawny zestaw mebli w salonie."
+  ],
+  "audio_meta": {"tracks": ["CD075", "CD076"], "duration_sec": 55}
+}

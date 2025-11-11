@@ -1,0 +1,74 @@
+{
+  "id": "A1_L41",
+  "title": "Która godzina?",
+  "level": "A1",
+  "module": "M6 – Dzień za dniem",
+  "cefr_goal": "Potrafi pytać i odpowiadać o godzinę oraz rozumieć formy liczebników i konstrukcje czasowe.",
+  "objectives": [
+    "Pytanie i odpowiadanie o godzinę",
+    "Rozumienie form liczebników i konstrukcji czasowych"
+  ],
+  "vocabulary": [
+    {"pl": "godzina", "en": "hour / time"},
+    {"pl": "wpół do", "en": "half past"},
+    {"pl": "za piętnaście", "en": "quarter to"},
+    {"pl": "po", "en": "past"},
+    {"pl": "punkt", "en": "exactly"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "time_constructions",
+      "title": "Konstrukcje czasowe",
+      "content": "Konstrukcje: 'Jest godzina pierwsza / druga / trzecia.'."
+    },
+    {
+      "id": "time_prepositions",
+      "title": "Przyimki z godzinami",
+      "content": "Przyimki: 'o', 'po', 'za' z godzinami."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L41_d1",
+      "tutor": "Która godzina?",
+      "expected": ["Jest wpół do szóstej."],
+      "translation": "What time is it? / It's half past five.",
+      "hint": "Odpowiedz używając wyrażenia 'wpół do'.",
+      "audio": "CD081",
+      "options": []
+    },
+    {
+      "id": "A1_L41_d2",
+      "tutor": "Spotkanie jest o siódmej.",
+      "expected": ["Spotkanie jest o siódmej."],
+      "translation": "The meeting is at seven. / The meeting is at seven.",
+      "hint": "Użyj przyimka 'o' z godziną.",
+      "audio": "CD082",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L41_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz pytania o godzinę.",
+      "instruction_en": "Repeat questions about time.",
+      "items": ["Która godzina?", "Jest wpół do szóstej", "Spotkanie jest o siódmej", "Za piętnaście druga"]
+    },
+    {
+      "id": "A1_L41_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Jest godzina ...'",
+      "instruction_en": "Complete: 'It’s ... o’clock.'",
+      "blanks": [
+        {"sentence_pl": "Jest godzina ___.", "answer_pl": "pierwsza"},
+        {"sentence_en": "It’s ___ o’clock.", "answer_en": "one"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce często mówi się 'wpół do szóstej' zamiast 'pięć trzydzieści'.",
+    "Zegar 24-godzinny używany jest w rozkładach jazdy i urzędach."
+  ],
+  "audio_meta": {"tracks": ["CD081", "CD082"], "duration_sec": 60}
+}

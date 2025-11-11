@@ -223,7 +223,7 @@ class ReviewManager {
         await this.checkDueReviews();
         
         if (this.dueItems.length === 0) {
-            this.showMessage('No items due for review! Great job! 🎉', 'info');
+            this.showMessage('No items due for review! Great job!', 'info');
             return;
         }
         
@@ -306,27 +306,27 @@ class ReviewManager {
                         <p class="review__quality-label">How well did you remember this?</p>
                         <div class="review__quality-buttons">
                             <button class="review__quality-btn review__quality-btn--fail" data-quality="0">
-                                <span class="review__quality-emoji">😕</span>
+                                <span class="review__quality-icon" aria-hidden="true"><i data-feather="x-circle"></i></span>
                                 <span class="review__quality-text">Forgot</span>
                             </button>
                             <button class="review__quality-btn review__quality-btn--hard" data-quality="1">
-                                <span class="review__quality-emoji">😓</span>
+                                <span class="review__quality-icon" aria-hidden="true"><i data-feather="trending-down"></i></span>
                                 <span class="review__quality-text">Hard</span>
                             </button>
                             <button class="review__quality-btn review__quality-btn--medium" data-quality="2">
-                                <span class="review__quality-emoji">🤔</span>
+                                <span class="review__quality-icon" aria-hidden="true"><i data-feather="minus-circle"></i></span>
                                 <span class="review__quality-text">Medium</span>
                             </button>
                             <button class="review__quality-btn review__quality-btn--good" data-quality="3">
-                                <span class="review__quality-emoji">😊</span>
+                                <span class="review__quality-icon" aria-hidden="true"><i data-feather="thumbs-up"></i></span>
                                 <span class="review__quality-text">Good</span>
                             </button>
                             <button class="review__quality-btn review__quality-btn--easy" data-quality="4">
-                                <span class="review__quality-emoji">😄</span>
+                                <span class="review__quality-icon" aria-hidden="true"><i data-feather="check-circle"></i></span>
                                 <span class="review__quality-text">Easy</span>
                             </button>
                             <button class="review__quality-btn review__quality-btn--perfect" data-quality="5">
-                                <span class="review__quality-emoji">🎉</span>
+                                <span class="review__quality-icon" aria-hidden="true"><i data-feather="star"></i></span>
                                 <span class="review__quality-text">Perfect</span>
                             </button>
                         </div>
@@ -515,7 +515,9 @@ class ReviewManager {
         content.innerHTML = `
             <div class="review review--complete">
                 <div class="review__complete">
-                    <div class="review__complete-icon">🎉</div>
+                    <div class="review__complete-icon" aria-hidden="true">
+                        <i data-feather="award"></i>
+                    </div>
                     <h2 class="review__complete-title">Review Complete!</h2>
                     <p class="review__complete-message">
                         You reviewed ${completed} phrase${completed !== 1 ? 's' : ''} in ${elapsedMinutes} minute${elapsedMinutes !== 1 ? 's' : ''}.
@@ -524,6 +526,10 @@ class ReviewManager {
                 </div>
             </div>
         `;
+
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
         
         // Close button
         const closeButton = document.getElementById('review-close');

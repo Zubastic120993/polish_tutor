@@ -1,0 +1,75 @@
+{
+  "id": "A1_L16",
+  "title": "Ubrania",
+  "level": "A1",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi opisać ubrania, kolory i wygląd oraz prowadzić krótką rozmowę na temat stylu.",
+  "objectives": [
+    "Nazywanie ubrań i kolorów",
+    "Opisywanie wyglądu i stylu"
+  ],
+  "vocabulary": [
+    {"pl": "koszula", "en": "shirt"},
+    {"pl": "spodnie", "en": "trousers"},
+    {"pl": "sukienka", "en": "dress"},
+    {"pl": "buty", "en": "shoes"},
+    {"pl": "kurtka", "en": "jacket"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "colors_gender",
+      "title": "Kolory i rodzaj gramatyczny",
+      "content": "Kolory i rodzaj gramatyczny: 'biała koszula', 'czarne spodnie'."
+    },
+    {
+      "id": "clothing_constructions",
+      "title": "Konstrukcje z ubraniami",
+      "content": "Konstrukcje: 'Mam na sobie...', 'Noszę...'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L16_d1",
+      "tutor": "Ładna masz kurtka!",
+      "expected": ["Dziękuję, to nowa kurtka z promocji."],
+      "translation": "Nice jacket! / Thanks, it's a new one from a sale.",
+      "hint": "Odpowiedz grzecznie na komplement.",
+      "audio": "CD031",
+      "options": []
+    },
+    {
+      "id": "A1_L16_d2",
+      "tutor": "Lubię twoją niebieską sukienkę.",
+      "expected": ["Dziękuję."],
+      "translation": "I like your blue dress. / Thank you.",
+      "hint": "Odpowiedz na komplement dotyczący koloru ubrania.",
+      "audio": "CD032",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L16_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Posłuchaj nazw ubrań i powtórz.",
+      "instruction_en": "Listen to clothing names and repeat.",
+      "items": ["koszula", "spodnie", "sukienka", "buty", "kurtka"]
+    },
+    {
+      "id": "A1_L16_task_match_pairs",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz ubranie z kolorem.",
+      "instruction_en": "Match the clothing item with its color.",
+      "pairs": [
+        {"item": "koszula", "match": "biała"},
+        {"item": "spodnie", "match": "czarne"},
+        {"item": "sukienka", "match": "niebieska"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce zimą nosi się czapkę, szalik i rękawiczki.",
+    "Kolor biały często symbolizuje elegancję (np. koszula do pracy)."
+  ],
+  "audio_meta": {"tracks": ["CD031", "CD032"], "duration_sec": 55}
+}

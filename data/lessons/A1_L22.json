@@ -1,0 +1,75 @@
+{
+  "id": "A1_L22",
+  "title": "Jestem…",
+  "level": "A1",
+  "module": "M1 – Poznajmy się",
+  "cefr_goal": "Potrafi przedstawić siebie i innych, używając czasownika 'być' w pierwszej osobie.",
+  "objectives": [
+    "Przedstawianie siebie i innych",
+    "Używanie czasownika 'być' w pierwszej osobie"
+  ],
+  "vocabulary": [
+    {"pl": "jestem", "en": "I am"},
+    {"pl": "student", "en": "student (m)"},
+    {"pl": "studentka", "en": "student (f)"},
+    {"pl": "pracownik", "en": "employee"},
+    {"pl": "nauczyciel", "en": "teacher"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "verb_byc",
+      "title": "Czasownik 'być'",
+      "content": "Czasownik 'być' – odmiana: jestem, jesteś, jest."
+    },
+    {
+      "id": "sentences_with_byc",
+      "title": "Zdania z czasownikiem 'być'",
+      "content": "Zdania: 'Jestem studentem / studentką.'"
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L22_d1",
+      "tutor": "Kim jesteś?",
+      "expected": ["Jestem studentką."],
+      "translation": "Who are you? / I'm a student.",
+      "hint": "Odpowiedz używając czasownika 'być' w pierwszej osobie.",
+      "audio": "CD043",
+      "options": []
+    },
+    {
+      "id": "A1_L22_d2",
+      "tutor": "A ja jestem nauczycielem.",
+      "expected": ["A ja jestem nauczycielem."],
+      "translation": "And I'm a teacher.",
+      "hint": "Przedstaw się używając odpowiedniej formy zawodowej.",
+      "audio": "CD044",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L22_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz zdania z czasownikiem 'być'.",
+      "instruction_en": "Repeat sentences with the verb 'to be'.",
+      "items": ["Jestem studentem", "Jestem studentką", "Jestem nauczycielem", "Jestem pracownikiem"]
+    },
+    {
+      "id": "A1_L22_task_match_pairs",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz osobę z zawodem.",
+      "instruction_en": "Match the person with their profession.",
+      "pairs": [
+        {"item": "Anna", "match": "studentka"},
+        {"item": "Paweł", "match": "nauczyciel"},
+        {"item": "Maria", "match": "pracownik"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W języku polskim często pomija się czasownik 'być' w krótkich odpowiedziach ('Student.').",
+    "Zawody męskie i żeńskie mają inne końcówki."
+  ],
+  "audio_meta": {"tracks": ["CD043", "CD044"], "duration_sec": 60}
+}

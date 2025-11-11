@@ -1,0 +1,74 @@
+{
+  "id": "A1_L59",
+  "title": "Praca domowa",
+  "level": "A1",
+  "module": "M10 – Dzieci idą do szkoły",
+  "cefr_goal": "Potrafi rozumieć polecenia nauczyciela i używać czasowników związanych z nauką.",
+  "objectives": [
+    "Rozumienie poleceń nauczyciela",
+    "Używanie czasowników związanych z nauką"
+  ],
+  "vocabulary": [
+    {"pl": "czytać", "en": "to read"},
+    {"pl": "pisać", "en": "to write"},
+    {"pl": "uczyć się", "en": "to study / learn"},
+    {"pl": "zadanie", "en": "exercise / homework"},
+    {"pl": "notować", "en": "to take notes"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "imperative_mood",
+      "title": "Tryb rozkazujący",
+      "content": "Tryb rozkazujący (imperative): 'Czytaj!', 'Pisz!', 'Ucz się!'."
+    },
+    {
+      "id": "obligation_sentences",
+      "title": "Zdania z obowiązkiem",
+      "content": "Zdania wyrażające obowiązek: 'Muszę zrobić pracę domową.'"
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L59_d1",
+      "tutor": "Masz pracę domową?",
+      "expected": ["Tak, muszę napisać zadanie z polskiego."],
+      "translation": "Do you have homework? / Yes, I have to write a Polish exercise.",
+      "hint": "Odpowiedz na pytanie o pracę domową.",
+      "audio": "CD117",
+      "options": []
+    },
+    {
+      "id": "A1_L59_d2",
+      "tutor": "Powodzenia!",
+      "expected": ["Dziękuję!"],
+      "translation": "Good luck! / Thank you!",
+      "hint": "Odpowiedz na życzenia powodzenia.",
+      "audio": "CD118",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L59_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz polecenia nauczyciela.",
+      "instruction_en": "Repeat teacher's instructions.",
+      "items": ["Czytaj!", "Pisz!", "Ucz się!", "Zrób zadanie!"]
+    },
+    {
+      "id": "A1_L59_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Muszę zrobić ...'",
+      "instruction_en": "Complete: 'I have to do ...'.",
+      "blanks": [
+        {"sentence_pl": "Muszę zrobić ___.", "answer_pl": "pracę domową"},
+        {"sentence_en": "I have to do ___.", "answer_en": "homework"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W polskich szkołach uczniowie codziennie mają pracę domową.",
+    "Rodzice często pomagają dzieciom w odrabianiu lekcji."
+  ],
+  "audio_meta": {"tracks": ["CD117", "CD118"], "duration_sec": 55}
+}

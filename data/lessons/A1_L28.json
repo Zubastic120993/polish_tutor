@@ -1,0 +1,74 @@
+{
+  "id": "A1_L28",
+  "title": "Gdzie on pracuje?",
+  "level": "A1",
+  "module": "M2 – Moja rodzina",
+  "cefr_goal": "Potrafi opisywać miejsca pracy i czynności zawodowe, używając przyimków miejsca i czasowników związanych z pracą.",
+  "objectives": [
+    "Opisywanie miejsc pracy i czynności zawodowych",
+    "Używanie przyimków miejsca i czasowników związanych z pracą"
+  ],
+  "vocabulary": [
+    {"pl": "biuro", "en": "office"},
+    {"pl": "szpital", "en": "hospital"},
+    {"pl": "sklep", "en": "shop"},
+    {"pl": "szkoła", "en": "school"},
+    {"pl": "fabryka", "en": "factory"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "question_gdzie_pracuje",
+      "title": "Pytanie o miejsce pracy",
+      "content": "Pytanie: 'Gdzie on/ona pracuje?' – Odpowiedź: 'Pracuje w + miejscownik'."
+    },
+    {
+      "id": "verb_pracowac",
+      "title": "Czasownik 'pracować'",
+      "content": "Czasownik 'pracować' – odmiana: pracuję, pracujesz, pracuje."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L28_d1",
+      "tutor": "Gdzie pracuje twój brat?",
+      "expected": ["Pracuje w biurze."],
+      "translation": "Where does your brother work? / He works in an office.",
+      "hint": "Odpowiedz używając 'Pracuje w' + miejscownik miejsca pracy.",
+      "audio": "CD055",
+      "options": []
+    },
+    {
+      "id": "A1_L28_d2",
+      "tutor": "A siostra?",
+      "expected": ["Pracuje w szkole."],
+      "translation": "And your sister? / She works in a school.",
+      "hint": "Podaj miejsce pracy siostry.",
+      "audio": "CD056",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L28_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz zdania o miejscu pracy.",
+      "instruction_en": "Repeat sentences about workplace.",
+      "items": ["Pracuje w biurze", "Pracuje w szpitalu", "Pracuje w sklepie", "Pracuje w szkole", "Pracuje w fabryce"]
+    },
+    {
+      "id": "A1_L28_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Pracuje w ...'",
+      "instruction_en": "Complete: 'He/She works in ...'",
+      "blanks": [
+        {"sentence_pl": "Pracuje w ___.", "answer_pl": "szpitalu"},
+        {"sentence_en": "He works in ___.", "answer_en": "office"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce popularne zawody to nauczyciel, lekarz, informatyk.",
+    "Czasami używa się skrótu 'w pracy' jako miejsca – bez określenia ('Jestem w pracy.')."
+  ],
+  "audio_meta": {"tracks": ["CD055", "CD056"], "duration_sec": 70}
+}

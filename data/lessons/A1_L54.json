@@ -1,0 +1,74 @@
+{
+  "id": "A1_L54",
+  "title": "Umiem szybko pisać",
+  "level": "A1",
+  "module": "M9 – Szukam pracy",
+  "cefr_goal": "Potrafi opowiadać o swoich umiejętnościach oraz używać czasownika 'umieć' i rzeczowników odczasownikowych.",
+  "objectives": [
+    "Opowiadanie o swoich umiejętnościach",
+    "Używanie czasownika 'umieć' i rzeczowników odczasownikowych"
+  ],
+  "vocabulary": [
+    {"pl": "umieć", "en": "to know how to"},
+    {"pl": "pisać", "en": "to write"},
+    {"pl": "czytać", "en": "to read"},
+    {"pl": "obsługiwać komputer", "en": "to operate a computer"},
+    {"pl": "rozmawiać przez telefon", "en": "to talk on the phone"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "verb_umiec",
+      "title": "Czasownik 'umieć'",
+      "content": "Czasownik 'umieć' – odmiana: umiem, umiesz, umie."
+    },
+    {
+      "id": "umiec_construction",
+      "title": "Konstrukcja z 'umieć'",
+      "content": "Konstrukcja: 'Umiem + bezokolicznik' ('Umiem pisać', 'Umiem gotować')."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L54_d1",
+      "tutor": "Jakie masz umiejętności?",
+      "expected": ["Umiem szybko pisać i obsługiwać komputer."],
+      "translation": "What skills do you have? / I can type fast and use a computer.",
+      "hint": "Opisz swoje umiejętności używając czasownika 'umieć'.",
+      "audio": "CD107",
+      "options": []
+    },
+    {
+      "id": "A1_L54_d2",
+      "tutor": "Świetnie, to ważne w biurze.",
+      "expected": ["Tak, umiem też rozmawiać przez telefon."],
+      "translation": "Great, that's important in an office. / Yes, I can also talk on the phone.",
+      "hint": "Dodaj kolejną umiejętność przydatną w biurze.",
+      "audio": "CD108",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L54_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz zdania z czasownikiem 'umieć'.",
+      "instruction_en": "Repeat sentences with the verb 'to know how'.",
+      "items": ["Umiem pisać", "Umiem czytać", "Umiem obsługiwać komputer", "Umiem rozmawiać przez telefon"]
+    },
+    {
+      "id": "A1_L54_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Umiem ...'",
+      "instruction_en": "Complete: 'I can ...'",
+      "blanks": [
+        {"sentence_pl": "Umiem ___.", "answer_pl": "szybko pisać"},
+        {"sentence_en": "I can ___.", "answer_en": "type fast"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W CV w Polsce często używa się sekcji 'Umiejętności' z punktami ('obsługa komputera', 'prawo jazdy').",
+    "Podczas rozmowy kwalifikacyjnej należy mówić spokojnie i uprzejmie."
+  ],
+  "audio_meta": {"tracks": ["CD107", "CD108"], "duration_sec": 65}
+}

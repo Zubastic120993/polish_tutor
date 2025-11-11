@@ -1,0 +1,74 @@
+{
+  "id": "A1_L39",
+  "title": "Chcę wynająć mieszkanie",
+  "level": "A1",
+  "module": "M5 – Moje mieszkanie",
+  "cefr_goal": "Potrafi pytać o wynajem mieszkania oraz używać czasownika 'chcieć' i konstrukcji 'do wynajęcia'.",
+  "objectives": [
+    "Pytanie o wynajem mieszkania",
+    "Używanie czasownika 'chcieć' i konstrukcji 'do wynajęcia'"
+  ],
+  "vocabulary": [
+    {"pl": "wynajmować", "en": "to rent"},
+    {"pl": "czynsz", "en": "rent (payment)"},
+    {"pl": "ogłoszenie", "en": "advertisement"},
+    {"pl": "pokój", "en": "room"},
+    {"pl": "kaucja", "en": "deposit"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "verb_chciec",
+      "title": "Czasownik 'chcieć'",
+      "content": "Czasownik 'chcieć' – odmiana: chcę, chcesz, chce."
+    },
+    {
+      "id": "rental_expressions",
+      "title": "Wyrażenia związane z wynajmem",
+      "content": "Wyrażenia: 'do wynajęcia', 'pokój jednoosobowy'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L39_d1",
+      "tutor": "Dzień dobry, dzwonię w sprawie ogłoszenia. Czy mieszkanie jest jeszcze wolne?",
+      "expected": ["Tak, proszę przyjść jutro o 17:00."],
+      "translation": "Good morning, I'm calling about the ad. Is the apartment still available? / Yes, please come tomorrow at 5 p.m.",
+      "hint": "Odpowiedz jako właściciel mieszkania, podając termin spotkania.",
+      "audio": "CD077",
+      "options": []
+    },
+    {
+      "id": "A1_L39_d2",
+      "tutor": "Dobrze, dziękuję. Do zobaczenia.",
+      "expected": ["Dobrze, dziękuję. Do zobaczenia."],
+      "translation": "All right, thank you. See you. / All right, thank you. See you.",
+      "hint": "Odpowiedz grzecznie potwierdzając spotkanie.",
+      "audio": "CD078",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L39_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz dialog o wynajmie.",
+      "instruction_en": "Repeat the dialogue about renting.",
+      "items": ["Chcę wynająć mieszkanie", "Czy mieszkanie jest wolne?", "Proszę przyjść jutro", "Do zobaczenia"]
+    },
+    {
+      "id": "A1_L39_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Chcę wynająć ...'",
+      "instruction_en": "Complete: 'I want to rent ...'",
+      "blanks": [
+        {"sentence_pl": "Chcę wynająć ___ dwupokojowe.", "answer_pl": "mieszkanie"},
+        {"sentence_en": "I want to rent ___ two-room apartment.", "answer_en": "a"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Ogłoszenia o wynajmie często zaczynają się od słowa 'Kawalerka'.",
+    "W Polsce kaucja zwykle wynosi równowartość jednego miesiąca czynszu."
+  ],
+  "audio_meta": {"tracks": ["CD077", "CD078"], "duration_sec": 65}
+}

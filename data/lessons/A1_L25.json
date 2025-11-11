@@ -1,0 +1,76 @@
+{
+  "id": "A1_L25",
+  "title": "Kto to jest?",
+  "level": "A1",
+  "module": "M2 – Moja rodzina",
+  "cefr_goal": "Potrafi rozpoznawać i opisywać członków rodziny oraz zadawać pytania o osoby.",
+  "objectives": [
+    "Rozpoznawanie i opisywanie członków rodziny",
+    "Zadawanie pytań o osoby"
+  ],
+  "vocabulary": [
+    {"pl": "mama", "en": "mother"},
+    {"pl": "tata", "en": "father"},
+    {"pl": "brat", "en": "brother"},
+    {"pl": "siostra", "en": "sister"},
+    {"pl": "dziecko", "en": "child"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "question_kto_to_jest",
+      "title": "Pytanie 'Kto to jest?'",
+      "content": "Pytanie: 'Kto to jest?' – Odpowiedź: 'To jest + mianownik'."
+    },
+    {
+      "id": "singular_plural_family",
+      "title": "Liczba pojedyncza i mnoga",
+      "content": "Liczba pojedyncza i mnoga: 'brat – bracia', 'siostra – siostry'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L25_d1",
+      "tutor": "Kto to jest?",
+      "expected": ["To jest moja mama."],
+      "translation": "Who is this? / This is my mother.",
+      "hint": "Odpowiedz używając 'To jest' + nazwa członka rodziny.",
+      "audio": "CD049",
+      "options": []
+    },
+    {
+      "id": "A1_L25_d2",
+      "tutor": "A to jest twój tata?",
+      "expected": ["Tak, to jest mój tata."],
+      "translation": "And is that your father? / Yes, this is my father.",
+      "hint": "Potwierdź i nazwij członka rodziny.",
+      "audio": "CD050",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L25_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz pytania i odpowiedzi o rodzinie.",
+      "instruction_en": "Repeat family questions and answers.",
+      "items": ["Kto to jest?", "To jest moja mama", "To jest mój tata", "To jest mój brat", "To jest moja siostra"]
+    },
+    {
+      "id": "A1_L25_task_match_pairs",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz osobę z jej rolą w rodzinie.",
+      "instruction_en": "Match each person to their family role.",
+      "pairs": [
+        {"item": "Anna", "match": "mama"},
+        {"item": "Piotr", "match": "tata"},
+        {"item": "Marek", "match": "brat"},
+        {"item": "Ewa", "match": "siostra"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce często mówi się 'moja mama', 'mój tata' zamiast 'matka', 'ojciec'.",
+    "Rodzina wielopokoleniowa jest wciąż dość popularna."
+  ],
+  "audio_meta": {"tracks": ["CD049", "CD050"], "duration_sec": 55}
+}

@@ -1,0 +1,74 @@
+{
+  "id": "A1_L56",
+  "title": "Od kiedy mogę zacząć pracę?",
+  "level": "A1",
+  "module": "M9 – Szukam pracy",
+  "cefr_goal": "Potrafi ustalać warunki rozpoczęcia pracy oraz używać przyimków czasu i form przyszłych.",
+  "objectives": [
+    "Ustalanie warunków rozpoczęcia pracy",
+    "Używanie przyimków czasu i form przyszłych"
+  ],
+  "vocabulary": [
+    {"pl": "zacząć", "en": "to start"},
+    {"pl": "jutro", "en": "tomorrow"},
+    {"pl": "w przyszłym tygodniu", "en": "next week"},
+    {"pl": "od zaraz", "en": "immediately"},
+    {"pl": "pełny etat", "en": "full-time"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "time_prepositions_work",
+      "title": "Przyimki czasu przy pracy",
+      "content": "Przyimki czasu: 'od', 'do' – 'od poniedziałku', 'do piątku'."
+    },
+    {
+      "id": "future_forms_work",
+      "title": "Formy przyszłe przy pracy",
+      "content": "Formy przyszłe: 'zacznę', 'będę pracować'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L56_d1",
+      "tutor": "Od kiedy może pan zacząć pracę?",
+      "expected": ["Od zaraz, mogę pracować na pełny etat."],
+      "translation": "When can you start work? / Immediately, I can work full-time.",
+      "hint": "Odpowiedz podając dostępność i rodzaj etatu.",
+      "audio": "CD111",
+      "options": []
+    },
+    {
+      "id": "A1_L56_d2",
+      "tutor": "Świetnie, zaczynamy w poniedziałek.",
+      "expected": ["Świetnie, zaczynamy w poniedziałek."],
+      "translation": "Excellent, we start on Monday. / Excellent, we start on Monday.",
+      "hint": "Potwierdź termin rozpoczęcia pracy.",
+      "audio": "CD112",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L56_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz pytania o rozpoczęcie pracy.",
+      "instruction_en": "Repeat start-date questions.",
+      "items": ["Od kiedy może pan zacząć pracę?", "Od zaraz", "W przyszłym tygodniu", "Na pełny etat"]
+    },
+    {
+      "id": "A1_L56_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Mogę zacząć ...'",
+      "instruction_en": "Complete: 'I can start ...'",
+      "blanks": [
+        {"sentence_pl": "Mogę zacząć ___.", "answer_pl": "od zaraz"},
+        {"sentence_en": "I can start ___.", "answer_en": "immediately"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce większość prac zaczyna się w poniedziałek.",
+    "Umowy o pracę często zawierają okres próbny (np. 3 miesiące)."
+  ],
+  "audio_meta": {"tracks": ["CD111", "CD112"], "duration_sec": 70}
+}

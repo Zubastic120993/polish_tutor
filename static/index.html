@@ -6,11 +6,35 @@
     <meta name="description" content="Patient Polish Tutor - AI-assisted conversational tutor for learning spoken Polish">
     <title>Patient Polish Tutor</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="/static/css/variables.css">
     <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/layout.css">
     <link rel="stylesheet" href="/static/css/components.css">
     <link rel="stylesheet" href="/static/css/tailwind.generated.css">
+    <style>
+        [data-theme="dark"] #lesson-progress-title,
+        [data-theme="dark"] #lesson-progress-value,
+        [data-theme="dark"] #lesson-progress-step {
+            color: rgba(248, 250, 252, 0.85) !important;
+        }
+
+        [data-theme="dark"] #lesson-progress-meter {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.6), rgba(16, 185, 129, 0.65));
+        }
+
+        [data-theme="dark"] .current-lesson-meta-card {
+            background: rgba(15, 23, 42, 0.7) !important;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+        }
+
+        [data-theme="dark"] .current-lesson-meta-card p {
+            color: rgba(248, 250, 252, 0.9) !important;
+        }
+    </style>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,51 +42,48 @@
 
     <script src="https://unpkg.com/feather-icons"></script>
 </head>
-<body class="font-sans text-cafe-espresso bg-cafe-foam relative min-h-screen overflow-hidden">
+<body class="font-sans text-cafe-espresso bg-cafe-foam relative min-h-screen overflow-x-hidden">
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.85),_rgba(247,233,217,0.6))]"></div>
     <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_bottom,_rgba(235,197,165,0.2),_rgba(255,255,255,0))]"></div>
 
     <div class="relative z-10 flex flex-col h-screen">
-        <header class="px-6 lg:px-10 py-5 flex items-center justify-between gap-6">
-            <div>
-                <p class="text-[0.45rem] tracking-[0.5em] uppercase text-cafe-mocha/70 font-semibold">Patient Polish Tutor</p>
-                <h1 class="font-display text-3xl text-cafe-mocha">Practice your Polish</h1>
-                <p class="text-sm text-cafe-espresso/75">Choose a lesson, press start, and chat with your friendly tutor. Voice + text ready.</p>
+        <header class="app-header px-6 lg:px-10 py-6">
+            <div class="app-header__brand">
+                <div class="app-header__tag">Patient Polish Tutor</div>
+                <h1>Ready to Learn Polish?</h1>
+                <p>Personal practice sessions with a friendly tutor — voice or text, at your pace.</p>
             </div>
-            <div class="flex items-center gap-3">
-                <div id="connection-status" class="surface-card flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold">
-                    <span class="inline-flex w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true"></span>
+            <div class="app-header__cta">
+                <div class="status-pill" id="connection-status">
+                    <span class="status-pill__dot"></span>
                     <span id="connection-status-text">Connecting...</span>
                 </div>
-                <button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/80 hover:bg-white transition" id="review-button" aria-label="Open review queue" title="Review Queue">
+                <button class="ghost-icon" id="review-button" aria-label="Open review queue" title="Review Queue">
                     <i data-feather="refresh-cw"></i>
                 </button>
-                <button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/80 hover:bg-white transition" id="settings-button" aria-label="Open settings" title="Settings">
+                <button class="ghost-icon" id="settings-button" aria-label="Open settings" title="Settings">
                     <i data-feather="settings"></i>
                 </button>
             </div>
         </header>
 
-        <div id="floating-hint" class="hint-bar text-xs flex items-center gap-2 px-6 lg:px-10">
-            <span class="hint-bar__icon">💡</span>
-            <span id="floating-hint-text">Step 1: Pick a lesson · Step 2: Press ▶ Start · Step 3: Speak or type your reply</span>
+        <div class="onboarding-banner px-6 lg:px-10" id="floating-hint" aria-live="polite">
+            <div class="onboarding-banner__icon" aria-hidden="true">
+                <i data-feather="smile"></i>
+            </div>
+            <div>
+                <p class="onboarding-banner__title">Start Here</p>
+                <p class="onboarding-banner__steps" id="floating-hint-text">
+                    Choose any lesson card to unlock the Start Lesson button — we’ll guide you from there.
+                </p>
+            </div>
         </div>
 
         <main class="flex-1 px-6 lg:px-10 pb-6" id="main-content">
-            <div class="grid grid-cols-[280px_minmax(0,1fr)] gap-5 h-full">
+            <div class="layout-grid">
                 <aside class="flex flex-col gap-4 h-full">
-                    <section class="surface-card rounded-3xl p-5 space-y-3">
-                        <h2 class="text-lg font-display text-cafe-mocha">Welcome 👋</h2>
-                        <ol class="space-y-2 text-xs text-cafe-espresso/80">
-                            <li><strong>1.</strong> Pick a lesson topic.</li>
-                            <li><strong>2.</strong> Press ▶ Start Lesson.</li>
-                            <li><strong>3.</strong> Answer in Polish (voice or text).</li>
-                        </ol>
-                        <p class="text-[0.75rem] text-cafe-espresso/60">Need help? Try the helper buttons below.</p>
-                    </section>
-
                     <section class="lesson-library surface-card" id="lesson-catalog-panel" aria-labelledby="lesson-library-title">
                         <div class="lesson-library__header">
                             <div>
@@ -74,40 +95,121 @@
                                 <span>Refresh</span>
                             </button>
                         </div>
-                        <div class="grid gap-2">
-                            <label class="lesson-library__label" for="lesson-catalog-select">Choose a lesson to begin</label>
-                            <div class="lesson-library__select-wrapper">
-                                <select id="lesson-catalog-select" class="lesson-library__select" disabled>
-                                    <option value="">Loading lessons...</option>
-                                </select>
-                                <i data-feather="chevron-down" aria-hidden="true" class="lesson-library__select-icon"></i>
+
+                        <!-- Search and Filter -->
+                        <div class="lesson-library__search">
+                            <div class="lesson-library__search-wrapper">
+                                <input type="text" id="lesson-search-input" class="lesson-library__search-input" placeholder="Search lessons..." aria-label="Search lessons">
+                                <i data-feather="search" aria-hidden="true" class="lesson-library__search-icon"></i>
                             </div>
                         </div>
-                        <p class="lesson-library__empty" id="lesson-catalog-empty">Loading lessons...</p>
-                        <div class="lesson-library__details" id="lesson-catalog-preview" hidden>
-                            <p class="lesson-library__details-id" id="lesson-preview-id"></p>
-                            <p class="lesson-library__details-title" id="lesson-preview-title"></p>
-                            <p class="lesson-library__details-subtitle" id="lesson-preview-subtitle"></p>
-                            <p class="lesson-library__details-meta" id="lesson-preview-meta"></p>
+
+                        <!-- Recent & Recommended -->
+                        <div class="lesson-library__quick-access" id="lesson-quick-access">
+                            <div class="lesson-library__quick-section">
+                                <p class="lesson-library__quick-title">Recommended</p>
+                                <div class="lesson-library__quick-list" id="recommended-lessons">
+                                    <!-- Recommended lessons will be populated here -->
+                                </div>
+                            </div>
+                            <div class="lesson-library__quick-section">
+                                <div class="lesson-carousel" id="recent-carousel">
+                                    <div class="lesson-carousel__header">
+                                        <p class="lesson-carousel__title">Recent</p>
+                                        <div class="lesson-carousel__nav">
+                                            <button class="lesson-carousel__nav-btn" id="recent-prev" aria-label="Previous recent lesson">‹</button>
+                                            <button class="lesson-carousel__nav-btn" id="recent-next" aria-label="Next recent lesson">›</button>
+                                        </div>
+                                    </div>
+                                    <div class="lesson-carousel__container">
+                                        <div class="lesson-carousel__track" id="recent-track">
+                                            <!-- Recent lessons carousel will be populated here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Full Catalog -->
+                        <div class="lesson-library__catalog">
+                            <div class="grid gap-2">
+                                <label class="lesson-library__label" for="lesson-catalog-select">Browse all lessons</label>
+                                <div class="lesson-library__select-wrapper">
+                                    <select id="lesson-catalog-select" class="lesson-library__select" disabled data-onboarding-target="lesson-select">
+                                        <option value="">Loading lessons...</option>
+                                    </select>
+                                    <i data-feather="chevron-down" aria-hidden="true" class="lesson-library__select-icon"></i>
+                                </div>
+                            </div>
+                            <p class="lesson-library__empty" id="lesson-catalog-empty">Loading lessons...</p>
+                            <div class="lesson-library__details" id="lesson-catalog-preview" hidden>
+                                <div class="lesson-preview-header">
+                                <div class="lesson-preview-icon" id="lesson-preview-icon" aria-hidden="true">
+                                    <i data-feather="book-open"></i>
+                                </div>
+                                    <div class="lesson-preview-content">
+                                        <p class="lesson-library__details-id" id="lesson-preview-id"></p>
+                                        <p class="lesson-library__details-title" id="lesson-preview-title"></p>
+                                        <p class="lesson-library__details-subtitle" id="lesson-preview-subtitle"></p>
+                                    </div>
+                                </div>
+                                <div class="lesson-library__details-meta-grid">
+                                    <div class="lesson-library__details-meta-item">
+                                        <span class="lesson-library__details-meta-label">Goal</span>
+                                        <span class="lesson-library__details-meta-value" id="lesson-preview-goal">Practice describing neighborhoods</span>
+                                    </div>
+                                    <div class="lesson-library__details-meta-item">
+                                        <span class="lesson-library__details-meta-label">Est. Time</span>
+                                        <span class="lesson-library__details-meta-value" id="lesson-preview-time">3-5 minutes</span>
+                                    </div>
+                                    <div class="lesson-library__details-meta-item">
+                                        <span class="lesson-library__details-meta-label">Level</span>
+                                        <span class="lesson-library__details-meta-value" id="lesson-preview-level">A1</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </section>
 
                     <section class="lesson-library-collapsed surface-card" id="lesson-library-collapsed" hidden>
-                        <p class="text-[0.7rem] text-cafe-espresso/70">Current lesson</p>
-                        <p class="text-base font-semibold" id="active-lesson-label">—</p>
+                        <div class="lesson-library-collapsed__label">Current lesson</div>
+                        <div class="lesson-library-collapsed__title" id="active-lesson-label">—</div>
+                        <div class="lesson-library-collapsed__meta">
+                            <span id="active-lesson-goal">—</span>
+                            <span id="active-lesson-time">—</span>
+                        </div>
+                        <div class="lesson-library-collapsed__progress">
+                            <div class="lesson-library-collapsed__progress-bar" id="active-lesson-progress"></div>
+                        </div>
                         <button type="button" class="control-button text-xs justify-center" id="lesson-library-toggle">
-                            🔄 Change lesson
+                            <i data-feather="refresh-cw" class="control-button__icon" aria-hidden="true"></i>
+                            <span class="control-button__text">Change lesson</span>
                         </button>
                     </section>
 
                     <section class="surface-card rounded-3xl p-4 space-y-3">
                         <p class="text-xs font-semibold text-cafe-espresso/70 uppercase tracking-wide">Helper buttons</p>
                         <div class="grid gap-2">
-                            <button class="control-button text-xs justify-center" type="button" data-action="repeat" id="support-repeat" title="Replay the last tutor prompt">🔁 Repeat</button>
-                            <button class="control-button text-xs justify-center" type="button" data-action="hint" id="support-hint" title="Show an English hint">💡 Hint</button>
-                            <button class="control-button text-xs justify-center" type="button" data-action="slow" id="support-slow" title="Hear the tutor at a slower pace">🐢 Slow Polish</button>
-                            <button class="control-button text-xs justify-center" type="button" data-action="topic" id="support-topic" title="Switch to another lesson topic">📚 Topic</button>
-                            <button class="control-button text-xs justify-center" type="button" data-action="culture" id="support-culture" title="Get a cultural bite-sized tip">🍩 Culture</button>
+                            <button class="control-button text-xs justify-center" type="button" data-action="repeat" id="support-repeat" title="Replay the last tutor prompt">
+                                <i data-feather="rotate-cw" class="control-button__icon" aria-hidden="true"></i>
+                                <span class="control-button__text">Repeat</span>
+                            </button>
+                            <button class="control-button text-xs justify-center" type="button" data-action="hint" id="support-hint" title="Show an English hint">
+                                <i data-feather="help-circle" class="control-button__icon" aria-hidden="true"></i>
+                                <span class="control-button__text">Hint</span>
+                            </button>
+                            <button class="control-button text-xs justify-center" type="button" data-action="slow" id="support-slow" title="Hear the tutor at a slower pace">
+                                <i data-feather="wind" class="control-button__icon" aria-hidden="true"></i>
+                                <span class="control-button__text">Slow Polish</span>
+                            </button>
+                            <button class="control-button text-xs justify-center" type="button" data-action="topic" id="support-topic" title="Switch to another lesson topic">
+                                <i data-feather="book-open" class="control-button__icon" aria-hidden="true"></i>
+                                <span class="control-button__text">Topic</span>
+                            </button>
+                            <button class="control-button text-xs justify-center" type="button" data-action="culture" id="support-culture" title="Get a cultural bite-sized tip">
+                                <i data-feather="globe" class="control-button__icon" aria-hidden="true"></i>
+                                <span class="control-button__text">Culture</span>
+                            </button>
                         </div>
                     </section>
                 </aside>
@@ -121,23 +223,23 @@
                         </div>
                         <div class="text-right space-y-1">
                             <div class="start-tooltip" id="start-tooltip">Choose a lesson, then press start!</div>
-                            <button id="start-lesson-button" type="button" data-state="select" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cafe-green to-emerald-500 px-5 py-2.5 text-white text-sm font-semibold shadow-lg disabled:opacity-60">
-                                ▶ Start Lesson
+                            <button id="start-lesson-button" type="button" data-state="select" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cafe-green to-emerald-500 px-5 py-2.5 text-white text-sm font-semibold shadow-lg disabled:opacity-60" data-onboarding-target="start-button">
+                                Start Lesson
                             </button>
                             <p class="text-[0.65rem] text-cafe-espresso/60 mt-1" id="start-lesson-hint">Pick a lesson to enable the tutor.</p>
                         </div>
                     </header>
 
                     <div class="grid grid-cols-3 gap-3 text-xs font-semibold text-cafe-espresso/80">
-                        <div class="rounded-2xl bg-cafe-cream/60 p-3 surface-card">
+                        <div class="rounded-2xl bg-cafe-cream/60 p-3 surface-card current-lesson-meta-card">
                             <p class="text-[0.55rem] uppercase tracking-[0.2em] text-cafe-espresso/60">Goal</p>
                             <p class="text-base text-cafe-mocha" id="lesson-goal">Order a drink politely</p>
                         </div>
-                        <div class="rounded-2xl bg-cafe-cream/60 p-3 surface-card">
+                        <div class="rounded-2xl bg-cafe-cream/60 p-3 surface-card current-lesson-meta-card">
                             <p class="text-[0.55rem] uppercase tracking-[0.2em] text-cafe-espresso/60">Est. Time</p>
                             <p class="text-base text-cafe-mocha" id="lesson-duration">3 minutes</p>
                         </div>
-                        <div class="rounded-2xl bg-cafe-cream/60 p-3 surface-card">
+                        <div class="rounded-2xl bg-cafe-cream/60 p-3 surface-card current-lesson-meta-card">
                             <p class="text-[0.55rem] uppercase tracking-[0.2em] text-cafe-espresso/60">Focus</p>
                             <p class="text-base text-cafe-mocha" id="lesson-focus">Polite café phrases</p>
                         </div>
@@ -155,18 +257,17 @@
                     </div>
 
                     <div class="flex-1 flex gap-4">
-                        <div class="flex-1 rounded-3xl border border-cafe-hazelnut/20 bg-white/80 backdrop-blur relative overflow-hidden surface-card flex flex-col">
+                        <div class="conversation-panel flex-1 rounded-3xl border border-cafe-hazelnut/20 bg-white/80 backdrop-blur relative overflow-hidden surface-card flex flex-col">
                             <div class="conversation-panel__overlay rounded-3xl" id="welcome-overlay" role="dialog" aria-modal="false">
                                 <div class="welcome-card text-center">
                                     <h2>Ready to start?</h2>
                                     <ol>
                                         <li>Pick a lesson on the left.</li>
-                                        <li>Tap ▶ Start Lesson.</li>
+                                        <li>Tap Start Lesson.</li>
                                         <li>Reply in Polish by voice or typing.</li>
                                     </ol>
                                     <div class="welcome-card__actions">
                                         <button type="button" class="welcome-card__start" id="welcome-start">
-                                            <span class="welcome-card__start-icon">▶</span>
                                             <span class="welcome-card__start-text">Start Lesson</span>
                                         </button>
                                         <button type="button" class="welcome-card__dismiss" id="welcome-dismiss">Browse lessons</button>
@@ -176,9 +277,11 @@
                             <div class="conversation-panel__messages flex-1 space-y-3" id="chat-messages" role="log" aria-live="polite" aria-label="Lesson dialogue">
                                 <div id="chat-placeholder" class="message message--tutor">
                                     <div class="message__wrapper">
-                                        <div class="message__avatar message__avatar--tutor">🧑‍🏫</div>
+                                        <div class="message__avatar message__avatar--tutor" aria-hidden="true">
+                                            <i data-feather="user"></i>
+                                        </div>
                                         <div class="message__bubble">
-                                            Cześć! I’m your tutor. Choose a lesson and press ▶ to begin.
+                                            Cześć! I’m your tutor. Choose a lesson and press Start to begin.
                                         </div>
                                     </div>
                                 </div>
@@ -192,7 +295,7 @@
                         </div>
                     </div>
 
-                    <div class="input-bar input-bar--conversation flex items-center gap-3 surface-card" role="region" aria-label="Reply to tutor">
+                    <div class="input-bar input-bar--conversation flex items-center gap-3 surface-card" role="region" aria-label="Reply to tutor" data-onboarding-target="input-area">
                         <button class="input-bar__button input-bar__button--secondary rounded-2xl border border-cafe-hazelnut/50 bg-white/80 hover:bg-white transition" id="mic-button" aria-label="Start voice input" title="Click to speak – I will transcribe it" type="button" disabled>
                             <i data-feather="mic" class="input-bar__button-icon"></i>
                         </button>
@@ -230,6 +333,68 @@
                 </button>
             </div>
             <div class="modal__body" id="review-content"></div>
+        </div>
+    </div>
+
+    <!-- Guided Onboarding Overlay -->
+    <div class="onboarding-overlay" id="onboarding-overlay" role="dialog" aria-labelledby="onboarding-title" aria-modal="true" aria-hidden="true">
+        <div class="onboarding-flow-demo" id="onboarding-flow-demo">
+            <div class="onboarding-flow-arrow" id="onboarding-flow-arrow"></div>
+        </div>
+        <div class="onboarding-overlay__content">
+            <div class="onboarding-header">
+                <h2 class="onboarding-title" id="onboarding-title">
+                    Welcome to Patient Polish Tutor!
+                </h2>
+                <p class="onboarding-subtitle">Let's get you started with your first lesson in 3 simple steps</p>
+            </div>
+
+            <div class="onboarding-steps">
+                <div class="onboarding-step onboarding-step--active" data-step="1">
+                    <div class="onboarding-step__number">1</div>
+                    <div class="onboarding-step__content">
+                        <h3 class="onboarding-step__title">Choose a lesson</h3>
+                        <p class="onboarding-step__description">Browse the lesson library and pick a topic that interests you</p>
+                        <div class="onboarding-step__highlight" data-target="lesson-select"></div>
+                    </div>
+                </div>
+                <div class="onboarding-step" data-step="2">
+                    <div class="onboarding-step__number">2</div>
+                    <div class="onboarding-step__content">
+                        <h3 class="onboarding-step__title">Press Start Lesson</h3>
+                        <p class="onboarding-step__description">Click the big green start button to begin your conversation</p>
+                        <div class="onboarding-step__highlight" data-target="start-button"></div>
+                    </div>
+                </div>
+                <div class="onboarding-step" data-step="3">
+                    <div class="onboarding-step__number">3</div>
+                    <div class="onboarding-step__content">
+                        <h3 class="onboarding-step__title">Answer in Polish</h3>
+                        <p class="onboarding-step__description">Speak or type your reply in Polish. Your tutor will guide you!</p>
+                        <div class="onboarding-step__highlight" data-target="input-area"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="onboarding-actions">
+                <button class="onboarding-button onboarding-button--secondary" id="onboarding-skip">
+                    Skip tutorial
+                </button>
+                <button class="onboarding-button onboarding-button--primary" id="onboarding-next">
+                    Next
+                </button>
+            </div>
+
+            <div class="onboarding-progress">
+                <div class="onboarding-progress__bar">
+                    <div class="onboarding-progress__fill" style="width: 33.33%"></div>
+                </div>
+                <div class="onboarding-progress__dots">
+                    <span class="onboarding-progress__dot onboarding-progress__dot--active"></span>
+                    <span class="onboarding-progress__dot"></span>
+                    <span class="onboarding-progress__dot"></span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -282,6 +447,25 @@
     <script src="/static/js/review.js"></script>
     <script src="/static/js/session.js"></script>
     <script src="/static/js/error_handler.js"></script>
+    <script src="/static/js/onboarding.js"></script>
     <script src="/static/js/chat.js"></script>
 </body>
 </html>
+                    <section class="surface-card rounded-3xl p-5 space-y-3">
+                        <h2 class="text-lg font-display text-cafe-mocha">Quick tips</h2>
+                        <ul class="quick-tips__list">
+                            <li class="quick-tips__item">
+                                <i data-feather="volume-2" aria-hidden="true"></i>
+                                <span>Tap Play or Repeat whenever you need to hear Polish again.</span>
+                            </li>
+                            <li class="quick-tips__item">
+                                <i data-feather="mic" aria-hidden="true"></i>
+                                <span>Mix typing and speaking — the tutor understands both.</span>
+                            </li>
+                            <li class="quick-tips__item">
+                                <i data-feather="settings" aria-hidden="true"></i>
+                                <span>Use Hint or Settings if you need slower speech or translations.</span>
+                            </li>
+                        </ul>
+                        <p class="text-[0.75rem] text-cafe-espresso/60">Need more guidance? The helper buttons below are always available.</p>
+                    </section>

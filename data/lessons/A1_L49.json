@@ -1,0 +1,76 @@
+{
+  "id": "A1_L49",
+  "title": "Deszcz ze śniegiem",
+  "level": "A1",
+  "module": "M8 – Ach, ta pogoda!",
+  "cefr_goal": "Potrafi opisywać pogody oraz rozumieć podstawowych zjawisk atmosferycznych.",
+  "objectives": [
+    "Opisywanie pogody",
+    "Rozumienie podstawowych zjawisk atmosferycznych"
+  ],
+  "vocabulary": [
+    {"pl": "deszcz", "en": "rain"},
+    {"pl": "śnieg", "en": "snow"},
+    {"pl": "wiatr", "en": "wind"},
+    {"pl": "słońce", "en": "sun"},
+    {"pl": "chmura", "en": "cloud"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "impersonal_sentences",
+      "title": "Zdania bezosobowe",
+      "content": "Zdania bezosobowe: 'Pada deszcz', 'Świeci słońce'."
+    },
+    {
+      "id": "adverbs_temperature",
+      "title": "Przysłówki temperatury",
+      "content": "Przysłówki: 'jest zimno', 'jest ciepło'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L49_d1",
+      "tutor": "Jaka dziś pogoda?",
+      "expected": ["Pada deszcz ze śniegiem i jest zimno."],
+      "translation": "What’s the weather like today? / It's sleeting and cold.",
+      "hint": "Opisz pogodę używając zdań bezosobowych.",
+      "audio": "CD097",
+      "options": []
+    },
+    {
+      "id": "A1_L49_d2",
+      "tutor": "Brr... zimno!",
+      "expected": ["Brr... zimno!"],
+      "translation": "Brr... it’s cold! / Brr... it’s cold!",
+      "hint": "Zgódź się z opinią o zimnie.",
+      "audio": "CD098",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L49_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz zdania o pogodzie.",
+      "instruction_en": "Repeat sentences about the weather.",
+      "items": ["Pada deszcz", "Śnieg pada", "Wieje wiatr", "Świeci słońce", "Jest zimno"]
+    },
+    {
+      "id": "A1_L49_task_match_pairs",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz słowo z obrazkiem zjawiska.",
+      "instruction_en": "Match each word with the weather picture.",
+      "pairs": [
+        {"item": "deszcz", "match": "rain"},
+        {"item": "śnieg", "match": "snow"},
+        {"item": "wiatr", "match": "wind"},
+        {"item": "słońce", "match": "sun"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Polska ma cztery pory roku: wiosna, lato, jesień, zima.",
+    "W zimie temperatury często spadają poniżej zera."
+  ],
+  "audio_meta": {"tracks": ["CD097", "CD098"], "duration_sec": 60}
+}

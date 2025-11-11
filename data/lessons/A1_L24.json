@@ -1,0 +1,76 @@
+{
+  "id": "A1_L24",
+  "title": "Co to jest?",
+  "level": "A1",
+  "module": "M1 – Poznajmy się",
+  "cefr_goal": "Potrafi zadawać pytania o przedmioty i rozpoznawać rodzaje gramatyczne rzeczowników.",
+  "objectives": [
+    "Zadawanie i rozumienie pytań o przedmioty",
+    "Stosowanie rodzajów gramatycznych (rzeczowniki męskie, żeńskie, nijakie)"
+  ],
+  "vocabulary": [
+    {"pl": "to", "en": "this / that"},
+    {"pl": "książka", "en": "book"},
+    {"pl": "telefon", "en": "phone"},
+    {"pl": "krzesło", "en": "chair"},
+    {"pl": "stół", "en": "table"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "question_co_to_jest",
+      "title": "Pytanie 'Co to jest?'",
+      "content": "Pytanie: 'Co to jest?' Odpowiedź: 'To jest + rzeczownik'."
+    },
+    {
+      "id": "grammatical_gender",
+      "title": "Rodzaje gramatyczne",
+      "content": "Rodzaje gramatyczne rzeczowników."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L24_d1",
+      "tutor": "Co to jest?",
+      "expected": ["To jest telefon."],
+      "translation": "What is this? / It's a phone.",
+      "hint": "Odpowiedz używając 'To jest' + nazwa przedmiotu.",
+      "audio": "CD047",
+      "options": []
+    },
+    {
+      "id": "A1_L24_d2",
+      "tutor": "A to jest książka.",
+      "expected": ["A to jest książka."],
+      "translation": "And this is a book.",
+      "hint": "Nazwij przedmiot używając 'To jest'.",
+      "audio": "CD048",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L24_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Posłuchaj i powtórz pytania 'Co to jest?'.",
+      "instruction_en": "Listen and repeat 'What is this?'.",
+      "items": ["Co to jest?", "To jest książka", "To jest telefon", "To jest krzesło", "To jest stół"]
+    },
+    {
+      "id": "A1_L24_task_match_pairs",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz obrazek z nazwą przedmiotu.",
+      "instruction_en": "Match each picture to the object name.",
+      "pairs": [
+        {"item": "książka", "match": "book"},
+        {"item": "telefon", "match": "phone"},
+        {"item": "krzesło", "match": "chair"},
+        {"item": "stół", "match": "table"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W języku polskim rzeczowniki mają trzy rodzaje: męski, żeński, nijaki.",
+    "Warto uczyć się słów od razu z rodzajem (np. 'ten stół', 'ta książka')."
+  ],
+  "audio_meta": {"tracks": ["CD047", "CD048"], "duration_sec": 55}
+}

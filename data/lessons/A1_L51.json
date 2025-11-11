@@ -1,0 +1,76 @@
+{
+  "id": "A1_L51",
+  "title": "Boli mnie głowa",
+  "level": "A1",
+  "module": "M8 – Ach, ta pogoda!",
+  "cefr_goal": "Potrafi opisywać samopoczucie i ból oraz używać konstrukcji 'boli mnie ...'.",
+  "objectives": [
+    "Opisywanie samopoczucia i bólu",
+    "Używanie konstrukcji 'boli mnie ...'"
+  ],
+  "vocabulary": [
+    {"pl": "głowa", "en": "head"},
+    {"pl": "gardło", "en": "throat"},
+    {"pl": "brzuch", "en": "stomach"},
+    {"pl": "plecy", "en": "back"},
+    {"pl": "kaszel", "en": "cough"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "pain_constructions",
+      "title": "Konstrukcje bólu",
+      "content": "Konstrukcje: 'Boli mnie głowa', 'Bolą mnie plecy'."
+    },
+    {
+      "id": "health_expressions",
+      "title": "Wyrażenia zdrowia",
+      "content": "Wyrażenia z 'źle się czuję', 'jestem chory'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L51_d1",
+      "tutor": "Co ci jest?",
+      "expected": ["Boli mnie głowa i gardło."],
+      "translation": "What’s wrong? / I have a headache and sore throat.",
+      "hint": "Opisz swoje dolegliwości używając konstrukcji 'boli mnie'.",
+      "audio": "CD101",
+      "options": []
+    },
+    {
+      "id": "A1_L51_d2",
+      "tutor": "Musisz iść do lekarza.",
+      "expected": ["Tak, pójdę jutro."],
+      "translation": "You must go to the doctor. / Yes, I'll go tomorrow.",
+      "hint": "Zgódź się z radą i zaproponuj termin.",
+      "audio": "CD102",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L51_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz zdania o samopoczuciu.",
+      "instruction_en": "Repeat sentences about how you feel.",
+      "items": ["Boli mnie głowa", "Boli mnie gardło", "Bolą mnie plecy", "Źle się czuję", "Jestem chory"]
+    },
+    {
+      "id": "A1_L51_task_match_pairs",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz część ciała z jej nazwą.",
+      "instruction_en": "Match body parts with their names.",
+      "pairs": [
+        {"item": "głowa", "match": "head"},
+        {"item": "gardło", "match": "throat"},
+        {"item": "brzuch", "match": "stomach"},
+        {"item": "plecy", "match": "back"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce do lekarza rodzinnego (POZ) trzeba mieć skierowanie na badania specjalistyczne.",
+    "W aptekach można kupić wiele leków bez recepty."
+  ],
+  "audio_meta": {"tracks": ["CD101", "CD102"], "duration_sec": 70}
+}

@@ -1,0 +1,74 @@
+{
+  "id": "A1_L46",
+  "title": "Gdzie mogę kupić bilet?",
+  "level": "A1",
+  "module": "M7 – Poproszę bilet do Wrocławia",
+  "cefr_goal": "Potrafi kupować bilet na transport publiczny oraz używać form pytań grzecznościowych.",
+  "objectives": [
+    "Kupowanie biletu na transport publiczny",
+    "Używanie form pytań grzecznościowych"
+  ],
+  "vocabulary": [
+    {"pl": "bilet", "en": "ticket"},
+    {"pl": "kasa", "en": "ticket office"},
+    {"pl": "automat biletowy", "en": "ticket machine"},
+    {"pl": "przystanek", "en": "stop"},
+    {"pl": "stacja", "en": "station"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "polite_questions_tickets",
+      "title": "Zwroty grzecznościowe z biletami",
+      "content": "Zwroty grzecznościowe: 'Czy mogę ...?', 'Poproszę bilet ...'."
+    },
+    {
+      "id": "preposition_na_transport",
+      "title": "Przyimek 'na' z transportem",
+      "content": "Konstrukcja: 'na + biernik' – 'na autobus', 'na pociąg'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L46_d1",
+      "tutor": "Przepraszam, gdzie mogę kupić bilet?",
+      "expected": ["W automacie albo w kiosku."],
+      "translation": "Excuse me, where can I buy a ticket? / In the ticket machine or kiosk.",
+      "hint": "Odpowiedz wskazując miejsca zakupu biletów.",
+      "audio": "CD091",
+      "options": []
+    },
+    {
+      "id": "A1_L46_d2",
+      "tutor": "Dziękuję bardzo!",
+      "expected": ["Dziękuję bardzo!"],
+      "translation": "Thank you very much! / Thank you very much!",
+      "hint": "Odpowiedz grzecznie na podziękowanie.",
+      "audio": "CD092",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L46_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz pytania o bilet.",
+      "instruction_en": "Repeat ticket-buying questions.",
+      "items": ["Gdzie mogę kupić bilet?", "W automacie", "W kiosku", "Poproszę bilet na autobus"]
+    },
+    {
+      "id": "A1_L46_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Poproszę bilet ...'",
+      "instruction_en": "Complete: 'A ticket to ... please.'",
+      "blanks": [
+        {"sentence_pl": "Poproszę bilet ___ Wrocław.", "answer_pl": "do"},
+        {"sentence_en": "A ticket to ___ Wrocław please.", "answer_en": "Wrocław"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Bilety komunikacji miejskiej można kupić w automatach lub aplikacjach (np. Jakdojade).",
+    "W pociągach PKP często można kupić bilet u konduktora, ale z dopłatą."
+  ],
+  "audio_meta": {"tracks": ["CD091", "CD092"], "duration_sec": 55}
+}

@@ -1,0 +1,75 @@
+{
+  "id": "A1_L20",
+  "title": "Czas wolny",
+  "level": "A1",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi mówić o hobby i czasie wolnym, stosując odpowiednie czasowniki.",
+  "objectives": [
+    "Mówienie o hobby i czasie wolnym",
+    "Stosowanie czasowników lubić, grać, chodzić"
+  ],
+  "vocabulary": [
+    {"pl": "kino", "en": "cinema"},
+    {"pl": "muzyka", "en": "music"},
+    {"pl": "czytać książki", "en": "to read books"},
+    {"pl": "grać w piłkę", "en": "to play football"},
+    {"pl": "chodzić na spacer", "en": "to go for a walk"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "leisure_verbs",
+      "title": "Czasowniki hobby",
+      "content": "Czasowniki: 'lubić', 'grać w + biernik', 'chodzić na + biernik'."
+    },
+    {
+      "id": "leisure_sentences",
+      "title": "Zdania o czasie wolnym",
+      "content": "Zdania: 'Lubię muzykę.', 'Gram w piłkę.', 'Chodzę na basen.'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L20_d1",
+      "tutor": "Co robisz w wolnym czasie?",
+      "expected": ["Lubię czytać i słuchać muzyki."],
+      "translation": "What do you do in your free time? / I like reading and listening to music.",
+      "hint": "Odpowiedz używając czasownika 'lubić'.",
+      "audio": "CD039",
+      "options": []
+    },
+    {
+      "id": "A1_L20_d2",
+      "tutor": "Ja gram w piłkę z kolegami.",
+      "expected": ["Gram w piłkę z kolegami."],
+      "translation": "I play football with my friends.",
+      "hint": "Zwróć uwagę na konstrukcję 'grać w + biernik'.",
+      "audio": "CD040",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L20_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Posłuchaj dialogu i powtórz czynności.",
+      "instruction_en": "Listen to the dialogue and repeat the activities.",
+      "items": ["lubię czytać", "gram w piłkę", "chodzę na spacer", "słucham muzyki"]
+    },
+    {
+      "id": "A1_L20_task_match_pairs",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz hobby z obrazkiem.",
+      "instruction_en": "Match hobbies with pictures.",
+      "pairs": [
+        {"item": "czytać książki", "match": "książka"},
+        {"item": "grać w piłkę", "match": "piłka"},
+        {"item": "chodzić na spacer", "match": "spacer"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Polacy często spędzają czas wolny na świeżym powietrzu – spacery, rower, działka.",
+    "Popularne hobby to piłka nożna, książki i muzyka."
+  ],
+  "audio_meta": {"tracks": ["CD039", "CD040"], "duration_sec": 60}
+}

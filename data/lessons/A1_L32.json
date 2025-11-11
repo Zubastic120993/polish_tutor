@@ -1,0 +1,77 @@
+{
+  "id": "A1_L32",
+  "title": "Warzywa i owoce",
+  "level": "A1",
+  "module": "M3 – Robię zakupy",
+  "cefr_goal": "Potrafi nazywać warzywa i owoce oraz używać liczby mnogiej i odmiany przez przypadki.",
+  "objectives": [
+    "Nazywanie warzyw i owoców",
+    "Używanie liczby mnogiej i odmiany przez przypadki"
+  ],
+  "vocabulary": [
+    {"pl": "jabłko", "en": "apple"},
+    {"pl": "banan", "en": "banana"},
+    {"pl": "pomidor", "en": "tomato"},
+    {"pl": "ziemniak", "en": "potato"},
+    {"pl": "marchewka", "en": "carrot"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "plural_forms",
+      "title": "Liczba mnoga",
+      "content": "Liczba mnoga: 'jabłka', 'banany', 'pomidory'."
+    },
+    {
+      "id": "food_constructions",
+      "title": "Konstrukcje z jedzeniem",
+      "content": "Konstrukcje: 'Poproszę kilo jabłek', 'Mam dwa pomidory'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L32_d1",
+      "tutor": "Poproszę kilo jabłek i dwa pomidory.",
+      "expected": ["Proszę bardzo. Coś jeszcze?"],
+      "translation": "A kilo of apples and two tomatoes, please. / Here you are. Anything else?",
+      "hint": "Odpowiedz jako sprzedawca na targu.",
+      "audio": "CD063",
+      "options": []
+    },
+    {
+      "id": "A1_L32_d2",
+      "tutor": "Nie, dziękuję. Do widzenia.",
+      "expected": ["Do widzenia!"],
+      "translation": "No, thank you. Goodbye. / Goodbye!",
+      "hint": "Odpowiedz grzecznie na pożegnanie.",
+      "audio": "CD064",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L32_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz nazwy warzyw i owoców.",
+      "instruction_en": "Repeat names of vegetables and fruits.",
+      "items": ["jabłko", "jabłka", "banan", "banany", "pomidor", "pomidory", "ziemniak", "ziemniaki", "marchewka", "marchewki"]
+    },
+    {
+      "id": "A1_L32_task_match_pairs",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz słowo z obrazkiem warzywa lub owocu.",
+      "instruction_en": "Match each word with a picture of the fruit or vegetable.",
+      "pairs": [
+        {"item": "jabłko", "match": "apple"},
+        {"item": "banan", "match": "banana"},
+        {"item": "pomidor", "match": "tomato"},
+        {"item": "ziemniak", "match": "potato"},
+        {"item": "marchewka", "match": "carrot"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Na targach warzywnych w Polsce często kupuje się na wagę (kg).",
+    "Sprzedawcy chętnie dodają gratis np. 'jedno jabłko więcej'."
+  ],
+  "audio_meta": {"tracks": ["CD063", "CD064"], "duration_sec": 60}
+}

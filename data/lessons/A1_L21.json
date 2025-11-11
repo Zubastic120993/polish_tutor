@@ -1,0 +1,74 @@
+{
+  "id": "A1_L21",
+  "title": "Dzień dobry!",
+  "level": "A1",
+  "module": "M1 – Poznajmy się",
+  "cefr_goal": "Potrafi stosować formy powitania i pożegnania w sytuacjach formalnych i nieformalnych.",
+  "objectives": [
+    "Powtarzanie form powitania i pożegnania w codziennych sytuacjach",
+    "Rozpoznawanie kontekstu formalnego i nieformalnego"
+  ],
+  "vocabulary": [
+    {"pl": "Dzień dobry", "en": "Good morning / Good afternoon"},
+    {"pl": "Dobry wieczór", "en": "Good evening"},
+    {"pl": "Do widzenia", "en": "Goodbye"},
+    {"pl": "Na razie", "en": "See you"},
+    {"pl": "Miłego dnia", "en": "Have a nice day"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "politeness_phrases",
+      "title": "Zwroty grzecznościowe",
+      "content": "Zwroty grzecznościowe w formie oficjalnej i nieoficjalnej."
+    },
+    {
+      "id": "greeting_intonation",
+      "title": "Intonacja w powitaniach",
+      "content": "Intonacja w pytaniach powitalnych."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L21_d1",
+      "tutor": "Dzień dobry, panie Adamie!",
+      "expected": ["Dzień dobry, pani Mario. Jak się pani ma?"],
+      "translation": "Good morning, Mr Adam! / Good morning, Mrs Maria. How are you?",
+      "hint": "Odpowiedz grzecznie używając formy oficjalnej.",
+      "audio": "CD041",
+      "options": []
+    },
+    {
+      "id": "A1_L21_d2",
+      "tutor": "Dziękuję, dobrze. Miłego dnia!",
+      "expected": ["Dziękuję, dobrze. Miłego dnia!"],
+      "translation": "Thank you, I'm well. Have a nice day!",
+      "hint": "Odpowiedz na pytanie o samopoczucie i pożegnaj się.",
+      "audio": "CD042",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L21_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz formy powitania i pożegnania.",
+      "instruction_en": "Repeat greetings and farewells.",
+      "items": ["Dzień dobry", "Dobry wieczór", "Do widzenia", "Na razie", "Miłego dnia"]
+    },
+    {
+      "id": "A1_L21_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: '... dobry!'",
+      "instruction_en": "Complete: '... dobry!' → 'Good ...!'",
+      "blanks": [
+        {"sentence_pl": "___ dobry!", "answer_pl": "Dzień"},
+        {"sentence_en": "Good ___!", "answer_en": "morning"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce używa się 'dzień dobry' od rana do wczesnego wieczora.",
+    "'Dobry wieczór' mówi się po godz. 18:00."
+  ],
+  "audio_meta": {"tracks": ["CD041", "CD042"], "duration_sec": 55}
+}

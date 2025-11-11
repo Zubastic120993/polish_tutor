@@ -1,0 +1,74 @@
+{
+  "id": "A1_L60",
+  "title": "Dzienniczek ucznia",
+  "level": "A1",
+  "module": "M10 – Dzieci idą do szkoły",
+  "cefr_goal": "Potrafi opisywać oceny i uwagi w dzienniczku ucznia, używając przymiotników opisujących zachowanie.",
+  "objectives": [
+    "Opisywanie ocen i uwag w dzienniku ucznia",
+    "Używanie przymiotników opisujących zachowanie"
+  ],
+  "vocabulary": [
+    {"pl": "ocena", "en": "grade"},
+    {"pl": "piątka", "en": "grade 5 (very good)"},
+    {"pl": "jedynka", "en": "grade 1 (fail)"},
+    {"pl": "uwaga", "en": "note / remark"},
+    {"pl": "zachowanie", "en": "behavior"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "adjective_sentences",
+      "title": "Zdania z przymiotnikami",
+      "content": "Zdania z przymiotnikami: 'Dostałem dobrą ocenę', 'Mam uwagę od nauczyciela'."
+    },
+    {
+      "id": "ordinal_numbers",
+      "title": "Liczebniki porządkowe",
+      "content": "Liczebniki porządkowe: 'pierwsza klasa', 'druga klasa'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L60_d1",
+      "tutor": "Jakie masz oceny w dzienniczku?",
+      "expected": ["Same piątki i jedna uwaga."],
+      "translation": "What grades do you have in your journal? / All fives and one remark.",
+      "hint": "Opisz swoje oceny w dzienniczku szkolnym.",
+      "audio": "CD119",
+      "options": []
+    },
+    {
+      "id": "A1_L60_d2",
+      "tutor": "Gratuluję, to świetny wynik!",
+      "expected": ["Dziękuję!"],
+      "translation": "Congratulations, that's a great result! / Thank you!",
+      "hint": "Odpowiedz na gratulacje.",
+      "audio": "CD120",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L60_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz słownictwo o ocenach.",
+      "instruction_en": "Repeat vocabulary about grades.",
+      "items": ["ocena", "piątka", "jedynka", "uwaga", "zachowanie"]
+    },
+    {
+      "id": "A1_L60_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Mam ... w dzienniczku.'",
+      "instruction_en": "Complete: 'I have ... in my school journal.'",
+      "blanks": [
+        {"sentence_pl": "Mam ___ w dzienniczku.", "answer_pl": "piątkę"},
+        {"sentence_en": "I have ___ in my school journal.", "answer_en": "an A"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W polskich szkołach oceny są w skali od 1 do 6, gdzie 6 to najlepsza.",
+    "Dzienniczki elektroniczne (np. Librus) są teraz powszechne."
+  ],
+  "audio_meta": {"tracks": ["CD119", "CD120"], "duration_sec": 70}
+}

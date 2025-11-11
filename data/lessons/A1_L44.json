@@ -1,0 +1,74 @@
+{
+  "id": "A1_L44",
+  "title": "Co robisz w weekend?",
+  "level": "A1",
+  "module": "M6 – Dzień za dniem",
+  "cefr_goal": "Potrafi opowiadać o planach na weekend oraz używać czasu teraźniejszego w kontekście czasu wolnego.",
+  "objectives": [
+    "Opowiadanie o planach na weekend",
+    "Używanie czasu teraźniejszego w kontekście czasu wolnego"
+  ],
+  "vocabulary": [
+    {"pl": "oglądać film", "en": "to watch a movie"},
+    {"pl": "spotykać się z przyjaciółmi", "en": "to meet friends"},
+    {"pl": "jechać za miasto", "en": "to go out of town"},
+    {"pl": "czytać książkę", "en": "to read a book"},
+    {"pl": "odpoczywać", "en": "to rest"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "verb_robic_leisure",
+      "title": "Czasownik 'robić' w kontekście czasu wolnego",
+      "content": "Czasownik 'robić' i wyrażenia czasu wolnego."
+    },
+    {
+      "id": "weekend_sentences",
+      "title": "Zdania o weekendzie",
+      "content": "Zdania: 'W weekend spotykam się z przyjaciółmi.'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L44_d1",
+      "tutor": "Co robisz w weekend?",
+      "expected": ["Oglądam film i odpoczywam w domu."],
+      "translation": "What are you doing this weekend? / I watch a movie and rest at home.",
+      "hint": "Opisz swoje plany weekendowe używając czasowników niedokonanych.",
+      "audio": "CD087",
+      "options": []
+    },
+    {
+      "id": "A1_L44_d2",
+      "tutor": "A ja jadę za miasto z rodziną.",
+      "expected": ["A ja jadę za miasto z rodziną."],
+      "translation": "And I'm going out of town with my family.",
+      "hint": "Podziel się swoimi planami na weekend.",
+      "audio": "CD088",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L44_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz zdania o planach na weekend.",
+      "instruction_en": "Repeat sentences about weekend plans.",
+      "items": ["Co robisz w weekend?", "Oglądam film", "Odpoczywam w domu", "Jadę za miasto", "Czytam książkę"]
+    },
+    {
+      "id": "A1_L44_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'W weekend ...'",
+      "instruction_en": "Complete: 'On the weekend ...'",
+      "blanks": [
+        {"sentence_pl": "W weekend ___.", "answer_pl": "odpoczywam"},
+        {"sentence_en": "On the weekend ___.", "answer_en": "I rest"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Weekend w Polsce trwa od soboty do niedzieli.",
+    "Wiele osób spędza weekendy na działkach lub poza miastem."
+  ],
+  "audio_meta": {"tracks": ["CD087", "CD088"], "duration_sec": 65}
+}

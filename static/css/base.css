@@ -19,7 +19,8 @@ body {
   font-size: var(--font-size-base);
   line-height: var(--line-height-base);
   color: var(--color-text);
-  background-color: var(--color-bg);
+  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.9), rgba(253, 245, 235, 0.6)),
+    linear-gradient(180deg, #fdf7ef, #f4ece1);
   transition: background-color var(--transition-base), color var(--transition-base);
   min-height: 100vh;
   overflow-x: hidden;
@@ -140,4 +141,3 @@ input::placeholder, textarea::placeholder {
     transition-duration: 0.01ms !important;
   }
 }
-

@@ -178,6 +178,15 @@ class AudioManager {
      * @returns {HTMLElement} Progress container element
      */
     createProgressBar(messageEl) {
+        let targetEl = messageEl;
+        if (!targetEl) {
+            console.warn('[AudioManager] Missing message element for progress bar; falling back to button container.');
+            targetEl = this.currentButton ? this.currentButton.closest('.message') : null;
+        }
+        if (!targetEl) {
+            targetEl = document.createElement('div');
+        }
+
         const container = document.createElement('div');
         container.className = 'audio-progress-container';
         container.setAttribute('role', 'progressbar');
@@ -196,9 +205,15 @@ class AudioManager {
         container.appendChild(bar);
         container.appendChild(timeDisplay);
         
-        // Insert after message bubble
-        const bubble = messageEl.querySelector('.message__bubble');
-        bubble.appendChild(container);
+        // Insert after message bubble when available, otherwise append to target element
+        const bubble = targetEl && targetEl.querySelector ? targetEl.querySelector('.message__bubble') : null;
+        if (bubble && typeof bubble.appendChild === 'function') {
+            bubble.appendChild(container);
+        } else if (targetEl && typeof targetEl.appendChild === 'function') {
+            targetEl.appendChild(container);
+        } else {
+            console.warn('[AudioManager] No valid container found for audio progress bar.');
+        }
         
         return container;
     }
@@ -388,4 +403,3 @@ class AudioManager {
 
 // Global audio manager instance
 window.audioManager = new AudioManager();
-

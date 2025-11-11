@@ -1,0 +1,74 @@
+{
+  "id": "A1_L45",
+  "title": "Czym jeździsz do pracy?",
+  "level": "A1",
+  "module": "M7 – Poproszę bilet do Wrocławia",
+  "cefr_goal": "Potrafi mówić o środkach transportu oraz używać narzędnika z czasownikiem 'jeździć'.",
+  "objectives": [
+    "Mówienie o środkach transportu",
+    "Używanie narzędnika z czasownikiem 'jeździć'"
+  ],
+  "vocabulary": [
+    {"pl": "autobus", "en": "bus"},
+    {"pl": "tramwaj", "en": "tram"},
+    {"pl": "pociąg", "en": "train"},
+    {"pl": "samochód", "en": "car"},
+    {"pl": "rower", "en": "bicycle"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "verb_jezdzic",
+      "title": "Czasownik 'jeździć'",
+      "content": "Czasownik 'jeździć' – odmiana: jeżdżę, jeździsz, jeździ."
+    },
+    {
+      "id": "transport_construction",
+      "title": "Konstrukcje z transportem",
+      "content": "Konstrukcja: 'Jeżdżę do pracy autobusem / samochodem'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L45_d1",
+      "tutor": "Czym jeździsz do pracy?",
+      "expected": ["Jeżdżę autobusem albo tramwajem."],
+      "translation": "How do you get to work? / I go by bus or tram.",
+      "hint": "Odpowiedz używając czasownika 'jeździć' i narzędnika.",
+      "audio": "CD089",
+      "options": []
+    },
+    {
+      "id": "A1_L45_d2",
+      "tutor": "A w weekend?",
+      "expected": ["Czasem jadę samochodem."],
+      "translation": "And on weekends? / Sometimes I go by car.",
+      "hint": "Użyj formy dokonanej 'jechać' dla pojedynczych podróży.",
+      "audio": "CD090",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L45_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz pytania o transport.",
+      "instruction_en": "Repeat questions about transport.",
+      "items": ["Czym jeździsz do pracy?", "Jeżdżę autobusem", "Jadę samochodem", "Jeżdżę rowerem"]
+    },
+    {
+      "id": "A1_L45_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Jeżdżę do pracy ...'",
+      "instruction_en": "Complete: 'I go to work by ...'",
+      "blanks": [
+        {"sentence_pl": "Jeżdżę do pracy ___.", "answer_pl": "autobusem"},
+        {"sentence_en": "I go to work by ___.", "answer_en": "bus"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W dużych miastach popularne są bilety miesięczne.",
+    "Polacy często dojeżdżają do pracy komunikacją miejską."
+  ],
+  "audio_meta": {"tracks": ["CD089", "CD090"], "duration_sec": 65}
+}

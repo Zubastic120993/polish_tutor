@@ -1,0 +1,76 @@
+{
+  "id": "A1_L29",
+  "title": "Gdzie jest piekarnia?",
+  "level": "A1",
+  "module": "M3 – Robię zakupy",
+  "cefr_goal": "Potrafi pytać o lokalizację sklepów i używać przyimków miejsca z nazwami obiektów.",
+  "objectives": [
+    "Pytanie o lokalizację sklepu",
+    "Używanie przyimków miejsca z nazwami obiektów"
+  ],
+  "vocabulary": [
+    {"pl": "piekarnia", "en": "bakery"},
+    {"pl": "sklep", "en": "shop"},
+    {"pl": "apteka", "en": "pharmacy"},
+    {"pl": "rynek", "en": "market square"},
+    {"pl": "skrzyżowanie", "en": "crossroad"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "location_questions",
+      "title": "Pytania o lokalizację",
+      "content": "Pytania: 'Gdzie jest...?', 'Gdzie są...?'."
+    },
+    {
+      "id": "location_prepositions",
+      "title": "Przyimki miejsca",
+      "content": "Przyimki: 'na rogu', 'naprzeciwko', 'obok', 'za'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L29_d1",
+      "tutor": "Przepraszam, gdzie jest piekarnia?",
+      "expected": ["Na rogu, obok apteki."],
+      "translation": "Excuse me, where is the bakery? / On the corner, next to the pharmacy.",
+      "hint": "Odpowiedz używając przyimków miejsca.",
+      "audio": "CD057",
+      "options": []
+    },
+    {
+      "id": "A1_L29_d2",
+      "tutor": "Dziękuję bardzo!",
+      "expected": ["Nie ma za co."],
+      "translation": "Thank you very much! / You're welcome.",
+      "hint": "Odpowiedz grzecznie na podziękowanie.",
+      "audio": "CD058",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L29_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz pytania o lokalizację.",
+      "instruction_en": "Repeat location questions.",
+      "items": ["Gdzie jest piekarnia?", "Gdzie jest apteka?", "Gdzie jest sklep?", "Gdzie jest rynek?"]
+    },
+    {
+      "id": "A1_L29_task_match_pairs",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz miejsce z odpowiednim przyimkiem.",
+      "instruction_en": "Match each place with the correct preposition.",
+      "pairs": [
+        {"item": "piekarnia", "match": "na rogu"},
+        {"item": "apteka", "match": "obok"},
+        {"item": "sklep", "match": "naprzeciwko"},
+        {"item": "rynek", "match": "za"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W małych miastach piekarnie często otwarte są od 6:00 rano.",
+    "Polacy często używają słowa 'na rogu' dla sklepów narożnych."
+  ],
+  "audio_meta": {"tracks": ["CD057", "CD058"], "duration_sec": 55}
+}

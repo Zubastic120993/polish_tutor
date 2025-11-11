@@ -1,0 +1,76 @@
+{
+  "id": "A1_L27",
+  "title": "Kim on jest?",
+  "level": "A1",
+  "module": "M2 – Moja rodzina",
+  "cefr_goal": "Potrafi określać zawody członków rodziny i rozróżniać formy męskie i żeńskie zawodów.",
+  "objectives": [
+    "Określanie zawodów członków rodziny",
+    "Rozróżnianie form męskich i żeńskich zawodów"
+  ],
+  "vocabulary": [
+    {"pl": "lekarz / lekarka", "en": "doctor"},
+    {"pl": "pielęgniarz / pielęgniarka", "en": "nurse"},
+    {"pl": "kierowca", "en": "driver"},
+    {"pl": "sprzedawca / sprzedawczyni", "en": "salesman / saleswoman"},
+    {"pl": "uczeń / uczennica", "en": "pupil / student"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "question_kim_on_jest",
+      "title": "Pytanie 'Kim on jest?'",
+      "content": "Pytanie: 'Kim on jest?' – Odpowiedź: 'On jest lekarzem.'."
+    },
+    {
+      "id": "instrumental_case",
+      "title": "Narzędnik (instrumental)",
+      "content": "Narzędnik (instrumental): 'lekarzem', 'nauczycielem', 'studentką'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L27_d1",
+      "tutor": "Kim jest twój ojciec?",
+      "expected": ["Jest kierowcą."],
+      "translation": "Who is your father? / He is a driver.",
+      "hint": "Odpowiedz używając zawodu w narzędniku.",
+      "audio": "CD053",
+      "options": []
+    },
+    {
+      "id": "A1_L27_d2",
+      "tutor": "A mama?",
+      "expected": ["Jest nauczycielką."],
+      "translation": "And your mother? / She is a teacher.",
+      "hint": "Użyj formy żeńskiej zawodu.",
+      "audio": "CD054",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L27_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz pytania 'Kim on/ona jest?'",
+      "instruction_en": "Repeat 'Who is he/she?'",
+      "items": ["Kim jest twój ojciec?", "Jest lekarzem", "Kim jest twoja matka?", "Jest lekarką", "Kim jest twój brat?", "Jest uczniem"]
+    },
+    {
+      "id": "A1_L27_task_match_pairs",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz osoby z ich zawodem.",
+      "instruction_en": "Match people with their professions.",
+      "pairs": [
+        {"item": "ojciec", "match": "kierowca"},
+        {"item": "matka", "match": "nauczycielka"},
+        {"item": "brat", "match": "lekarz"},
+        {"item": "siostra", "match": "pielęgniarka"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W polskim języku formy żeńskie zawodów są coraz bardziej popularne ('psycholożka', 'premierka').",
+    "Przy przedstawianiu się zawodowo używa się narzędnika: 'Jestem inżynierem.'"
+  ],
+  "audio_meta": {"tracks": ["CD053", "CD054"], "duration_sec": 65}
+}

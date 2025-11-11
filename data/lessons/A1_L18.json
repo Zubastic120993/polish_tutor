@@ -1,0 +1,75 @@
+{
+  "id": "A1_L18",
+  "title": "W mieście",
+  "level": "A1",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi nazywać miejsca w mieście, pytać o drogę i lokalizację.",
+  "objectives": [
+    "Nazywanie miejsc w mieście",
+    "Pytanie o drogę i lokalizację"
+  ],
+  "vocabulary": [
+    {"pl": "ulica", "en": "street"},
+    {"pl": "poczta", "en": "post office"},
+    {"pl": "bank", "en": "bank"},
+    {"pl": "park", "en": "park"},
+    {"pl": "sklep spożywczy", "en": "grocery shop"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "direction_questions",
+      "title": "Pytania o kierunek",
+      "content": "Pytania o kierunek: 'Gdzie jest...?', 'Jak dojść do...?'."
+    },
+    {
+      "id": "location_prepositions_city",
+      "title": "Przyimki z miejscami",
+      "content": "Przyimki z miejscami: 'do', 'na', 'w'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L18_d1",
+      "tutor": "Przepraszam, gdzie jest poczta?",
+      "expected": ["Na rogu, obok banku."],
+      "translation": "Excuse me, where is the post office? / On the corner, next to the bank.",
+      "hint": "Odpowiedz wskazując lokalizację.",
+      "audio": "CD035",
+      "options": []
+    },
+    {
+      "id": "A1_L18_d2",
+      "tutor": "Dziękuję!",
+      "expected": ["Proszę bardzo."],
+      "translation": "Thank you! / You're welcome.",
+      "hint": "Odpowiedz grzecznie na podziękowanie.",
+      "audio": "CD036",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L18_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz pytania o drogę.",
+      "instruction_en": "Repeat questions asking for directions.",
+      "items": ["Gdzie jest poczta?", "Jak dojść do banku?", "Gdzie jest sklep?"]
+    },
+    {
+      "id": "A1_L18_task_match_pairs",
+      "type": "match_pairs",
+      "instruction_pl": "Połącz miejsce z jego lokalizacją.",
+      "instruction_en": "Match each place to its location.",
+      "pairs": [
+        {"item": "poczta", "match": "na rogu"},
+        {"item": "bank", "match": "obok poczty"},
+        {"item": "park", "match": "w centrum"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W polskich miastach często są place o nazwie 'Rynek' – centralny punkt miasta.",
+    "Warto znać słowa 'skrzyżowanie', 'przystanek', 'rondo'."
+  ],
+  "audio_meta": {"tracks": ["CD035", "CD036"], "duration_sec": 55}
+}

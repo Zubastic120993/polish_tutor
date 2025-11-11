@@ -112,31 +112,31 @@
           "id": "A1_L16",
           "title_pl": "Ubrania",
           "title_en": "Clothes",
-          "status": "pending"
+          "status": "in_progress"
         },
         {
           "id": "A1_L17",
           "title_pl": "Mieszkanie",
           "title_en": "Housing",
-          "status": "pending"
+          "status": "in_progress"
         },
         {
           "id": "A1_L18",
           "title_pl": "W mieście",
           "title_en": "Around the city",
-          "status": "pending"
+          "status": "in_progress"
         },
         {
           "id": "A1_L19",
           "title_pl": "Środki transportu",
           "title_en": "Transport",
-          "status": "pending"
+          "status": "in_progress"
         },
         {
           "id": "A1_L20",
           "title_pl": "Czas wolny",
           "title_en": "Free time",
-          "status": "pending"
+          "status": "in_progress"
         }
       ]
     },
@@ -155,25 +155,25 @@
               "id": "A1_L21",
               "title_pl": "Dzień dobry!",
               "title_en": "Good morning!",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L22",
               "title_pl": "Jestem…",
               "title_en": "I am…",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L23",
               "title_pl": "Mieszkam w…",
               "title_en": "I live in…",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L24",
               "title_pl": "Co to jest?",
               "title_en": "What is this?",
-              "status": "pending"
+              "status": "in_progress"
             }
           ]
         },
@@ -186,25 +186,25 @@
               "id": "A1_L25",
               "title_pl": "Kto to jest?",
               "title_en": "Who is this?",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L26",
               "title_pl": "Jaki on jest?",
               "title_en": "What is he like?",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L27",
               "title_pl": "Kim on jest?",
               "title_en": "Who is he?",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L28",
               "title_pl": "Gdzie on pracuje?",
               "title_en": "Where does he work?",
-              "status": "pending"
+              "status": "in_progress"
             }
           ]
         },
@@ -217,25 +217,25 @@
               "id": "A1_L29",
               "title_pl": "Gdzie jest piekarnia?",
               "title_en": "Where is the bakery?",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L30",
               "title_pl": "Proszę chleb i bułkę",
               "title_en": "Bread and rolls, please",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L31",
               "title_pl": "Ile kosztuje…",
               "title_en": "How much does it cost…",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L32",
               "title_pl": "Warzywa i owoce",
               "title_en": "Vegetables and fruits",
-              "status": "pending"
+              "status": "in_progress"
             }
           ]
         },
@@ -248,25 +248,25 @@
               "id": "A1_L33",
               "title_pl": "Śniadanie w barze",
               "title_en": "Breakfast at the bar",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L34",
               "title_pl": "Obiad w restauracji",
               "title_en": "Lunch in a restaurant",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L35",
               "title_pl": "Kolacja w domu",
               "title_en": "Dinner at home",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L36",
               "title_pl": "Na wynos",
               "title_en": "Takeaway",
-              "status": "pending"
+              "status": "in_progress"
             }
           ]
         },
@@ -279,25 +279,25 @@
               "id": "A1_L37",
               "title_pl": "Dom czy mieszkanie?",
               "title_en": "House or apartment?",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L38",
               "title_pl": "Meble",
               "title_en": "Furniture",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L39",
               "title_pl": "Chcę wynająć mieszkanie",
               "title_en": "I want to rent a flat",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L40",
               "title_pl": "Okolica",
               "title_en": "Neighborhood",
-              "status": "pending"
+              "status": "in_progress"
             }
           ]
         },
@@ -310,25 +310,25 @@
               "id": "A1_L41",
               "title_pl": "Która godzina?",
               "title_en": "What time is it?",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L42",
               "title_pl": "Najpierw kawa, potem prysznic",
               "title_en": "First coffee, then shower",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L43",
               "title_pl": "O której zaczynasz pracę?",
               "title_en": "What time do you start work?",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L44",
               "title_pl": "Co robisz w weekend?",
               "title_en": "What do you do on weekends?",
-              "status": "pending"
+              "status": "in_progress"
             }
           ]
         },
@@ -341,25 +341,25 @@
               "id": "A1_L45",
               "title_pl": "Czym jeździsz do pracy?",
               "title_en": "How do you get to work?",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L46",
               "title_pl": "Gdzie mogę kupić bilet?",
               "title_en": "Where can I buy a ticket?",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L47",
               "title_pl": "Gdzie byłeś wczoraj?",
               "title_en": "Where were you yesterday?",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L48",
               "title_pl": "Co robiłeś w styczniu?",
               "title_en": "What did you do in January?",
-              "status": "pending"
+              "status": "in_progress"
             }
           ]
         },
@@ -372,25 +372,25 @@
               "id": "A1_L49",
               "title_pl": "Deszcz ze śniegiem",
               "title_en": "Rain and snow",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L50",
               "title_pl": "Jesienią mam zawsze parasol",
               "title_en": "In autumn, I always have an umbrella",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L51",
               "title_pl": "Boli mnie głowa",
               "title_en": "I have a headache",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L52",
               "title_pl": "Od internisty do specjalisty",
               "title_en": "From GP to specialist",
-              "status": "pending"
+              "status": "in_progress"
             }
           ]
         },
@@ -403,25 +403,25 @@
               "id": "A1_L53",
               "title_pl": "Zatrudnię…",
               "title_en": "Help wanted…",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L54",
               "title_pl": "Umiem szybko pisać",
               "title_en": "I can type fast",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L55",
               "title_pl": "Jakie ma pan doświadczenie?",
               "title_en": "What experience do you have?",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L56",
               "title_pl": "Od kiedy mogę zacząć pracę?",
               "title_en": "When can I start work?",
-              "status": "pending"
+              "status": "in_progress"
             }
           ]
         },
@@ -440,19 +440,19 @@
               "id": "A1_L58",
               "title_pl": "Pierwszy dzień w szkole",
               "title_en": "First day at school",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L59",
               "title_pl": "Praca domowa",
               "title_en": "Homework",
-              "status": "pending"
+              "status": "in_progress"
             },
             {
               "id": "A1_L60",
               "title_pl": "Dzienniczek ucznia",
               "title_en": "Student's journal",
-              "status": "pending"
+              "status": "in_progress"
             }
           ]
         }

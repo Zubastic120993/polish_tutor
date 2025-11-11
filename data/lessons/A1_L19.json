@@ -1,0 +1,74 @@
+{
+  "id": "A1_L19",
+  "title": "Środki transportu",
+  "level": "A1",
+  "module": "Kurs wstępny – Pierwsze spotkanie",
+  "cefr_goal": "Potrafi nazywać środki transportu i używać przyimków z nazwami pojazdów.",
+  "objectives": [
+    "Nazywanie środków transportu",
+    "Używanie przyimków z nazwami pojazdów"
+  ],
+  "vocabulary": [
+    {"pl": "samochód", "en": "car"},
+    {"pl": "autobus", "en": "bus"},
+    {"pl": "pociąg", "en": "train"},
+    {"pl": "tramwaj", "en": "tram"},
+    {"pl": "rower", "en": "bicycle"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "transport_constructions",
+      "title": "Konstrukcje ze środkami transportu",
+      "content": "Konstrukcje: 'Jadę samochodem / autobusem / tramwajem'."
+    },
+    {
+      "id": "movement_verbs",
+      "title": "Czasowniki ruchu",
+      "content": "Czasowniki ruchu: 'jechać', 'iść', 'lecieć'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L19_d1",
+      "tutor": "Czym jedziesz do pracy?",
+      "expected": ["Jadę tramwajem."],
+      "translation": "How do you get to work? / I go by tram.",
+      "hint": "Odpowiedz używając przyimka z narzędnikiem.",
+      "audio": "CD037",
+      "options": []
+    },
+    {
+      "id": "A1_L19_d2",
+      "tutor": "A w weekend jeżdżę rowerem.",
+      "expected": ["Ja też jeżdżę rowerem."],
+      "translation": "And on weekends I ride a bike. / I also ride a bike.",
+      "hint": "Zgódź się i odpowiedz podobnie.",
+      "audio": "CD038",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L19_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Posłuchaj nazw środków transportu.",
+      "instruction_en": "Listen to the names of transport types and repeat.",
+      "items": ["samochód", "autobus", "pociąg", "tramwaj", "rower"]
+    },
+    {
+      "id": "A1_L19_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Jadę ... do pracy.'",
+      "instruction_en": "Complete: 'I go to work by ...'.",
+      "blanks": [
+        {"sentence_pl": "Jadę ___ do pracy.", "answer_pl": "tramwajem"},
+        {"sentence_en": "I go to work by ___ .", "answer_en": "bus"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W dużych miastach popularny jest tramwaj i metro.",
+    "W Polsce bilety często kasuje się w pojeździe po wejściu."
+  ],
+  "audio_meta": {"tracks": ["CD037", "CD038"], "duration_sec": 65}
+}

@@ -1,0 +1,74 @@
+{
+  "id": "A1_L26",
+  "title": "Jaki on jest?",
+  "level": "A1",
+  "module": "M2 – Moja rodzina",
+  "cefr_goal": "Potrafi opisywać wygląd i charakter osób, stosując przymiotniki w rodzaju męskim i żeńskim.",
+  "objectives": [
+    "Opisywanie wyglądu i charakteru osób",
+    "Stosowanie przymiotników w rodzaju męskim i żeńskim"
+  ],
+  "vocabulary": [
+    {"pl": "wysoki / wysoka", "en": "tall"},
+    {"pl": "niski / niska", "en": "short"},
+    {"pl": "miły / miła", "en": "nice"},
+    {"pl": "wesoły / wesoła", "en": "cheerful"},
+    {"pl": "pracowity / pracowita", "en": "hard-working"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "gender_agreement",
+      "title": "Zgoda rodzaju między rzeczownikiem a przymiotnikiem",
+      "content": "Zgoda rodzaju między rzeczownikiem a przymiotnikiem: 'on jest wysoki', 'ona jest niska'."
+    },
+    {
+      "id": "sentences_with_byc_adjectives",
+      "title": "Zdania z 'być' i przymiotnikiem",
+      "content": "Zdania z 'być' i przymiotnikiem."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L26_d1",
+      "tutor": "Jaki jest twój brat?",
+      "expected": ["Mój brat jest wesoły i pracowity."],
+      "translation": "What is your brother like? / My brother is cheerful and hardworking.",
+      "hint": "Opisz osobę używając przymiotników w rodzaju męskim.",
+      "audio": "CD051",
+      "options": []
+    },
+    {
+      "id": "A1_L26_d2",
+      "tutor": "A siostra?",
+      "expected": ["Ona jest spokojna."],
+      "translation": "And your sister? / She is calm.",
+      "hint": "Użyj formy żeńskiej przymiotnika.",
+      "audio": "CD052",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L26_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz przymiotniki opisujące ludzi.",
+      "instruction_en": "Repeat adjectives describing people.",
+      "items": ["wysoki", "wysoka", "miły", "miła", "wesoły", "wesoła", "pracowity", "pracowita"]
+    },
+    {
+      "id": "A1_L26_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'On jest ... / Ona jest ...'",
+      "instruction_en": "Fill in: 'He is ... / She is ...'",
+      "blanks": [
+        {"sentence_pl": "On jest ___.", "answer_pl": "wysoki"},
+        {"sentence_en": "She is ___.", "answer_en": "nice"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Polacy często mówią o cechach charakteru przy opisie rodziny.",
+    "Przymiotniki mają formy męskie i żeńskie – ważne przy nauce słownictwa."
+  ],
+  "audio_meta": {"tracks": ["CD051", "CD052"], "duration_sec": 65}
+}

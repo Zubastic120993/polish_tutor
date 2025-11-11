@@ -1,0 +1,74 @@
+{
+  "id": "A1_L52",
+  "title": "Od internisty do specjalisty",
+  "level": "A1",
+  "module": "M8 – Ach, ta pogoda!",
+  "cefr_goal": "Potrafi umawiać wizyty lekarskie oraz rozumieć proste polecenia i instrukcje medyczne.",
+  "objectives": [
+    "Umawianie wizyty lekarskiej",
+    "Rozumienie prostych poleceń i instrukcji medycznych"
+  ],
+  "vocabulary": [
+    {"pl": "lekarz", "en": "doctor"},
+    {"pl": "pielęgniarka", "en": "nurse"},
+    {"pl": "przychodnia", "en": "clinic"},
+    {"pl": "recepta", "en": "prescription"},
+    {"pl": "specjalista", "en": "specialist"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "reflexive_verb_umawiac",
+      "title": "Czasownik zwrotny 'umawiać się'",
+      "content": "Czasownik 'umawiać się' – odmiana: umawiam się, umawiasz się."
+    },
+    {
+      "id": "appointment_phrases",
+      "title": "Zwroty umów",
+      "content": "Zwroty: 'Chciałbym się umówić do lekarza', 'Mam wizytę o 10:00'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L52_d1",
+      "tutor": "Dzień dobry, chciałbym się umówić do lekarza.",
+      "expected": ["Do internisty czy do specjalisty?"],
+      "translation": "Good morning, I'd like to make a doctor's appointment. / To a general practitioner or specialist?",
+      "hint": "Zapytaj o rodzaj lekarza.",
+      "audio": "CD103",
+      "options": []
+    },
+    {
+      "id": "A1_L52_d2",
+      "tutor": "Do specjalisty, proszę.",
+      "expected": ["Dobrze, proszę przyjść w piątek o 14:00."],
+      "translation": "To a specialist, please. / All right, please come on Friday at 2 p.m.",
+      "hint": "Umów wizytę na konkretny termin.",
+      "audio": "CD104",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L52_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz dialog w przychodni.",
+      "instruction_en": "Repeat the conversation in a clinic.",
+      "items": ["Chciałbym się umówić do lekarza", "Do internisty czy do specjalisty?", "Proszę przyjść w piątek", "Dziękuję"]
+    },
+    {
+      "id": "A1_L52_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Chciałbym się umówić do ...'",
+      "instruction_en": "Complete: 'I'd like to make an appointment with ...'",
+      "blanks": [
+        {"sentence_pl": "Chciałbym się umówić do ___.", "answer_pl": "lekarza"},
+        {"sentence_en": "I'd like to make an appointment with ___.", "answer_en": "a doctor"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Wizyta u specjalisty wymaga skierowania od lekarza rodzinnego.",
+    "System e-recept w Polsce pozwala odebrać leki z dowolnej apteki."
+  ],
+  "audio_meta": {"tracks": ["CD103", "CD104"], "duration_sec": 75}
+}

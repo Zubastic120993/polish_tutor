@@ -1,0 +1,75 @@
+{
+  "id": "A1_L42",
+  "title": "Najpierw kawa, potem prysznic",
+  "level": "A1",
+  "module": "M6 – Dzień za dniem",
+  "cefr_goal": "Potrafi opowiadać o porannej rutynie oraz używać przysłówków kolejności: najpierw, potem, później.",
+  "objectives": [
+    "Opowiadanie o porannej rutynie",
+    "Używanie przysłówków kolejności: najpierw, potem, później"
+  ],
+  "vocabulary": [
+    {"pl": "wstawać", "en": "to get up"},
+    {"pl": "brać prysznic", "en": "to take a shower"},
+    {"pl": "pić kawę", "en": "to drink coffee"},
+    {"pl": "jeść śniadanie", "en": "to eat breakfast"},
+    {"pl": "iść do pracy", "en": "to go to work"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "reflexive_verbs",
+      "title": "Czasowniki zwrotne",
+      "content": "Czasowniki zwrotne: 'wstaję, myję się'."
+    },
+    {
+      "id": "sequence_expressions",
+      "title": "Wyrażenia sekwencji",
+      "content": "Wyrażenia sekwencji: 'najpierw', 'potem', 'później'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L42_d1",
+      "tutor": "Co robisz rano?",
+      "expected": ["Najpierw piję kawę, potem biorę prysznic."],
+      "translation": "What do you do in the morning? / First I drink coffee, then I take a shower.",
+      "hint": "Opisz swoją poranną rutynę używając przysłówków kolejności.",
+      "audio": "CD083",
+      "options": []
+    },
+    {
+      "id": "A1_L42_d2",
+      "tutor": "A śniadanie?",
+      "expected": ["Jem śniadanie po prysznicu."],
+      "translation": "And breakfast? / I eat breakfast after my shower.",
+      "hint": "Użyj przyimka 'po' + miejscownik dla sekwencji czasowej.",
+      "audio": "CD084",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L42_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz czasowniki opisujące poranek.",
+      "instruction_en": "Repeat morning routine verbs.",
+      "items": ["wstaję", "biorę prysznic", "piję kawę", "jem śniadanie", "idę do pracy"]
+    },
+    {
+      "id": "A1_L42_task_sequence",
+      "type": "sequence",
+      "instruction_pl": "Ułóż zdania w kolejności: najpierw, potem, później.",
+      "instruction_en": "Order the sentences: first, then, later.",
+      "items": [
+        "Najpierw wstaję",
+        "Potem biorę prysznic",
+        "Później jem śniadanie"
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Typowy polski poranek zaczyna się między 6:00 a 7:00.",
+    "Wielu Polaków nie je dużego śniadania – tylko kawę i kanapkę."
+  ],
+  "audio_meta": {"tracks": ["CD083", "CD084"], "duration_sec": 70}
+}

@@ -1,0 +1,74 @@
+{
+  "id": "A1_L37",
+  "title": "Dom czy mieszkanie?",
+  "level": "A1",
+  "module": "M5 – Moje mieszkanie",
+  "cefr_goal": "Potrafi rozróżniać typ miejsca zamieszkania i używać słownictwa opisującego budynki.",
+  "objectives": [
+    "Rozróżnianie typu miejsca zamieszkania (dom, mieszkanie)",
+    "Używanie słownictwa opisującego budynki"
+  ],
+  "vocabulary": [
+    {"pl": "dom", "en": "house"},
+    {"pl": "mieszkanie", "en": "apartment"},
+    {"pl": "blok", "en": "apartment building"},
+    {"pl": "balkon", "en": "balcony"},
+    {"pl": "ogród", "en": "garden"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "housing_constructions",
+      "title": "Konstrukcje opisujące mieszkania",
+      "content": "Konstrukcje: 'Mam dom / mieszkanie z balkonem.'."
+    },
+    {
+      "id": "adjective_agreement_housing",
+      "title": "Zgoda przymiotników z rzeczownikami",
+      "content": "Rodzaj rzeczownika a końcówka przymiotnika: 'mały dom', 'małe mieszkanie'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L37_d1",
+      "tutor": "Gdzie mieszkasz? W domu czy w bloku?",
+      "expected": ["W bloku, na trzecim piętrze."],
+      "translation": "Where do you live? In a house or in a block? / In a block, on the third floor.",
+      "hint": "Odpowiedz podając typ mieszkania i piętro.",
+      "audio": "CD073",
+      "options": []
+    },
+    {
+      "id": "A1_L37_d2",
+      "tutor": "Ja mam dom z ogrodem.",
+      "expected": ["Ja mam dom z ogrodem."],
+      "translation": "I have a house with a garden.",
+      "hint": "Opisz swój dom używając odpowiednich cech.",
+      "audio": "CD074",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L37_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz pytania o typ mieszkania.",
+      "instruction_en": "Repeat questions about housing type.",
+      "items": ["Gdzie mieszkasz?", "W domu czy w bloku?", "Na którym piętrze?", "Z balkonem czy bez?"]
+    },
+    {
+      "id": "A1_L37_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Mieszkam w ...'",
+      "instruction_en": "Complete: 'I live in ...'",
+      "blanks": [
+        {"sentence_pl": "Mieszkam w ___ z balkonem.", "answer_pl": "mieszkaniu"},
+        {"sentence_en": "I live in ___ with a balcony.", "answer_en": "an apartment"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W miastach większość osób mieszka w blokach z lat 70–90.",
+    "Na wsiach popularne są domy jednorodzinne z ogrodem."
+  ],
+  "audio_meta": {"tracks": ["CD073", "CD074"], "duration_sec": 60}
+}

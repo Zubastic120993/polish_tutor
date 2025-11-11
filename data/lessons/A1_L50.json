@@ -1,0 +1,74 @@
+{
+  "id": "A1_L50",
+  "title": "Jesienią mam zawsze parasol",
+  "level": "A1",
+  "module": "M8 – Ach, ta pogoda!",
+  "cefr_goal": "Potrafi mówić o ubraniu w różnych porach roku oraz używać przyimków czasu i wyrażeń częstotliwości.",
+  "objectives": [
+    "Mówienie o ubraniu w różnych porach roku",
+    "Używanie przyimków czasu i wyrażeń częstotliwości"
+  ],
+  "vocabulary": [
+    {"pl": "kurtka", "en": "jacket"},
+    {"pl": "płaszcz", "en": "coat"},
+    {"pl": "czapka", "en": "hat"},
+    {"pl": "szalik", "en": "scarf"},
+    {"pl": "parasol", "en": "umbrella"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "seasonal_prepositions",
+      "title": "Przyimki czasu",
+      "content": "Przyimek czasu: 'wiosną', 'latem', 'jesienią', 'zimą'."
+    },
+    {
+      "id": "verb_nosic",
+      "title": "Czasownik 'nosić'",
+      "content": "Czasownik 'nosić' – odmiana: noszę, nosisz, nosi."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L50_d1",
+      "tutor": "Co nosisz jesienią?",
+      "expected": ["Kurtkę i czapkę. Mam też parasol."],
+      "translation": "What do you wear in autumn? / A jacket and a hat. I also have an umbrella.",
+      "hint": "Opisz swoje ubranie jesienne i akcesoria.",
+      "audio": "CD099",
+      "options": []
+    },
+    {
+      "id": "A1_L50_d2",
+      "tutor": "Ja noszę płaszcz i szalik.",
+      "expected": ["Ja noszę płaszcz i szalik."],
+      "translation": "I wear a coat and a scarf.",
+      "hint": "Podziel się swoim ubraniem jesiennym.",
+      "audio": "CD100",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L50_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz nazwy ubrań.",
+      "instruction_en": "Repeat the names of clothes.",
+      "items": ["kurtka", "płaszcz", "czapka", "szalik", "parasol"]
+    },
+    {
+      "id": "A1_L50_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Zimą noszę ...'",
+      "instruction_en": "Complete: 'In winter I wear ...'",
+      "blanks": [
+        {"sentence_pl": "Zimą noszę ___.", "answer_pl": "czapkę"},
+        {"sentence_en": "In winter I wear ___.", "answer_en": "a hat"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Jesienią w Polsce często pada deszcz, dlatego parasol jest niezbędny.",
+    "Zimą popularne są czapki i szaliki z wełny."
+  ],
+  "audio_meta": {"tracks": ["CD099", "CD100"], "duration_sec": 65}
+}

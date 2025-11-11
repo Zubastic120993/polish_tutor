@@ -1,0 +1,74 @@
+{
+  "id": "A1_L36",
+  "title": "Na wynos",
+  "level": "A1",
+  "module": "M4 – Smacznego",
+  "cefr_goal": "Potrafi zamawiać jedzenie na wynos lub z dostawą oraz rozumieć podstawowe zwroty telefoniczne.",
+  "objectives": [
+    "Zamawianie jedzenia na wynos lub z dostawą",
+    "Rozumienie podstawowych zwrotów telefonicznych"
+  ],
+  "vocabulary": [
+    {"pl": "zamawiać", "en": "to order"},
+    {"pl": "pizza", "en": "pizza"},
+    {"pl": "numer telefonu", "en": "phone number"},
+    {"pl": "adres", "en": "address"},
+    {"pl": "na wynos", "en": "takeaway"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "verb_zamawiac",
+      "title": "Czasownik 'zamawiać'",
+      "content": "Czasownik 'zamawiać' – odmiana: zamawiam, zamawiasz, zamawia."
+    },
+    {
+      "id": "ordering_phrases",
+      "title": "Zwroty do zamawiania",
+      "content": "Zwroty: 'Chciałbym zamówić pizzę na wynos.'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L36_d1",
+      "tutor": "Pizzeria Roma, dzień dobry.",
+      "expected": ["Dzień dobry. Chciałbym zamówić pizzę na wynos."],
+      "translation": "Pizzeria Roma, good morning. / Good morning. I'd like to order a pizza to go.",
+      "hint": "Zamów pizzę na wynos używając formy grzecznościowej.",
+      "audio": "CD071",
+      "options": []
+    },
+    {
+      "id": "A1_L36_d2",
+      "tutor": "Jaki adres i numer telefonu?",
+      "expected": ["Mój adres to ulica Długa 5, numer telefonu 123-456-789."],
+      "translation": "What is the address and phone number? / My address is Długa Street 5, phone number 123-456-789.",
+      "hint": "Podaj adres i numer telefonu do dostawy.",
+      "audio": "CD072",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L36_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz zwroty do zamawiania jedzenia.",
+      "instruction_en": "Repeat phrases for ordering food.",
+      "items": ["Chciałbym zamówić", "na wynos", "Jaki adres?", "Jaki numer telefonu?", "Dziękuję"]
+    },
+    {
+      "id": "A1_L36_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Chciałbym zamówić ... na ...'",
+      "instruction_en": "Complete: 'I'd like to order ... to ...'",
+      "blanks": [
+        {"sentence_pl": "Chciałbym zamówić pizzę ___ wynos.", "answer_pl": "na"},
+        {"sentence_en": "I'd like to order pizza ___ takeaway.", "answer_en": "for"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce coraz popularniejsze jest zamawianie jedzenia przez aplikacje (np. Pyszne.pl).",
+    "Słowo 'na wynos' oznacza jedzenie zapakowane do domu."
+  ],
+  "audio_meta": {"tracks": ["CD071", "CD072"], "duration_sec": 70}
+}

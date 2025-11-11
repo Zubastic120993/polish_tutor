@@ -1,0 +1,74 @@
+{
+  "id": "A1_L48",
+  "title": "Co robiłeś w styczniu?",
+  "level": "A1",
+  "module": "M7 – Poproszę bilet do Wrocławia",
+  "cefr_goal": "Potrafi opowiadać o czynnościach w przeszłości oraz używać czasu przeszłego czasownika 'robić'.",
+  "objectives": [
+    "Opowiadanie o czynnościach w przeszłości",
+    "Używanie czasu przeszłego czasownika 'robić'"
+  ],
+  "vocabulary": [
+    {"pl": "robić", "en": "to do"},
+    {"pl": "pracować", "en": "to work"},
+    {"pl": "odpoczywać", "en": "to rest"},
+    {"pl": "podróżować", "en": "to travel"},
+    {"pl": "zwiedzać", "en": "to visit (sightsee)"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "past_tense_other_verbs",
+      "title": "Czas przeszły innych czasowników",
+      "content": "Czas przeszły: 'robiłem / robiłam', 'pracowałem / pracowałam'."
+    },
+    {
+      "id": "past_sentences_activities",
+      "title": "Zdania o czynnościach w przeszłości",
+      "content": "Zdania: 'W styczniu podróżowałem po Polsce.'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L48_d1",
+      "tutor": "Co robiłeś w styczniu?",
+      "expected": ["Podróżowałem i zwiedzałem Kraków."],
+      "translation": "What did you do in January? / I travelled and visited Kraków.",
+      "hint": "Opisz swoje czynności w przeszłości używając czasu przeszłego.",
+      "audio": "CD095",
+      "options": []
+    },
+    {
+      "id": "A1_L48_d2",
+      "tutor": "A ja odpoczywałam w domu.",
+      "expected": ["A ja odpoczywałam w domu."],
+      "translation": "And I was resting at home.",
+      "hint": "Podziel się swoimi planami na styczeń.",
+      "audio": "CD096",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L48_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz czasowniki w czasie przeszłym.",
+      "instruction_en": "Repeat verbs in past tense.",
+      "items": ["robiłem", "pracowałem", "odpoczywałem", "podróżowałem", "zwiedzałem"]
+    },
+    {
+      "id": "A1_L48_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'W styczniu ...'",
+      "instruction_en": "Complete: 'In January ...'",
+      "blanks": [
+        {"sentence_pl": "W styczniu ___.", "answer_pl": "odpoczywam"},
+        {"sentence_en": "In January ___.", "answer_en": "I rest"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce ferie zimowe przypadają na styczeń lub luty.",
+    "Kraków i Zakopane to popularne kierunki zimowych podróży."
+  ],
+  "audio_meta": {"tracks": ["CD095", "CD096"], "duration_sec": 70}
+}

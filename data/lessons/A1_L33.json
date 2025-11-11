@@ -1,0 +1,74 @@
+{
+  "id": "A1_L33",
+  "title": "Śniadanie w barze",
+  "level": "A1",
+  "module": "M4 – Smacznego",
+  "cefr_goal": "Potrafi zamawiać śniadanie w barze lub kawiarni oraz rozumieć nazwy posiłków i napojów.",
+  "objectives": [
+    "Zamawianie śniadania w barze lub kawiarni",
+    "Rozumienie nazw posiłków i napojów"
+  ],
+  "vocabulary": [
+    {"pl": "kawa", "en": "coffee"},
+    {"pl": "herbata", "en": "tea"},
+    {"pl": "kanapka", "en": "sandwich"},
+    {"pl": "jajko", "en": "egg"},
+    {"pl": "sok pomarańczowy", "en": "orange juice"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "poprosze_construction_food",
+      "title": "Konstrukcja 'Poproszę'",
+      "content": "Konstrukcja: 'Poproszę + biernik' – 'Poproszę kawę, kanapkę'."
+    },
+    {
+      "id": "meal_types",
+      "title": "Rodzaje posiłków",
+      "content": "Rodzaje posiłków: 'śniadanie', 'obiad', 'kolacja'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L33_d1",
+      "tutor": "Dzień dobry. Poproszę kawę z mlekiem i kanapkę z serem.",
+      "expected": ["Proszę bardzo. Coś jeszcze?"],
+      "translation": "Good morning. Coffee with milk and a cheese sandwich, please. / Here you are. Anything else?",
+      "hint": "Odpowiedz jako kelner w barze.",
+      "audio": "CD065",
+      "options": []
+    },
+    {
+      "id": "A1_L33_d2",
+      "tutor": "Nie, dziękuję. Ile płacę?",
+      "expected": ["Razem dwanaście złotych."],
+      "translation": "No, thank you. How much? / Twelve zloty altogether.",
+      "hint": "Podaj sumę do zapłaty.",
+      "audio": "CD066",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L33_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz dialog w barze.",
+      "instruction_en": "Repeat the dialogue in a café.",
+      "items": ["Poproszę kawę z mlekiem", "Proszę bardzo", "Coś jeszcze?", "Nie, dziękuję", "Ile płacę?"]
+    },
+    {
+      "id": "A1_L33_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Poproszę ... z ...'",
+      "instruction_en": "Complete: 'Please ... with ...'",
+      "blanks": [
+        {"sentence_pl": "Poproszę kawę ___ mlekiem.", "answer_pl": "z"},
+        {"sentence_en": "Please coffee ___ milk.", "answer_en": "with"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Typowe polskie śniadanie to kanapka i kawa lub herbata.",
+    "W barach mlecznych można zjeść tanie, domowe śniadania."
+  ],
+  "audio_meta": {"tracks": ["CD065", "CD066"], "duration_sec": 55}
+}

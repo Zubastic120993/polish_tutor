@@ -1,0 +1,74 @@
+{
+  "id": "A1_L57",
+  "title": "Polska edukacja",
+  "level": "A1",
+  "module": "M10 – Dzieci idą do szkoły",
+  "cefr_goal": "Potrafi rozumieć podstawowych pojęć o systemie edukacji w Polsce oraz używać słownictwa związanego ze szkołą i nauką.",
+  "objectives": [
+    "Rozumienie podstawowych pojęć o systemie edukacji w Polsce",
+    "Używanie słownictwa związanego ze szkołą i nauką"
+  ],
+  "vocabulary": [
+    {"pl": "szkoła podstawowa", "en": "primary school"},
+    {"pl": "liceum", "en": "high school"},
+    {"pl": "nauczyciel", "en": "teacher"},
+    {"pl": "uczeń", "en": "student / pupil"},
+    {"pl": "klasa", "en": "classroom / grade"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "plural_education",
+      "title": "Liczba mnoga w edukacji",
+      "content": "Liczba mnoga: 'uczniowie', 'nauczyciele'."
+    },
+    {
+      "id": "education_sentences",
+      "title": "Zdania o edukacji",
+      "content": "Zdania: 'Moje dzieci chodzą do szkoły podstawowej.'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L57_d1",
+      "tutor": "Ile lat trwają szkoły w Polsce?",
+      "expected": ["Szkoła podstawowa trwa osiem lat, potem jest liceum."],
+      "translation": "How long do schools last in Poland? / Primary school lasts eight years, then high school.",
+      "hint": "Odpowiedz podając długość edukacji na różnych poziomach.",
+      "audio": "CD113",
+      "options": []
+    },
+    {
+      "id": "A1_L57_d2",
+      "tutor": "A studia?",
+      "expected": ["Zwykle trzy lata licencjatu i dwa magisterskie."],
+      "translation": "And university? / Usually three years for a bachelor's and two for a master's.",
+      "hint": "Opisz system studiów wyższych w Polsce.",
+      "audio": "CD114",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L57_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz słowa związane ze szkołą.",
+      "instruction_en": "Repeat school-related words.",
+      "items": ["szkoła podstawowa", "liceum", "nauczyciel", "uczeń", "klasa"]
+    },
+    {
+      "id": "A1_L57_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Moje dziecko chodzi do ...'",
+      "instruction_en": "Complete: 'My child goes to ...'",
+      "blanks": [
+        {"sentence_pl": "Moje dziecko chodzi do ___.", "answer_pl": "szkoły podstawowej"},
+        {"sentence_en": "My child goes to ___.", "answer_en": "primary school"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce rok szkolny zaczyna się 1 września i kończy w czerwcu.",
+    "Dzieci uczą się języka angielskiego od najmłodszych klas."
+  ],
+  "audio_meta": {"tracks": ["CD113", "CD114"], "duration_sec": 70}
+}

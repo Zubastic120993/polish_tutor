@@ -1,0 +1,74 @@
+{
+  "id": "A1_L31",
+  "title": "Ile kosztuje…?",
+  "level": "A1",
+  "module": "M3 – Robię zakupy",
+  "cefr_goal": "Potrafi pytać o cenę produktów i rozumieć liczebniki oraz walutę polską.",
+  "objectives": [
+    "Pytanie o cenę produktów",
+    "Rozumienie liczebników i walut"
+  ],
+  "vocabulary": [
+    {"pl": "drogi / tani", "en": "expensive / cheap"},
+    {"pl": "promocja", "en": "sale / promotion"},
+    {"pl": "paragon", "en": "receipt"},
+    {"pl": "reszta", "en": "change (money)"},
+    {"pl": "gotówka / karta", "en": "cash / card"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "price_questions",
+      "title": "Pytania o cenę",
+      "content": "Pytanie: 'Ile to kosztuje?' – Odpowiedź: 'To kosztuje ... złotych.'."
+    },
+    {
+      "id": "numbers_in_prices",
+      "title": "Liczebniki w cenach",
+      "content": "Liczebniki powyżej 20 w wyrażeniach pieniężnych."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L31_d1",
+      "tutor": "Ile kosztuje ser?",
+      "expected": ["Osiem złotych za pół kilo."],
+      "translation": "How much is the cheese? / Eight zlotys for half a kilo.",
+      "hint": "Odpowiedz podając cenę z jednostką miary.",
+      "audio": "CD061",
+      "options": []
+    },
+    {
+      "id": "A1_L31_d2",
+      "tutor": "A masło?",
+      "expected": ["Cztery złote pięćdziesiąt."],
+      "translation": "And butter? / Four zloty fifty.",
+      "hint": "Podaj cenę w złotówkach i groszach.",
+      "audio": "CD062",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L31_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz pytania i odpowiedzi o cenie.",
+      "instruction_en": "Repeat price questions and answers.",
+      "items": ["Ile kosztuje ser?", "Osiem złotych", "Ile kosztuje masło?", "Cztery złote pięćdziesiąt"]
+    },
+    {
+      "id": "A1_L31_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'To kosztuje ... złotych.'",
+      "instruction_en": "Complete: 'It costs ... zloty.'",
+      "blanks": [
+        {"sentence_pl": "To kosztuje ___ złotych.", "answer_pl": "pięć"},
+        {"sentence_en": "It costs ___ zloty.", "answer_en": "five"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce ceny często podaje się w formie skróconej: 'trzy pięćdziesiąt' = 3,50 zł.",
+    "Większość sklepów akceptuje karty, ale w małych miejscowościach wciąż preferowana jest gotówka."
+  ],
+  "audio_meta": {"tracks": ["CD061", "CD062"], "duration_sec": 65}
+}

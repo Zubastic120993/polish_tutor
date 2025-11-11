@@ -52,11 +52,34 @@ def test_helper_buttons_present(page, app_base_url):
 
 
 def test_voice_flow_controls(page, app_base_url):
-    """Ensure the voice controls are accessible for voice-only practice."""
+    """Ensure the voice controls respond during a voice-only session."""
     _goto_home(page, app_base_url)
 
     mic = page.locator("#mic-button")
-    expect(mic).to_have_attribute("aria-label", re.compile("voice input", re.IGNORECASE))
+    page.evaluate(
+        """() => {
+            const btn = document.getElementById('mic-button');
+            if (btn) btn.removeAttribute('disabled');
+        }"""
+    )
+    expect(mic).to_have_attribute("aria-label", re.compile("Start voice input", re.IGNORECASE))
+
+    # Simulate the mic button click
+    page.click("#mic-button")
+    page.evaluate("window.chatUI.updateMicButtonState(true)")
+    expect(mic).to_have_class(re.compile(".*mic-button--listening.*"))
+
+    # Feed a fake transcript and ensure it lands in the input
+    transcript = "To jest głosowy test."
+    page.evaluate(
+        "window.voiceInputManager.onTranscriptReady && window.voiceInputManager.onTranscriptReady(arguments[0])",
+        transcript,
+    )
+    expect(page.locator("#message-input")).to_have_value(transcript)
+
+    # Stop listening
+    page.evaluate("window.chatUI.updateMicButtonState(false)")
+    expect(mic).not_to_have_class(re.compile(".*mic-button--listening.*"))
     expect(page.locator("#floating-hint-text")).to_contain_text("Speak or type")
 
 
@@ -70,6 +93,18 @@ def test_text_input_flow(page, app_base_url):
 
     page.fill("#message-input", "To jest test.")
     expect(page.locator("#message-input")).to_have_value("To jest test.")
+
+    # Simulate append of learner/tutor messages to validate DOM handling
+    page.evaluate(
+        """
+        const msg = window.chatUI.createMessageElement('learner', 'To jest test.');
+        window.chatUI.chatMessages.appendChild(msg);
+        const reply = window.chatUI.createMessageElement('tutor', 'Świetnie!');
+        window.chatUI.chatMessages.appendChild(reply);
+    """
+    )
+    expect(page.locator(".message--learner")).to_have_count(1)
+    expect(page.locator(".message--tutor")).to_have_count(2)  # placeholder + reply
 
 
 def test_branch_navigation_guidance(page, app_base_url):

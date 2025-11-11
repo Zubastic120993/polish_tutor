@@ -1,0 +1,74 @@
+{
+  "id": "A1_L58",
+  "title": "Pierwszy dzień w szkole",
+  "level": "A1",
+  "module": "M10 – Dzieci idą do szkoły",
+  "cefr_goal": "Potrafi opowiadać o pierwszym dniu w szkole, używając czasowników ruchu i emocji.",
+  "objectives": [
+    "Opowiadanie o pierwszym dniu w szkole",
+    "Używanie czasowników ruchu i emocji"
+  ],
+  "vocabulary": [
+    {"pl": "tornister", "en": "school bag"},
+    {"pl": "zeszyt", "en": "notebook"},
+    {"pl": "lekcja", "en": "lesson"},
+    {"pl": "tablica", "en": "blackboard"},
+    {"pl": "radość", "en": "joy"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "motion_verbs",
+      "title": "Czasowniki ruchu",
+      "content": "Czasowniki ruchu: 'iść', 'przychodzić', 'wracać'."
+    },
+    {
+      "id": "past_tense",
+      "title": "Czas przeszły",
+      "content": "Zdania w czasie przeszłym: 'Poszedłem do szkoły o ósmej.'"
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L58_d1",
+      "tutor": "Jak minął pierwszy dzień w szkole?",
+      "expected": ["Było super! Mam nowych kolegów i koleżanki."],
+      "translation": "How was the first day at school? / It was great! I have new friends.",
+      "hint": "Opisz swoje wrażenia z pierwszego dnia w szkole.",
+      "audio": "CD115",
+      "options": []
+    },
+    {
+      "id": "A1_L58_d2",
+      "tutor": "Cieszę się, że ci się podobało.",
+      "expected": ["Dziękuję!"],
+      "translation": "I’m glad you liked it. / Thank you!",
+      "hint": "Odpowiedz grzecznie na wyrazy radości.",
+      "audio": "CD116",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L58_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz dialog o pierwszym dniu.",
+      "instruction_en": "Repeat the dialogue about the first day.",
+      "items": ["Jak minął pierwszy dzień w szkole?", "Było super!", "Mam nowych kolegów i koleżanki."]
+    },
+    {
+      "id": "A1_L58_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Poszedłem do szkoły o ...'",
+      "instruction_en": "Complete: 'I went to school at ...'.",
+      "blanks": [
+        {"sentence_pl": "Poszedłem do szkoły o ___.", "answer_pl": "ósmej"},
+        {"sentence_en": "I went to school at ___.", "answer_en": "eight o'clock"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Pierwszy dzień szkoły w Polsce to ważne wydarzenie – dzieci dostają 'rogi obfitości' z prezentami.",
+    "Rodzice często towarzyszą dzieciom do szkoły."
+  ],
+  "audio_meta": {"tracks": ["CD115", "CD116"], "duration_sec": 65}
+}

@@ -1,0 +1,74 @@
+{
+  "id": "A1_L43",
+  "title": "O której zaczynasz pracę?",
+  "level": "A1",
+  "module": "M6 – Dzień za dniem",
+  "cefr_goal": "Potrafi mówić o godzinach rozpoczęcia i zakończenia pracy oraz używać czasowników związanych z dniem pracy.",
+  "objectives": [
+    "Mówienie o godzinach rozpoczęcia i zakończenia pracy",
+    "Używanie czasowników związanych z dniem pracy"
+  ],
+  "vocabulary": [
+    {"pl": "pracować", "en": "to work"},
+    {"pl": "zaczynać", "en": "to start"},
+    {"pl": "kończyć", "en": "to finish"},
+    {"pl": "przerwa", "en": "break"},
+    {"pl": "obiad", "en": "lunch"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "work_time_questions",
+      "title": "Pytania o godziny pracy",
+      "content": "Pytania: 'O której zaczynasz?', 'O której kończysz?'."
+    },
+    {
+      "id": "work_verbs_conjugation",
+      "title": "Czasowniki pracy",
+      "content": "Czasowniki w 1. i 2. osobie: 'zaczynam, kończysz'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L43_d1",
+      "tutor": "O której zaczynasz pracę?",
+      "expected": ["O ósmej. Mam przerwę o dwunastej."],
+      "translation": "What time do you start work? / At eight. I have a break at twelve.",
+      "hint": "Odpowiedz podając godzinę rozpoczęcia i przerwę.",
+      "audio": "CD085",
+      "options": []
+    },
+    {
+      "id": "A1_L43_d2",
+      "tutor": "A o której kończysz?",
+      "expected": ["O szesnastej."],
+      "translation": "And what time do you finish? / At four p.m.",
+      "hint": "Podaj godzinę zakończenia pracy.",
+      "audio": "CD086",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L43_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz zdania o godzinach pracy.",
+      "instruction_en": "Repeat sentences about work hours.",
+      "items": ["O której zaczynasz pracę?", "O ósmej", "Mam przerwę o dwunastej", "O której kończysz?", "O szesnastej"]
+    },
+    {
+      "id": "A1_L43_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Zaczynam o ...', 'Kończę o ...'",
+      "instruction_en": "Complete: 'I start at ...', 'I finish at ...'",
+      "blanks": [
+        {"sentence_pl": "Zaczynam o ___.", "answer_pl": "ósmej"},
+        {"sentence_en": "I start at ___.", "answer_en": "eight"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce standardowy dzień pracy trwa od 8:00 do 16:00.",
+    "Przerwa obiadowa często trwa 30 minut."
+  ],
+  "audio_meta": {"tracks": ["CD085", "CD086"], "duration_sec": 65}
+}

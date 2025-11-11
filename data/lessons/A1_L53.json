@@ -1,0 +1,74 @@
+{
+  "id": "A1_L53",
+  "title": "Zatrudnię...",
+  "level": "A1",
+  "module": "M9 – Szukam pracy",
+  "cefr_goal": "Potrafi rozumieć ogłoszenia o pracę oraz używać słownictwa związanego z zatrudnieniem.",
+  "objectives": [
+    "Rozumienie ogłoszeń o pracę",
+    "Używanie słownictwa związanego z zatrudnieniem"
+  ],
+  "vocabulary": [
+    {"pl": "zatrudnienie", "en": "employment"},
+    {"pl": "ogłoszenie", "en": "advertisement"},
+    {"pl": "pracodawca", "en": "employer"},
+    {"pl": "pracownik", "en": "employee"},
+    {"pl": "umowa", "en": "contract"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "impersonal_job_ads",
+      "title": "Konstrukcje bezosobowe w ogłoszeniach",
+      "content": "Konstrukcje bezosobowe: 'Zatrudnię pracownika', 'Szukam sprzedawcy'."
+    },
+    {
+      "id": "gender_in_ads",
+      "title": "Rodzaj w ogłoszeniach",
+      "content": "Rzeczowniki rodzaju męskiego i żeńskiego w ogłoszeniach."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L53_d1",
+      "tutor": "Znalazłem ogłoszenie: 'Zatrudnię kucharza'.",
+      "expected": ["To brzmi interesująco. Czy masz doświadczenie?"],
+      "translation": "I found an ad: 'Hiring a cook.' / That sounds interesting. Do you have experience?",
+      "hint": "Zainteresuj się ofertą i zapytaj o doświadczenie.",
+      "audio": "CD105",
+      "options": []
+    },
+    {
+      "id": "A1_L53_d2",
+      "tutor": "A gdzie?",
+      "expected": ["W restauracji na rynku."],
+      "translation": "And where? / In a restaurant on the market square.",
+      "hint": "Podaj lokalizację pracy.",
+      "audio": "CD106",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L53_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz ogłoszenia o pracę.",
+      "instruction_en": "Repeat job advertisements.",
+      "items": ["Zatrudnię kucharza", "Szukam sprzedawcy", "Potrzebuję kelnerki", "Oferuję pracę"]
+    },
+    {
+      "id": "A1_L53_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Zatrudnię ...'",
+      "instruction_en": "Complete: 'Hiring a ...'",
+      "blanks": [
+        {"sentence_pl": "Zatrudnię ___.", "answer_pl": "pracownika"},
+        {"sentence_en": "Hiring a ___.", "answer_en": "worker"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "W Polsce ogłoszenia o pracę można znaleźć w internecie, np. Pracuj.pl.",
+    "Popularne są także ogłoszenia w lokalnych sklepach i gazetach."
+  ],
+  "audio_meta": {"tracks": ["CD105", "CD106"], "duration_sec": 60}
+}

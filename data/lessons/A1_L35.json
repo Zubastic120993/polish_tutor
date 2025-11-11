@@ -1,0 +1,74 @@
+{
+  "id": "A1_L35",
+  "title": "Kolacja w domu",
+  "level": "A1",
+  "module": "M4 – Smacznego",
+  "cefr_goal": "Potrafi opowiadać o posiłkach w domu oraz używać czasowników gotować, jeść, pić.",
+  "objectives": [
+    "Opowiadanie o posiłkach w domu",
+    "Używanie czasowników gotować, jeść, pić"
+  ],
+  "vocabulary": [
+    {"pl": "gotować", "en": "to cook"},
+    {"pl": "jeść", "en": "to eat"},
+    {"pl": "pić", "en": "to drink"},
+    {"pl": "sałatka", "en": "salad"},
+    {"pl": "zupa", "en": "soup"}
+  ],
+  "grammar_notes": [
+    {
+      "id": "eating_verbs_conjugation",
+      "title": "Czasowniki jedzenia",
+      "content": "Czasowniki: 'gotuję, jesz, pijemy'."
+    },
+    {
+      "id": "meal_sentences",
+      "title": "Zdania o posiłkach",
+      "content": "Zdania: 'Wieczorem jem kolację z rodziną.'."
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "A1_L35_d1",
+      "tutor": "Co jesz na kolację?",
+      "expected": ["Zupę i sałatkę. A ty?"],
+      "translation": "What do you eat for dinner? / Soup and salad. And you?",
+      "hint": "Opisz swoją kolację i zapytaj o rozmówcę.",
+      "audio": "CD069",
+      "options": []
+    },
+    {
+      "id": "A1_L35_d2",
+      "tutor": "Ja piję herbatę i jem kanapkę.",
+      "expected": ["Ja piję herbatę i jem kanapkę."],
+      "translation": "I drink tea and eat a sandwich.",
+      "hint": "Opisz swoją kolację używając czasowników 'pić' i 'jeść'.",
+      "audio": "CD070",
+      "options": []
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A1_L35_task_listen_repeat",
+      "type": "listen_repeat",
+      "instruction_pl": "Powtórz czasowniki 'jeść', 'pić'.",
+      "instruction_en": "Repeat the verbs 'to eat', 'to drink'.",
+      "items": ["jem", "jemy", "jecie", "piję", "pijemy", "picie", "gotuję", "gotujesz", "gotuje"]
+    },
+    {
+      "id": "A1_L35_task_fill_blank",
+      "type": "fill_blank",
+      "instruction_pl": "Uzupełnij: 'Wieczorem jem ...'",
+      "instruction_en": "Complete: 'In the evening I eat ...'",
+      "blanks": [
+        {"sentence_pl": "Wieczorem ___ kolację.", "answer_pl": "jem"},
+        {"sentence_en": "In the evening I ___ dinner.", "answer_en": "eat"}
+      ]
+    }
+  ],
+  "culture_notes": [
+    "Kolacja w Polsce to lekki posiłek, często między 18:00 a 20:00.",
+    "Popularne potrawy to kanapki, herbata, zupa mleczna."
+  ],
+  "audio_meta": {"tracks": ["CD069", "CD070"], "duration_sec": 60}
+}
