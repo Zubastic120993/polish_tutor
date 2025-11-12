@@ -2,9 +2,11 @@
 
 import logging
 import time
-from typing import Dict, Optional, Any
 import os
+import asyncio
+from datetime import datetime
 from pathlib import Path
+from typing import Dict, Optional, Any
 
 from redis import Redis
 from rq import Queue, get_current_job
@@ -44,22 +46,7 @@ def synthesize_speech_task(
     correlation_id: Optional[str] = None,
     **kwargs,
 ) -> Dict[str, Any]:
-    """RQ task to synthesize speech using Murf API.
-
-    Args:
-        text: Text to synthesize
-        voice_id: Murf voice ID
-        cache_key: Cache key for deduplication
-        language: Language code
-        style: Voice style
-        format: Audio format
-        request_id: Request ID from the original API call
-        correlation_id: Correlation ID for tracing
-        **kwargs: Additional parameters
-
-    Returns:
-        Task result dictionary
-    """
+    """RQ task to synthesize speech using Murf API."""
     job = get_current_job()
 
     # Set up logging context
@@ -70,7 +57,6 @@ def synthesize_speech_task(
 
     # Create job-specific logger with job ID context
     job_logger = get_logger(__name__)
-    # Add job_id to all log records for this job
     job_logger.extra.update({"job_id": job.id})
 
     job_start_time = time.time()
@@ -91,14 +77,11 @@ def synthesize_speech_task(
         murf_client = MurfClient()
         cache_manager = AudioCacheManager()
 
-        # Check if already cached
+        # Check cache
         if cache_manager.is_cached(cache_key, format):
             job_logger.info(
                 "Audio already cached, returning existing result",
-                extra={
-                    "cache_key": cache_key,
-                    "format": format,
-                },
+                extra={"cache_key": cache_key, "format": format},
             )
             audio_url = cache_manager.get_audio_url(cache_key, format)
             return {
@@ -109,10 +92,9 @@ def synthesize_speech_task(
                 "job_id": job.id,
             }
 
-        # Update job progress
+        # Submit to Murf
         job.meta["progress"] = "submitting_to_murf"
         job.save_meta()
-
         job_logger.info(
             "Submitting synthesis job to Murf API",
             extra={
@@ -121,7 +103,6 @@ def synthesize_speech_task(
             },
         )
 
-        # Submit synthesis job to Murf
         synthesis_result = murf_client.synthesize_speech(
             text=text,
             voice_id=voice_id,
@@ -138,41 +119,37 @@ def synthesize_speech_task(
 
         job_logger.info(
             "Murf job submitted successfully",
-            extra={
-                "murf_job_id": murf_job_id,
-                "cache_key": cache_key,
-            },
+            extra={"murf_job_id": murf_job_id, "cache_key": cache_key},
         )
 
         # Wait for completion
         job_logger.info(
             "Waiting for Murf job completion",
-            extra={
-                "murf_job_id": murf_job_id,
-                "max_wait_time": 300,
-            },
+            extra={"murf_job_id": murf_job_id, "max_wait_time": 300},
         )
 
         final_status = murf_client.wait_for_completion(
-            murf_job_id, poll_interval=2.0, max_wait_time=300.0  # 5 minutes
+            murf_job_id, poll_interval=2.0, max_wait_time=300.0
         )
 
         job.meta["progress"] = "downloading_audio"
         job.save_meta()
-
         job_logger.info(
             "Murf job completed, downloading audio",
-            extra={
-                "murf_job_id": murf_job_id,
-                "cache_key": cache_key,
-            },
+            extra={"murf_job_id": murf_job_id, "cache_key": cache_key},
         )
 
-        # Download audio
+        # ✅ FIXED SECTION — handle async download correctly
         cache_path = cache_manager.get_cache_path(cache_key, format)
         downloaded_path = murf_client.download_audio(murf_job_id, cache_path)
 
-        # Store in cache with metadata
+        # If async coroutine, run it
+        if asyncio.iscoroutine(downloaded_path):
+            downloaded_path = asyncio.run(downloaded_path)
+
+        downloaded_path = Path(downloaded_path)
+
+        # Store in cache
         with open(downloaded_path, "rb") as f:
             audio_data = f.read()
 
@@ -194,7 +171,6 @@ def synthesize_speech_task(
         job.save_meta()
 
         job_duration = time.time() - job_start_time
-
         job_logger.info(
             "TTS synthesis completed successfully",
             extra={
@@ -206,7 +182,6 @@ def synthesize_speech_task(
             },
         )
 
-        # Record metrics (lazy import to avoid circular dependency)
         try:
             from src.core.metrics import record_tts_job_completed
 
@@ -226,7 +201,6 @@ def synthesize_speech_task(
 
     except Exception as e:
         job_duration = time.time() - job_start_time
-
         job_logger.error(
             "TTS synthesis failed",
             extra={
@@ -238,7 +212,6 @@ def synthesize_speech_task(
             exc_info=True,
         )
 
-        # Record metrics (lazy import to avoid circular dependency)
         try:
             from src.core.metrics import record_tts_job_failed
 
@@ -249,29 +222,19 @@ def synthesize_speech_task(
         job.meta["error"] = str(e)
         job.meta["progress"] = "failed"
         job.save_meta()
-
-        raise  # Re-raise to mark job as failed
+        raise
 
     finally:
-        # Cleanup
         try:
             murf_client.close()
-        except:
+        except Exception:
             pass
 
 
 def get_job_status(job_id: str) -> Optional[Dict[str, Any]]:
-    """Get the status of a TTS job.
-
-    Args:
-        job_id: RQ job ID
-
-    Returns:
-        Job status information or None if not found
-    """
+    """Get the status of a TTS job."""
     try:
         job = Job.fetch(job_id, connection=get_queue().connection)
-
         if job.is_finished:
             return {
                 "job_id": job_id,
@@ -301,14 +264,7 @@ def get_job_status(job_id: str) -> Optional[Dict[str, Any]]:
 
 
 def cancel_job(job_id: str) -> bool:
-    """Cancel a TTS job.
-
-    Args:
-        job_id: RQ job ID
-
-    Returns:
-        True if cancelled successfully
-    """
+    """Cancel a TTS job."""
     try:
         job = Job.fetch(job_id, connection=get_queue().connection)
         if job.is_started and not job.is_finished:
@@ -322,31 +278,21 @@ def cancel_job(job_id: str) -> bool:
 
 
 def cleanup_failed_jobs(max_age_hours: int = 24) -> int:
-    """Clean up old failed jobs.
-
-    Args:
-        max_age_hours: Maximum age of failed jobs to keep
-
-    Returns:
-        Number of jobs cleaned up
-    """
+    """Clean up old failed jobs."""
     try:
         queue = get_queue()
         failed_jobs = queue.failed_job_registry.get_job_ids()
-
         cleaned_count = 0
+
         for job_id in failed_jobs:
             try:
                 job = Job.fetch(job_id, connection=queue.connection)
                 if job.ended_at:
-                    age_hours = (
-                        datetime.utcnow() - job.ended_at
-                    ).total_seconds() / 3600
+                    age_hours = (datetime.utcnow() - job.ended_at).total_seconds() / 3600
                     if age_hours > max_age_hours:
                         job.delete()
                         cleaned_count += 1
-            except:
-                # Job might already be gone
+            except Exception:
                 pass
 
         if cleaned_count > 0:
@@ -357,7 +303,3 @@ def cleanup_failed_jobs(max_age_hours: int = 24) -> int:
     except Exception as e:
         logger.error(f"Failed to cleanup failed jobs: {e}")
         return 0
-
-
-# Import datetime for cleanup function
-from datetime import datetime
