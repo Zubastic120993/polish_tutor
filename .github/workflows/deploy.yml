@@ -14,12 +14,13 @@ jobs:
       - name: 🧩 Checkout repo
         uses: actions/checkout@v4
 
-      - name: 🧹 Clear pip and mypy cache
+      - name: 🧹 Full clean of caches and compiled files
         run: |
-          echo "Clearing pip and mypy cache to avoid stale type-checking data..."
-          rm -rf ~/.cache/pip || true
-          rm -rf ~/.cache/mypy_cache || true
-          rm -rf .mypy_cache || true
+          echo "Cleaning all caches and compiled Python files to avoid stale mypy data..."
+          rm -rf ~/.cache/pip ~/.cache/mypy_cache .mypy_cache || true
+          find . -type d -name "__pycache__" -exec rm -rf {} + || true
+          find . -type f -name "*.pyc" -delete || true
+          echo "✅ Workspace fully cleaned."
 
       - name: 🐍 Set up Python
         uses: actions/setup-python@v5
@@ -56,12 +57,13 @@ else:
     print("Playwright cache directory not found")
 PY
 
-      - name: 🧠 Run Mypy static type checks (non-blocking)
+      - name: 🧠 Run Mypy type checks (non-blocking)
         run: |
           echo "Running Mypy type checks..."
+          mypy backend/tts/tasks.py || true
           mypy . || true
 
-      - name: 🧪 Run test suite
+      - name: 🧪 Run full test suite
         run: pytest -v
 
       - name: 🐳 Build Docker image
