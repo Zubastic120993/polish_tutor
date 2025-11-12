@@ -31,14 +31,23 @@ jobs:
           # Ensure Playwright Python package is present
           pip install playwright pytest-playwright
 
-      - name: 🌐 Install Playwright browsers
+      - name: 🎭 Install Playwright browsers
         uses: microsoft/playwright-github-action@v1
         with:
           with-deps: true
-          cache: true
 
-      - name: 🔍 Verify Playwright browser installation
-        run: python -m playwright install chromium
+      - name: 🔍 List installed Playwright browsers
+        run: python - <<'PY'
+import pathlib
+base = pathlib.Path.home() / ".cache" / "ms-playwright"
+print(f"Listing contents of {base}")
+if base.exists():
+    for path in base.rglob("*"):
+        if path.is_file():
+            print(path.relative_to(base))
+else:
+    print("Playwright cache directory not found")
+PY
 
       - name: 🧪 Run tests
         run: pytest -v
