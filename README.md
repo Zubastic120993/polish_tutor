@@ -54,14 +54,166 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 # 3. Install dependencies
 pip install -r requirements.txt
 
-# 4. Initialize database
+# 4. Configure environment
+cp env.template .env
+# Edit .env with your JWT_SECRET_KEY and other settings
+
+# 5. Initialize database
 alembic upgrade head
 
-# 5. Run the application
+# 6. Run the application
 uvicorn main:app --reload
 ```
 
 Access the application at `http://localhost:8000`
+
+### Authentication Setup
+
+The application uses JWT (JSON Web Tokens) for authentication:
+
+1. **Environment Variables**: Set `JWT_SECRET_KEY` in your `.env` file
+2. **User Management**: Users are created with passwords via the API
+3. **Token Flow**: Access tokens (30min) + refresh tokens (7 days)
+4. **API Access**: Include `Authorization: Bearer <token>` header for protected endpoints
+
+**Authentication Endpoints:**
+- `POST /auth/login` - Login with username/password
+- `POST /auth/refresh` - Refresh access token
+- `POST /auth/logout` - Logout and revoke refresh token
+- `GET /auth/me` - Get current user info
+
+### Redis Queue Setup
+
+The application uses Redis Queue (RQ) for asynchronous TTS job processing:
+
+1. **Redis Installation**: Install Redis server (`brew install redis` on macOS)
+2. **Worker Management**: Use the provided worker management script
+3. **Environment Variables**: Configure Redis connection and queue settings
+
+**TTS Queue Endpoints:**
+- `POST /api/tts/speak` - Submit TTS synthesis job
+- `GET /api/tts/status/{job_id}` - Check job status
+- `DELETE /api/tts/jobs/{job_id}` - Cancel job
+- `GET /api/tts/health` - Queue health check
+- `GET /api/tts/stats` - Queue statistics
+
+**Worker Management:**
+```bash
+# Start all worker pools
+python scripts/manage_workers.py start --pool all
+
+# Start specific pool
+python scripts/manage_workers.py start --pool priority
+
+# Check worker status
+python scripts/manage_workers.py status
+
+# Stop workers gracefully
+python scripts/manage_workers.py stop --pool all
+
+# Health check
+python scripts/manage_workers.py health
+```
+
+**Queue Features:**
+- **Priority Queues**: High priority, standard, and batch processing
+- **Job Deduplication**: Prevents duplicate TTS generation
+- **Rate Limiting**: Per-user request limits
+- **Monitoring**: Health checks and performance metrics
+- **Automatic Retries**: Failed jobs retry with exponential backoff
+
+### Monitoring & Observability
+
+The application includes comprehensive monitoring with structured logging, metrics collection, and alerting:
+
+1. **Structured Logging**: JSON-formatted logs with correlation IDs and request tracing
+2. **Prometheus Metrics**: HTTP latency, queue depth, job success rates, cache performance
+3. **Health Checks**: Real-time system health monitoring
+4. **Grafana Dashboards**: Pre-built dashboard templates for TTS queue monitoring
+
+**Monitoring Endpoints:**
+- `GET /metrics` - Prometheus metrics endpoint
+- `GET /api/tts/health` - TTS service health check
+- `GET /api/tts/stats` - Queue statistics
+
+**Log Files:**
+- `logs/app.log` - Structured JSON application logs
+- Worker logs include job IDs and correlation IDs for tracing
+
+**Grafana Setup:**
+```bash
+# Import the dashboard template
+# 1. Open Grafana (http://localhost:3000)
+# 2. Import grafana-dashboard-tts.json
+# 3. Configure Prometheus as data source
+# 4. Set dashboard refresh to 30s
+```
+
+See `MONITORING_ALERTS.md` for complete SLO definitions, alert configurations, and runbooks.
+
+## 🐳 Docker Deployment
+
+The application includes complete Docker support for containerized deployment:
+
+### Quick Docker Start
+
+```bash
+# Start all services
+docker-compose up -d
+
+# View service status
+docker-compose ps
+
+# View logs
+docker-compose logs -f app
+
+# Run database migrations
+docker-compose exec app alembic upgrade head
+
+# Stop services
+docker-compose down
+```
+
+### Docker Services
+
+- **app**: FastAPI application server (port 8000)
+- **worker-standard** (x4): RQ workers for standard TTS jobs
+- **worker-priority** (x2): High-priority RQ workers
+- **worker-batch** (x1): Batch processing RQ workers
+- **redis**: Redis for queuing and caching (port 6379)
+- **prometheus**: Metrics collection (port 9090)
+
+### Docker Architecture
+
+- **Multi-stage builds** for optimized image sizes
+- **Health checks** for all services
+- **Volume mounts** for persistent data (database, cache, logs)
+- **Service dependencies** ensure proper startup order
+- **Prometheus metrics** collection from all services
+
+### Environment Variables
+
+Create a `.env` file or set environment variables:
+
+```bash
+# Required
+JWT_SECRET_KEY=your-secret-key-here
+
+# Optional
+REDIS_URL=redis://redis:6379
+DATABASE_URL=sqlite:///./data/polish_tutor.db
+PROMETHEUS_MULTIPROC_DIR=/tmp
+```
+
+### CI/CD Pipeline
+
+The repository includes GitHub Actions CI/CD pipeline:
+
+- **Lint**: Code quality checks (flake8, black, mypy)
+- **Test**: Unit and integration tests with coverage
+- **Build**: Multi-platform Docker image builds
+- **Push**: Automated container registry publishing
+- **Deploy**: Staging and production deployment triggers
 
 ## 🏗️ Project Structure
 

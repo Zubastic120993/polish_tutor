@@ -1,4 +1,5 @@
 """Database connection and session management."""
+
 import os
 from typing import Generator
 
@@ -10,9 +11,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 load_dotenv()
 
 # Database URL from environment
-DATABASE_URL = os.getenv(
-    "DATABASE_URL", "sqlite:///./data/polish_tutor.db"
-)
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./data/polish_tutor.db")
 
 # Create engine with SQLite-specific settings
 engine = create_engine(
@@ -23,11 +22,13 @@ engine = create_engine(
 
 # Enable foreign key constraints for SQLite
 if "sqlite" in DATABASE_URL:
+
     @event.listens_for(engine, "connect")
     def set_sqlite_pragma(dbapi_conn, connection_record):
         cursor = dbapi_conn.cursor()
         cursor.execute("PRAGMA foreign_keys=ON")
         cursor.close()
+
 
 # Session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -43,4 +44,3 @@ def get_db() -> Generator:
         yield db
     finally:
         db.close()
-

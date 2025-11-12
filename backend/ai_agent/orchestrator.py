@@ -1,4 +1,5 @@
 """Agent Orchestrator for conversation flow management."""
+
 import logging
 from typing import Dict, Optional
 from datetime import datetime
@@ -79,29 +80,40 @@ class AgentOrchestrator:
 
         # Detect intent using AI
         intent = self._detect_intent(user_id, text, lesson_id, dialogue_id)
-        logger.info(f"🤖 AI detected intent: {intent['type']} - {intent.get('action', 'N/A')}")
+        logger.info(
+            f"🤖 AI detected intent: {intent['type']} - {intent.get('action', 'N/A')}"
+        )
 
         # Route based on intent
-        if intent['type'] == 'command':
-            return self._execute_command(intent, text, lesson_id, dialogue_id, user_id, speed)
-        elif intent['type'] == 'question':
+        if intent["type"] == "command":
+            return self._execute_command(
+                intent, text, lesson_id, dialogue_id, user_id, speed
+            )
+        elif intent["type"] == "question":
             return self._handle_conversational_response(user_id, text, lesson_id)
 
         # Default: practice mode - continue with lesson evaluation
-        return self._process_practice_response(user_id, text, lesson_id, dialogue_id, speed, confidence)
+        return self._process_practice_response(
+            user_id, text, lesson_id, dialogue_id, speed, confidence
+        )
 
     def _detect_direct_lesson_request(self, text: str) -> Optional[str]:
         """Detect if user is requesting a specific lesson by ID."""
         import re
+
         # Match patterns like "lesson L01", "L01", "lesson 1", etc.
         patterns = [
-            r'\blesson\s+(L\d+|\d+)\b',
-            r'\b(L\d+)\b',
+            r"\blesson\s+(L\d+|\d+)\b",
+            r"\b(L\d+)\b",
         ]
         for pattern in patterns:
             match = re.search(pattern, text, re.IGNORECASE)
             if match:
-                lesson_id = match.group(1) if match.group(1).startswith('L') else f"L{match.group(1).zfill(2)}"
+                lesson_id = (
+                    match.group(1)
+                    if match.group(1).startswith("L")
+                    else f"L{match.group(1).zfill(2)}"
+                )
                 return lesson_id
         return None
 
@@ -155,7 +167,9 @@ class AgentOrchestrator:
                 "data": None,
             }
 
-    def _detect_intent(self, user_id: int, text: str, lesson_id: str, dialogue_id: str) -> Dict:
+    def _detect_intent(
+        self, user_id: int, text: str, lesson_id: str, dialogue_id: str
+    ) -> Dict:
         """Detect user intent using AI (placeholder for now)."""
         # TODO: Implement AI intent detection
         # For now, return practice intent as default
@@ -164,7 +178,15 @@ class AgentOrchestrator:
             "confidence": 1.0,
         }
 
-    def _execute_command(self, intent: Dict, text: str, lesson_id: str, dialogue_id: str, user_id: int, speed: float) -> Dict:
+    def _execute_command(
+        self,
+        intent: Dict,
+        text: str,
+        lesson_id: str,
+        dialogue_id: str,
+        user_id: int,
+        speed: float,
+    ) -> Dict:
         """Execute detected command."""
         # TODO: Implement command execution
         return {
@@ -173,7 +195,9 @@ class AgentOrchestrator:
             "data": None,
         }
 
-    def _handle_conversational_response(self, user_id: int, text: str, lesson_id: str) -> Dict:
+    def _handle_conversational_response(
+        self, user_id: int, text: str, lesson_id: str
+    ) -> Dict:
         """Handle conversational questions."""
         # TODO: Implement conversational response
         return {
@@ -182,7 +206,15 @@ class AgentOrchestrator:
             "data": None,
         }
 
-    def _process_practice_response(self, user_id: int, text: str, lesson_id: str, dialogue_id: str, speed: float, confidence: Optional[int]) -> Dict:
+    def _process_practice_response(
+        self,
+        user_id: int,
+        text: str,
+        lesson_id: str,
+        dialogue_id: str,
+        speed: float,
+        confidence: Optional[int],
+    ) -> Dict:
         """Process practice mode response."""
         # TODO: Implement practice response processing
         return {

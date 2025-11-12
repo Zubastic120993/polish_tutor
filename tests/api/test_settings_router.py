@@ -14,7 +14,9 @@ class StubSetting:
 
 
 class StubDatabase:
-    def __init__(self, settings_by_user=None, raise_on_get=False, raise_on_update=False):
+    def __init__(
+        self, settings_by_user=None, raise_on_get=False, raise_on_update=False
+    ):
         self.settings_by_user = settings_by_user or {}
         self.raise_on_get = raise_on_get
         self.raise_on_update = raise_on_update

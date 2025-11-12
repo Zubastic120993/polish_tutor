@@ -1,0 +1,94 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+venv
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.pytest_cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.venv
+.cache
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Node.js (if any)
+node_modules/
+npm-debug.log*
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+tests/__pycache__/
+tests/**/*.pyc
+
+# Documentation
+*.md
+docs/
+!README.md
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.github/
+
+# Logs (will be mounted as volume)
+logs/
+
+# Data (will be mounted as volume)
+data/
+audio_cache/
+sessions/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Environment files (should be provided at runtime)
+.env
+.env.*
+env.template
+
+# Development tools
+Makefile
+scripts/manage_workers.py
+
+# Grafana dashboards (optional)
+grafana-dashboard-*.json

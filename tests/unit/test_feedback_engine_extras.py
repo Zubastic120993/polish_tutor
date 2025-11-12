@@ -21,7 +21,9 @@ def feedback_engine(monkeypatch):
 
 def test_combined_similarity_uses_phoneme_signal(feedback_engine):
     base_score = feedback_engine.calculate_similarity("Dzień dobry", "Dzien dobry")
-    combined = feedback_engine.calculate_combined_similarity("Dzień dobry", "Dzien dobre")
+    combined = feedback_engine.calculate_combined_similarity(
+        "Dzień dobry", "Dzien dobre"
+    )
     assert combined != base_score  # phoneme weighting applied
     assert 0.0 <= combined <= 1.0
 

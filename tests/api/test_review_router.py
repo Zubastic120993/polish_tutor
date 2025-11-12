@@ -98,7 +98,9 @@ def stub_context():
         }
     )
     database = StubDatabase(due_items=[due_item], phrases={"L1_turn1": phrase})
-    srs_memory = StubSRSMemory(next_review=datetime(2025, 1, 5), interval_days=5, efactor=2.9)
+    srs_memory = StubSRSMemory(
+        next_review=datetime(2025, 1, 5), interval_days=5, efactor=2.9
+    )
     srs_manager = StubSRSManager(memory=srs_memory)
 
     tutor = SimpleNamespace(lesson_manager=lesson_manager, srs_manager=srs_manager)

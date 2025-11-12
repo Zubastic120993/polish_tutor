@@ -1,4 +1,5 @@
 """Murf.ai TTS API client."""
+
 import asyncio
 import logging
 from typing import Dict, Optional, Any
@@ -44,7 +45,7 @@ class MurfClient:
                 "Authorization": f"Bearer {self.api_key}",
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-            }
+            },
         )
 
     async def synthesize_speech(
@@ -54,7 +55,7 @@ class MurfClient:
         language: str = "pl",
         style: str = "conversational",
         format: str = "mp3",
-        **kwargs
+        **kwargs,
     ) -> Dict[str, Any]:
         """Synthesize speech from text using Murf API.
 
@@ -75,14 +76,13 @@ class MurfClient:
             "language": language,
             "style": style,
             "format": format,
-            **kwargs
+            **kwargs,
         }
 
         for attempt in range(self.max_retries + 1):
             try:
                 response = await self.client.post(
-                    f"{self.BASE_URL}/speech/generate",
-                    json=payload
+                    f"{self.BASE_URL}/speech/generate", json=payload
                 )
                 response.raise_for_status()
                 return response.json()
@@ -90,13 +90,19 @@ class MurfClient:
             except httpx.HTTPStatusError as e:
                 if e.response.status_code == 429:  # Rate limited
                     if attempt < self.max_retries:
-                        wait_time = self.retry_delay * (2 ** attempt)  # Exponential backoff
-                        logger.warning(f"Rate limited by Murf API, retrying in {wait_time}s")
+                        wait_time = self.retry_delay * (
+                            2**attempt
+                        )  # Exponential backoff
+                        logger.warning(
+                            f"Rate limited by Murf API, retrying in {wait_time}s"
+                        )
                         await asyncio.sleep(wait_time)
                         continue
                 elif e.response.status_code >= 500:  # Server error
                     if attempt < self.max_retries:
-                        logger.warning(f"Murf API server error, retrying in {self.retry_delay}s")
+                        logger.warning(
+                            f"Murf API server error, retrying in {self.retry_delay}s"
+                        )
                         await asyncio.sleep(self.retry_delay)
                         continue
                 raise
@@ -108,7 +114,9 @@ class MurfClient:
                     continue
                 raise
 
-        raise Exception(f"Failed to synthesize speech after {self.max_retries + 1} attempts")
+        raise Exception(
+            f"Failed to synthesize speech after {self.max_retries + 1} attempts"
+        )
 
     async def get_job_status(self, job_id: str) -> Dict[str, Any]:
         """Get the status of a synthesis job.
@@ -121,7 +129,9 @@ class MurfClient:
         """
         for attempt in range(self.max_retries + 1):
             try:
-                response = await self.client.get(f"{self.BASE_URL}/speech/jobs/{job_id}")
+                response = await self.client.get(
+                    f"{self.BASE_URL}/speech/jobs/{job_id}"
+                )
                 response.raise_for_status()
                 return response.json()
 
@@ -132,7 +142,9 @@ class MurfClient:
                     continue
                 raise
 
-        raise Exception(f"Failed to get job status after {self.max_retries + 1} attempts")
+        raise Exception(
+            f"Failed to get job status after {self.max_retries + 1} attempts"
+        )
 
     async def download_audio(self, job_id: str, output_path: Path) -> Path:
         """Download synthesized audio file.
@@ -148,7 +160,7 @@ class MurfClient:
             try:
                 response = await self.client.get(
                     f"{self.BASE_URL}/speech/jobs/{job_id}/download",
-                    follow_redirects=True
+                    follow_redirects=True,
                 )
                 response.raise_for_status()
 
@@ -165,7 +177,9 @@ class MurfClient:
                     continue
                 raise
 
-        raise Exception(f"Failed to download audio after {self.max_retries + 1} attempts")
+        raise Exception(
+            f"Failed to download audio after {self.max_retries + 1} attempts"
+        )
 
     async def get_voices(self, language: Optional[str] = None) -> Dict[str, Any]:
         """Get available voices, optionally filtered by language.
@@ -183,8 +197,7 @@ class MurfClient:
         for attempt in range(self.max_retries + 1):
             try:
                 response = await self.client.get(
-                    f"{self.BASE_URL}/voices",
-                    params=params
+                    f"{self.BASE_URL}/voices", params=params
                 )
                 response.raise_for_status()
                 return response.json()
@@ -199,10 +212,7 @@ class MurfClient:
         raise Exception(f"Failed to get voices after {self.max_retries + 1} attempts")
 
     async def wait_for_completion(
-        self,
-        job_id: str,
-        poll_interval: float = 2.0,
-        max_wait_time: float = 300.0
+        self, job_id: str, poll_interval: float = 2.0, max_wait_time: float = 300.0
     ) -> Dict[str, Any]:
         """Wait for a job to complete.
 
@@ -215,6 +225,7 @@ class MurfClient:
             Final job status
         """
         import time
+
         start_time = time.time()
 
         while time.time() - start_time < max_wait_time:
@@ -223,7 +234,9 @@ class MurfClient:
             if status.get("status") == "completed":
                 return status
             elif status.get("status") == "failed":
-                raise Exception(f"Job {job_id} failed: {status.get('error', 'Unknown error')}")
+                raise Exception(
+                    f"Job {job_id} failed: {status.get('error', 'Unknown error')}"
+                )
 
             await asyncio.sleep(poll_interval)
 

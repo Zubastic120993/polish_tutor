@@ -97,8 +97,7 @@ def test_load_all_lessons_skips_invalid(tmp_path, caplog):
 
     assert set(lessons.keys()) == {valid_id}
     assert any(
-        "Failed to load lesson invalid_001" in message
-        for message in caplog.messages
+        "Failed to load lesson invalid_001" in message for message in caplog.messages
     )
 
 
@@ -140,5 +139,6 @@ def test_load_lesson_catalog_flattens_entries(tmp_path):
     entries = manager.load_lesson_catalog()
     ids = {entry["id"] for entry in entries}
     assert ids == {"lesson_a", "lesson_b"}
-    assert any(entry["module"] == "Moduł 1" for entry in entries if entry["id"] == "lesson_b")
-
+    assert any(
+        entry["module"] == "Moduł 1" for entry in entries if entry["id"] == "lesson_b"
+    )

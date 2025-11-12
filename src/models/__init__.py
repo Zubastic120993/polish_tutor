@@ -1,4 +1,5 @@
 """Database ORM models with lazy imports to avoid circular dependencies."""
+
 from importlib import import_module
 
 __all__ = [

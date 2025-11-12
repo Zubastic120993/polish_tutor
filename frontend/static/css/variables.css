@@ -1,0 +1,113 @@
+/**
+ * CSS Variables - Design System Foundation
+ * Feature 12: Visual Design & Theme Foundations
+ */
+
+:root {
+  /* Colors - Light Mode */
+  --color-bg: #fef9f4;
+  --color-bg-dark: #10131a;
+  --color-surface: #ffffff;
+  --color-surface-dark: #1a1d26;
+  --color-text: #3b2f2a;
+  --color-text-dark: #f7fafc;
+  --color-text-muted: #8b6a5a;
+  --color-text-muted-dark: #cbd5f5;
+  
+  /* Accent Colors */
+  --color-accent: #f59e0b;
+  --color-accent-hover: #d97706;
+  --color-success: #22c55e;
+  --color-success-hover: #16a34a;
+  --color-warning: #f97316;
+  --color-error: #dc2626;
+  --color-info: #2563eb;
+  --color-soft-amber: #f8e1c4;
+  --color-soft-espresso: #b08b73;
+  --color-soft-blue: #cfe4f9;
+  --color-soft-cream: #fff8eb;
+  --color-soft-green: #d1f5da;
+  
+  /* Chat Colors */
+  --color-chat-tutor-bg: #fdf3e7;
+  --color-chat-tutor-bg-dark: #2d3748;
+  --color-chat-learner-bg: #dbeafe;
+  --color-chat-learner-bg-dark: #1d4ed8;
+  --color-chat-hint-bg: #fef3c7;
+  --color-chat-hint-bg-dark: #854d0e;
+  --color-chat-info-bg: #ede9fe;
+  --color-chat-info-bg-dark: #3730a3;
+  
+  /* Typography */
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-size-base: 18px;
+  --font-size-small: 16px;
+  --font-size-large: 20px;
+  --font-size-h1: 28px;
+  --font-size-h2: 24px;
+  --font-size-h3: 20px;
+  --line-height-base: 1.6;
+  --line-height-tight: 1.4;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 20px;
+  --radius-full: 9999px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 18px 30px rgba(124, 58, 18, 0.12);
+  --shadow-lg: 0 22px 45px rgba(124, 58, 18, 0.18);
+  
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-base: 300ms ease-in-out;
+  --transition-slow: 500ms ease-in-out;
+  
+  /* Layout */
+  --max-width-container: 800px;
+  --header-height: 64px;
+  --input-height: 56px;
+  
+  /* Accessibility */
+  --min-tap-target: 48px;
+  --focus-outline: 2px solid var(--color-accent);
+  --focus-outline-offset: 2px;
+}
+
+/* Dark Mode */
+[data-theme="dark"] {
+  --color-bg: var(--color-bg-dark);
+  --color-surface: var(--color-surface-dark);
+  --color-text: var(--color-text-dark);
+  --color-text-muted: var(--color-text-muted-dark);
+  --color-chat-tutor-bg: var(--color-chat-tutor-bg-dark);
+  --color-chat-learner-bg: var(--color-chat-learner-bg-dark);
+  --color-chat-hint-bg: var(--color-chat-hint-bg-dark);
+  --color-chat-info-bg: var(--color-chat-info-bg-dark);
+}
+
+/* Dyslexia-Friendly Font Override */
+[data-font="dyslexia"] {
+  --font-body: 'OpenDyslexic', 'Comic Sans MS', 'Comic Sans', sans-serif;
+}
+
+/* High Contrast Mode */
+[data-contrast="high"] {
+  --color-bg: #ffffff;
+  --color-bg-dark: #000000;
+  --color-text: #000000;
+  --color-text-dark: #ffffff;
+  --color-accent: #0066cc;
+  --focus-outline: 3px solid var(--color-accent);
+}

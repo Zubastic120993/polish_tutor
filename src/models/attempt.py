@@ -1,4 +1,5 @@
 """Attempt model."""
+
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, Float, Index, Integer, String, Text
@@ -13,8 +14,12 @@ class Attempt(Base):
     __tablename__ = "Attempts"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("Users.id", ondelete="CASCADE"), nullable=False)
-    phrase_id = Column(String, ForeignKey("Phrases.id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(
+        Integer, ForeignKey("Users.id", ondelete="CASCADE"), nullable=False
+    )
+    phrase_id = Column(
+        String, ForeignKey("Phrases.id", ondelete="CASCADE"), nullable=False
+    )
     user_input = Column(Text, nullable=False)
     score = Column(Float, nullable=False)  # 0.0 to 1.0
     phoneme_diffs = Column(Text)  # JSON array of mismatches
@@ -31,4 +36,3 @@ class Attempt(Base):
         Index("idx_attempts_phrase", "phrase_id"),
         Index("idx_attempts_created", "created_at"),
     )
-

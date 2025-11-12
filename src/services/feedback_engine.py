@@ -1,4 +1,5 @@
 """Feedback Engine for evaluating user input and generating responses."""
+
 import logging
 import os
 import re
@@ -55,10 +56,10 @@ class FeedbackEngine:
         self.language = language
         self._phonemizer_backend = None
         self._openai_client = None
-        
+
         # Track conversation history for conversational mode
         self._conversation_history: Dict[int, List[Dict[str, str]]] = {}
-        
+
         # Try to initialize OpenAI client
         try:
             api_key = os.getenv("OPENAI_API_KEY")
@@ -66,7 +67,9 @@ class FeedbackEngine:
                 self._openai_client = OpenAI(api_key=api_key)
                 logger.info("✅ OpenAI client initialized for AI evaluation")
             else:
-                logger.warning("OpenAI API key not found - falling back to basic matching")
+                logger.warning(
+                    "OpenAI API key not found - falling back to basic matching"
+                )
         except Exception as e:
             logger.warning(f"Failed to initialize OpenAI: {e}")
 
@@ -179,28 +182,28 @@ class FeedbackEngine:
         except Exception as e:
             logger.warning(f"Phoneme comparison failed: {e}")
             return None
-    
+
     def evaluate_with_ai(
         self, user_text: str, expected_phrases: List[str], context: str = ""
     ) -> Tuple[float, str]:
         """Use AI to evaluate if user's response is semantically correct.
-        
+
         Args:
             user_text: User's input text
             expected_phrases: List of acceptable phrases
             context: Additional context (e.g., prompt or situation)
-            
+
         Returns:
             Tuple of (score 0.0-1.0, explanation)
         """
         if not self._openai_client:
             logger.debug("OpenAI not available, skipping AI evaluation")
             return None, None
-            
+
         try:
             # Build prompt for AI evaluation
             expected_list = "\n".join([f"- {phrase}" for phrase in expected_phrases])
-            
+
             prompt = f"""You are a Polish language tutor evaluating a student's response.
 
 Context: {context if context else "General conversation"}
@@ -225,31 +228,37 @@ Consider:
 - Natural variations of the expected phrases should be accepted
 - Cultural appropriateness
 """
-            
+
             response = self._openai_client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
-                    {"role": "system", "content": "You are a helpful Polish language tutor. Respond only with valid JSON."},
-                    {"role": "user", "content": prompt}
+                    {
+                        "role": "system",
+                        "content": "You are a helpful Polish language tutor. Respond only with valid JSON.",
+                    },
+                    {"role": "user", "content": prompt},
                 ],
                 temperature=0.3,
-                max_tokens=200
+                max_tokens=200,
             )
-            
+
             result_text = response.choices[0].message.content.strip()
-            
+
             # Parse JSON response
             import json
+
             result = json.loads(result_text)
-            
+
             is_correct = result.get("is_correct", False)
             score = float(result.get("score", 0.0))
             explanation = result.get("explanation", "")
-            
-            logger.info(f"AI Evaluation - User: '{user_text}' | Correct: {is_correct} | Score: {score}")
-            
+
+            logger.info(
+                f"AI Evaluation - User: '{user_text}' | Correct: {is_correct} | Score: {score}"
+            )
+
             return score, explanation
-            
+
         except Exception as e:
             logger.error(f"AI evaluation failed: {e}")
             return None, None
@@ -352,17 +361,19 @@ Consider:
 
         # TRY AI EVALUATION FIRST (if available)
         ai_score, ai_explanation = self.evaluate_with_ai(
-            user_text, 
+            user_text,
             expected_phrases,
-            context=f"Grammar: {grammar}" if grammar else ""
+            context=f"Grammar: {grammar}" if grammar else "",
         )
-        
+
         if ai_score is not None:
             # AI evaluation succeeded - use it!
-            logger.info(f"✅ Using AI evaluation | Score: {ai_score} | User: '{user_text}'")
+            logger.info(
+                f"✅ Using AI evaluation | Score: {ai_score} | User: '{user_text}'"
+            )
             best_score = ai_score
             best_match = expected_phrases[0]
-            
+
             # AI provides more accurate scoring, use simpler thresholds
             if best_score >= 0.75:
                 feedback_type = "high"
@@ -457,10 +468,16 @@ Consider:
         else:  # low
             if consecutive_lows >= 2:
                 # Auto-reveal answer after two consecutive lows
-                return f"{base_message} Poprawna odpowiedź to: '{expected_phrase}'. Spróbuj jeszcze raz!" + command_suggestion
+                return (
+                    f"{base_message} Poprawna odpowiedź to: '{expected_phrase}'. Spróbuj jeszcze raz!"
+                    + command_suggestion
+                )
             else:
                 # Provide scaffolded hint
-                return f"{base_message} Pomyśl o: '{expected_phrase[:len(expected_phrase)//2]}...'" + command_suggestion
+                return (
+                    f"{base_message} Pomyśl o: '{expected_phrase[:len(expected_phrase)//2]}...'"
+                    + command_suggestion
+                )
 
     def evaluate_against_expected(
         self, user_text: str, expected_phrases: List[str]
@@ -487,29 +504,29 @@ Consider:
                 best_match = expected
 
         return (best_score, best_match)
-    
+
     def generate_conversational_response(
         self, user_text: str, user_id: int, lesson_context: Optional[str] = None
     ) -> str:
         """Generate a conversational response like ChatGPT but as a patient Polish tutor.
-        
+
         This allows free-form conversation about Polish language, grammar, culture, etc.
-        
+
         Args:
             user_text: User's input text
             user_id: User ID for conversation history tracking
             lesson_context: Optional context about current lesson
-            
+
         Returns:
             Conversational response from the tutor
         """
         if not self._openai_client:
             return "Przepraszam, funkcja konwersacyjna wymaga połączenia z OpenAI. Spróbuj odpowiedzieć na pytanie z lekcji."
-        
+
         # Initialize conversation history for this user
         if user_id not in self._conversation_history:
             self._conversation_history[user_id] = []
-        
+
         # Build system prompt for patient Polish tutor
         system_prompt = """You are a Patient Polish Tutor - a warm, encouraging, and patient language teacher.
         
@@ -530,24 +547,22 @@ Your teaching style:
 
 Respond naturally in a conversational way, mixing Polish and English as appropriate.
 Keep responses helpful, encouraging, and focused on Polish language learning."""
-        
+
         # Add lesson context if available
         if lesson_context:
             system_prompt += f"\n\nCurrent lesson context: {lesson_context}"
-        
+
         # Build conversation messages
-        messages = [
-            {"role": "system", "content": system_prompt}
-        ]
-        
+        messages = [{"role": "system", "content": system_prompt}]
+
         # Add conversation history (last 10 messages)
         history = self._conversation_history[user_id][-10:]
         for msg in history:
             messages.append(msg)
-        
+
         # Add current user message
         messages.append({"role": "user", "content": user_text})
-        
+
         try:
             response = self._openai_client.chat.completions.create(
                 model="gpt-4o-mini",
@@ -555,31 +570,36 @@ Keep responses helpful, encouraging, and focused on Polish language learning."""
                 temperature=0.7,  # More creative/conversational
                 max_tokens=500,
             )
-            
+
             tutor_response = response.choices[0].message.content.strip()
-            
+
             # Update conversation history
-            self._conversation_history[user_id].append({"role": "user", "content": user_text})
-            self._conversation_history[user_id].append({"role": "assistant", "content": tutor_response})
-            
+            self._conversation_history[user_id].append(
+                {"role": "user", "content": user_text}
+            )
+            self._conversation_history[user_id].append(
+                {"role": "assistant", "content": tutor_response}
+            )
+
             # Keep history manageable (last 20 messages = 10 exchanges)
             if len(self._conversation_history[user_id]) > 20:
-                self._conversation_history[user_id] = self._conversation_history[user_id][-20:]
-            
+                self._conversation_history[user_id] = self._conversation_history[
+                    user_id
+                ][-20:]
+
             logger.info(f"✅ Conversational response generated for user {user_id}")
             return tutor_response
-            
+
         except Exception as e:
             logger.error(f"Conversational response failed: {e}")
             return "Przepraszam, wystąpił błąd. Spróbuj ponownie lub odpowiedz na pytanie z lekcji."
-    
+
     def clear_conversation_history(self, user_id: int):
         """Clear conversation history for a user.
-        
+
         Args:
             user_id: User ID
         """
         if user_id in self._conversation_history:
             del self._conversation_history[user_id]
             logger.info(f"Conversation history cleared for user {user_id}")
-

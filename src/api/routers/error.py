@@ -1,4 +1,5 @@
 """Error reporting API endpoints."""
+
 import logging
 from fastapi import APIRouter, HTTPException
 
@@ -13,10 +14,10 @@ router = APIRouter(prefix="/api/error", tags=["error"])
 @router.post("/report", response_model=ErrorReportResponse, status_code=200)
 async def error_report(request: ErrorReportRequest):
     """Log client-side errors with context.
-    
+
     Args:
         request: Error report with type, message, stack trace, context
-        
+
     Returns:
         Error report confirmation
     """
@@ -25,29 +26,25 @@ async def error_report(request: ErrorReportRequest):
         error_msg = f"Client error reported: {request.error_type} - {request.message}"
         if request.user_id:
             error_msg += f" (user_id: {request.user_id})"
-        
+
         if request.stack_trace:
             logger.error(f"{error_msg}\nStack trace:\n{request.stack_trace}")
         else:
             logger.error(error_msg)
-        
+
         if request.context:
             logger.debug(f"Error context: {request.context}")
-        
+
         from datetime import datetime
-        
+
         return {
             "status": "success",
             "message": "Error report logged successfully",
             "data": {
                 "reported_at": datetime.utcnow().isoformat() + "Z",
-            }
+            },
         }
-        
+
     except Exception as e:
         logger.error(f"Error in error_report: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=500,
-            detail=f"Internal server error: {str(e)}"
-        )
-
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")

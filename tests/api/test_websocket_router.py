@@ -66,14 +66,14 @@ def test_websocket_message_flow(ws_client):
     _, stub_tutor = ws_client
     with _connected_socket(ws_client) as websocket:
         websocket.send_json(
-        {
-            "type": "message",
-            "text": "Cześć",
-            "lesson_id": "L1",
-            "dialogue_id": "D1",
-            "speed": 1.0,
-        }
-    )
+            {
+                "type": "message",
+                "text": "Cześć",
+                "lesson_id": "L1",
+                "dialogue_id": "D1",
+                "speed": 1.0,
+            }
+        )
 
         typing_msg = websocket.receive_json()
         assert typing_msg["type"] == "typing"
@@ -86,7 +86,9 @@ def test_websocket_message_flow(ws_client):
 
 def test_websocket_missing_fields(ws_client):
     with _connected_socket(ws_client) as websocket:
-        websocket.send_json({"type": "message", "text": "", "lesson_id": "", "dialogue_id": ""})
+        websocket.send_json(
+            {"type": "message", "text": "", "lesson_id": "", "dialogue_id": ""}
+        )
         error_msg = websocket.receive_json()
         assert error_msg["type"] == "error"
         assert "Missing required fields" in error_msg["message"]

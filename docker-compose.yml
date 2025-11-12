@@ -1,0 +1,131 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    depends_on:
+      - app
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=sqlite:///./data/polish_tutor.db
+      - PROMETHEUS_MULTIPROC_DIR=/tmp
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./audio_cache:/app/audio_cache
+      - ./sessions:/app/sessions
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  worker-standard:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=sqlite:///./data/polish_tutor.db
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./audio_cache:/app/audio_cache
+      - ./sessions:/app/sessions
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: ["python", "-m", "rq", "worker", "--url", "redis://redis:6379", "--name", "standard_0", "--timeout", "600", "--verbose", "tts_high_priority", "tts_jobs"]
+    deploy:
+      replicas: 4
+
+  worker-priority:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=sqlite:///./data/polish_tutor.db
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./audio_cache:/app/audio_cache
+      - ./sessions:/app/sessions
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: ["python", "-m", "rq", "worker", "--url", "redis://redis:6379", "--name", "priority_0", "--timeout", "300", "--verbose", "tts_high_priority"]
+    deploy:
+      replicas: 2
+
+  worker-batch:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=sqlite:///./data/polish_tutor.db
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./audio_cache:/app/audio_cache
+      - ./sessions:/app/sessions
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: ["python", "-m", "rq", "worker", "--url", "redis://redis:6379", "--name", "batch_0", "--timeout", "1800", "--verbose", "tts_batch"]
+
+  # Optional: Standalone frontend service
+  # Uncomment if you want to serve frontend separately from the API
+  # frontend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.frontend
+  #   ports:
+  #     - "8080:80"
+  #   volumes:
+  #     - ./frontend/static:/usr/share/nginx/html/static
+  #     - ./frontend/templates:/usr/share/nginx/html/templates
+  #     - ./audio_cache:/usr/share/nginx/html/audio_cache
+  #   depends_on:
+  #     - app
+
+volumes:
+  redis_data:
+  prometheus_data:

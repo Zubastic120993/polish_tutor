@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Patient Polish Tutor - AI-assisted conversational tutor for learning spoken Polish">
+    <title>{% block title %}Patient Polish Tutor{% endblock %}</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Favicon -->
+    <link rel="icon" href="/static/favicon.ico">
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/static/css/variables.css">
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/layout.css">
+    <link rel="stylesheet" href="/static/css/components.css">
+    <link rel="stylesheet" href="/static/css/tailwind.generated.css">
+
+    <!-- Theme-specific styles -->
+    <style>
+        [data-theme="dark"] #lesson-progress-title,
+        [data-theme="dark"] #lesson-progress-value,
+        [data-theme="dark"] #lesson-progress-step {
+            color: rgba(248, 250, 252, 0.85) !important;
+        }
+
+        [data-theme="dark"] #lesson-progress-meter {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.6), rgba(16, 185, 129, 0.65));
+        }
+
+        [data-theme="dark"] .current-lesson-meta-card {
+            background: rgba(15, 23, 42, 0.7) !important;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+        }
+
+        [data-theme="dark"] .current-lesson-meta-card p {
+            color: rgba(248, 250, 252, 0.9) !important;
+        }
+    </style>
+
+    {% block head %}{% endblock %}
+</head>
+<body class="font-sans text-cafe-espresso bg-cafe-foam relative min-h-screen overflow-x-hidden">
+    <!-- Skip link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Background gradients -->
+    <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.85),_rgba(247,233,217,0.6))]"></div>
+    <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_bottom,_rgba(235,197,165,0.2),_rgba(255,255,255,0))]"></div>
+
+    <!-- Main content area -->
+    <main id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Global scripts -->
+    <script src="/static/js/error_handler.js"></script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

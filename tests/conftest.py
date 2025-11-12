@@ -57,8 +57,12 @@ if "openai" not in sys.modules:
 
     class _DummyCompletions:
         def create(self, *_, **__):
-            message = types.SimpleNamespace(content='{"is_correct": false, "score": 0.0, "explanation": ""}')
-            return types.SimpleNamespace(choices=[types.SimpleNamespace(message=message)])
+            message = types.SimpleNamespace(
+                content='{"is_correct": false, "score": 0.0, "explanation": ""}'
+            )
+            return types.SimpleNamespace(
+                choices=[types.SimpleNamespace(message=message)]
+            )
 
     openai_module.OpenAI = _DummyOpenAI
 
@@ -176,6 +180,9 @@ if "sqlalchemy" not in sys.modules:
         def query(self, *_):
             return self._query
 
+        def expunge(self, *_):
+            pass
+
     def sessionmaker(**_):
         def factory():
             return _DummySession()
@@ -205,6 +212,7 @@ if "sqlalchemy" not in sys.modules:
 
     sqlalchemy_module.create_engine = create_engine
     sqlalchemy_module.event = types.SimpleNamespace(listens_for=listens_for)
+
     def and_(*conditions):
         return conditions
 
@@ -258,4 +266,3 @@ class _DummyTTS:
 tts_api_module.TTS = _DummyTTS
 sys.modules["TTS.api"] = tts_api_module
 setattr(tts_module, "api", tts_api_module)
-

@@ -47,8 +47,12 @@ class StubDatabase:
         self.raise_on_fetch = raise_on_fetch
         now = datetime(2025, 1, 1)
         self.attempts = [StubAttempt(1, "L1_turn1", created_at=now)]
-        self.lesson_progresses = [StubLessonProgress("L1", completed=True, last_accessed=now)]
-        self.srs_memories = [StubSRSMemory("L1_turn1", next_review=now, last_review=now)]
+        self.lesson_progresses = [
+            StubLessonProgress("L1", completed=True, last_accessed=now)
+        ]
+        self.srs_memories = [
+            StubSRSMemory("L1_turn1", next_review=now, last_review=now)
+        ]
         self.settings = [StubSetting("voice_mode", "online")]
 
     def _maybe_raise(self):
