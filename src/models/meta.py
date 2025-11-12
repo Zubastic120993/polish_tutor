@@ -1,4 +1,5 @@
 """Meta model."""
+
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, String
@@ -14,4 +15,3 @@ class Meta(Base):
     key = Column(String, primary_key=True)
     value = Column(String, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-

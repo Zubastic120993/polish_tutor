@@ -1,4 +1,5 @@
 """Lesson Manager for loading and validating lesson JSON files."""
+
 import json
 import logging
 import os
@@ -157,12 +158,12 @@ class LessonManager:
         Returns:
             List of catalog entries with ids, titles, module, part, and status
         """
-        catalog_file = self.lessons_dir / 'catalog.json'
+        catalog_file = self.lessons_dir / "catalog.json"
         if not catalog_file.exists():
             logger.debug(f"Lesson catalog not found: {catalog_file}")
             return []
         try:
-            with open(catalog_file, 'r', encoding='utf-8') as f:
+            with open(catalog_file, "r", encoding="utf-8") as f:
                 catalog_data = json.load(f)
         except Exception as exc:
             logger.warning(f"Failed to read lesson catalog: {exc}")
@@ -171,27 +172,33 @@ class LessonManager:
         entries: List[Dict] = []
         seen: Set[str] = set()
 
-        def push_entry(entry: Dict, part_title: Optional[str] = None, module_title: Optional[str] = None) -> None:
-            lesson_id = entry.get('id')
+        def push_entry(
+            entry: Dict,
+            part_title: Optional[str] = None,
+            module_title: Optional[str] = None,
+        ) -> None:
+            lesson_id = entry.get("id")
             if not lesson_id or lesson_id in seen:
                 return
             seen.add(lesson_id)
-            entries.append({
-                'id': lesson_id,
-                'title_pl': entry.get('title_pl'),
-                'title_en': entry.get('title_en'),
-                'status': entry.get('status', 'pending'),
-                'module': module_title,
-                'part': part_title
-            })
+            entries.append(
+                {
+                    "id": lesson_id,
+                    "title_pl": entry.get("title_pl"),
+                    "title_en": entry.get("title_en"),
+                    "status": entry.get("status", "pending"),
+                    "module": module_title,
+                    "part": part_title,
+                }
+            )
 
-        for part in catalog_data.get('parts', []):
-            part_title = part.get('title')
-            for lesson in part.get('lessons', []):
+        for part in catalog_data.get("parts", []):
+            part_title = part.get("title")
+            for lesson in part.get("lessons", []):
                 push_entry(lesson, part_title=part_title)
-            for module in part.get('modules', []):
-                module_title = module.get('title_pl') or module.get('title_en')
-                for lesson in module.get('lessons', []):
+            for module in part.get("modules", []):
+                module_title = module.get("title_pl") or module.get("title_en")
+                for lesson in module.get("lessons", []):
                     push_entry(lesson, part_title=part_title, module_title=module_title)
 
         return entries
@@ -271,10 +278,10 @@ class LessonManager:
         """Clear the lesson cache."""
         self._cache.clear()
         logger.info("Lesson cache cleared")
-    
+
     def cache_lesson(self, lesson_id: str, lesson_data: Dict) -> None:
         """Cache a lesson (e.g., from AI generation) without saving to file.
-        
+
         Args:
             lesson_id: Lesson identifier
             lesson_data: Lesson data dictionary
@@ -329,7 +336,10 @@ class LessonManager:
         if missing_ids:
             error_msg = f"Branch validation failed for lesson {lesson_id}: "
             error_msg += ", ".join(
-                [f"dialogue {d_id} references missing ID '{next_id}'" for d_id, next_id in missing_ids]
+                [
+                    f"dialogue {d_id} references missing ID '{next_id}'"
+                    for d_id, next_id in missing_ids
+                ]
             )
             logger.error(error_msg)
             raise ValueError(error_msg)
@@ -368,7 +378,9 @@ class LessonManager:
 
             # Check slow audio file
             if "audio_slow" in dialogue and dialogue["audio_slow"]:
-                audio_slow_path = self.audio_base_dir / lesson_id / dialogue["audio_slow"]
+                audio_slow_path = (
+                    self.audio_base_dir / lesson_id / dialogue["audio_slow"]
+                )
                 if not audio_slow_path.exists():
                     missing_audio.append(str(audio_slow_path))
 
@@ -381,4 +393,3 @@ class LessonManager:
             # raise ValueError(error_msg)
 
         logger.debug(f"Audio file validation passed for lesson {lesson_id}")
-

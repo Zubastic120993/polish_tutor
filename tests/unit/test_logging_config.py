@@ -1,4 +1,5 @@
 """Unit tests for logging configuration."""
+
 import logging
 import os
 import tempfile
@@ -11,14 +12,15 @@ def test_logging_config_module_structure():
     import src.core.logging_config as logging_config_module
 
     # Verify the function exists
-    assert hasattr(logging_config_module, 'setup_logging')
+    assert hasattr(logging_config_module, "setup_logging")
     assert callable(logging_config_module.setup_logging)
 
     # Verify function signature
     import inspect
+
     sig = inspect.signature(logging_config_module.setup_logging)
-    assert 'log_dir' in sig.parameters
-    assert 'log_level' in sig.parameters
+    assert "log_dir" in sig.parameters
+    assert "log_level" in sig.parameters
 
 
 def test_setup_logging_creates_directory(tmp_path):
@@ -27,6 +29,7 @@ def test_setup_logging_creates_directory(tmp_path):
 
     # Import and call the function
     from src.core.logging_config import setup_logging
+
     setup_logging(str(log_dir))
 
     # Verify directory was created
@@ -48,6 +51,7 @@ def test_setup_logging_with_existing_directory(tmp_path):
     test_file.write_text("existing content")
 
     from src.core.logging_config import setup_logging
+
     setup_logging(str(log_dir))
 
     # Verify existing file is preserved
@@ -96,7 +100,7 @@ def test_setup_logging_actual_logging_functionality(tmp_path):
     setup_logging(str(log_dir))
 
     # Get a logger and log a message
-    logger = logging.getLogger('test_logger')
+    logger = logging.getLogger("test_logger")
     logger.setLevel(logging.INFO)
     test_message = "Test message for logging functionality"
     logger.info(test_message)
@@ -123,7 +127,7 @@ def test_setup_logging_formatter_configuration(tmp_path):
     setup_logging(str(log_dir))
 
     # Log a message and check format
-    logger = logging.getLogger('format_test')
+    logger = logging.getLogger("format_test")
     logger.setLevel(logging.WARNING)
     logger.warning("Format test message")
 
@@ -140,6 +144,4 @@ def test_setup_logging_formatter_configuration(tmp_path):
     assert "format_test" in content
     assert "Format test message" in content
     # Should contain timestamp in YYYY-MM-DD HH:MM:SS format
-    assert len(content.split(' - ')) >= 4  # date, time, level, logger, message
-
-
+    assert len(content.split(" - ")) >= 4  # date, time, level, logger, message

@@ -1,4 +1,5 @@
 """Structured logging configuration with JSON output and correlation IDs."""
+
 import json
 import logging
 import os
@@ -42,11 +43,31 @@ class StructuredJSONFormatter(logging.Formatter):
         if self.include_extra and hasattr(record, "__dict__"):
             for key, value in record.__dict__.items():
                 if key not in {
-                    "name", "msg", "args", "levelname", "levelno", "pathname",
-                    "filename", "module", "exc_info", "exc_text", "stack_info",
-                    "lineno", "funcName", "created", "msecs", "relativeCreated",
-                    "thread", "threadName", "processName", "process", "message",
-                    "correlation_id", "user_id", "request_id", "job_id"
+                    "name",
+                    "msg",
+                    "args",
+                    "levelname",
+                    "levelno",
+                    "pathname",
+                    "filename",
+                    "module",
+                    "exc_info",
+                    "exc_text",
+                    "stack_info",
+                    "lineno",
+                    "funcName",
+                    "created",
+                    "msecs",
+                    "relativeCreated",
+                    "thread",
+                    "threadName",
+                    "processName",
+                    "process",
+                    "message",
+                    "correlation_id",
+                    "user_id",
+                    "request_id",
+                    "job_id",
                 }:
                     log_entry[f"extra_{key}"] = value
 
@@ -80,6 +101,7 @@ def set_correlation_id(correlation_id: str) -> None:
 
 def generate_correlation_id() -> str:
     import uuid
+
     return str(uuid.uuid4())
 
 
@@ -106,10 +128,15 @@ def setup_structured_logging(
     log_dir: str = "./logs",
     log_level: str = "INFO",
     json_output: bool = True,
-    console_output: bool = True
+    console_output: bool = True,
 ) -> None:
     """Set up structured logging with JSON output and correlation IDs."""
-    disable_file_logs = os.environ.get("DISABLE_FILE_LOGS", "").lower() in {"1", "true", "yes", "on"}
+    disable_file_logs = os.environ.get("DISABLE_FILE_LOGS", "").lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
 
     logger = logging.getLogger()
     logger.setLevel(getattr(logging, log_level.upper(), logging.INFO))
@@ -120,22 +147,26 @@ def setup_structured_logging(
         try:
             Path(log_dir).mkdir(parents=True, exist_ok=True)
             log_file = os.path.join(log_dir, "app.log")
-            file_handler = RotatingFileHandler(log_file, maxBytes=10_000_000, backupCount=10)
+            file_handler = RotatingFileHandler(
+                log_file, maxBytes=10_000_000, backupCount=10
+            )
             file_handler.setLevel(getattr(logging, log_level.upper(), logging.INFO))
 
             if json_output:
                 file_handler.setFormatter(StructuredJSONFormatter())
             else:
-                file_handler.setFormatter(logging.Formatter(
-                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-                    datefmt="%Y-%m-%d %H:%M:%S"
-                ))
+                file_handler.setFormatter(
+                    logging.Formatter(
+                        "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                        datefmt="%Y-%m-%d %H:%M:%S",
+                    )
+                )
             logger.addHandler(file_handler)
             file_handler_configured = True
         except PermissionError:
             logger.warning(
                 "File logging disabled due to insufficient permissions",
-                extra={"ctx_log_dir": log_dir}
+                extra={"ctx_log_dir": log_dir},
             )
             disable_file_logs = True
 
@@ -146,10 +177,12 @@ def setup_structured_logging(
         if json_output:
             console_handler.setFormatter(StructuredJSONFormatter())
         else:
-            console_handler.setFormatter(logging.Formatter(
-                "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-                datefmt="%Y-%m-%d %H:%M:%S"
-            ))
+            console_handler.setFormatter(
+                logging.Formatter(
+                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                    datefmt="%Y-%m-%d %H:%M:%S",
+                )
+            )
         logger.addHandler(console_handler)
 
     # ✅ FIXED SECTION — safe info log (no invalid `extra` keys)

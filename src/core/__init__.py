@@ -1,5 +1,7 @@
 """Core application components exposed lazily to avoid circular imports."""
+
 from importlib import import_module
+
 __all__ = [
     "AppContext",
     "app_context",

@@ -5,9 +5,17 @@ from src.services.speech_engine import SpeechEngine
 
 
 def test_generate_cache_key_is_deterministic():
-    engine = SpeechEngine(native_audio_dir="/tmp/nonexistent", cache_dir="/tmp/audio_cache", online_mode=False)
-    first = engine.generate_cache_key("tekst", voice_id="default", speed=1.0, engine="pyttsx3")
-    second = engine.generate_cache_key("tekst", voice_id="default", speed=1.0, engine="pyttsx3")
+    engine = SpeechEngine(
+        native_audio_dir="/tmp/nonexistent",
+        cache_dir="/tmp/audio_cache",
+        online_mode=False,
+    )
+    first = engine.generate_cache_key(
+        "tekst", voice_id="default", speed=1.0, engine="pyttsx3"
+    )
+    second = engine.generate_cache_key(
+        "tekst", voice_id="default", speed=1.0, engine="pyttsx3"
+    )
     assert first == second
 
 
@@ -51,7 +59,9 @@ def test_get_audio_path_returns_cached_file(tmp_path, monkeypatch):
     cached_file.write_bytes(b"cached")
 
     # Prevent fallback generation from running
-    monkeypatch.setattr(engine, "_generate_audio", lambda *args, **kwargs: (None, "none"))
+    monkeypatch.setattr(
+        engine, "_generate_audio", lambda *args, **kwargs: (None, "none")
+    )
 
     audio_path, source = engine.get_audio_path(text="Tekst", speed=1.0)
     assert Path(audio_path) == cached_file
@@ -60,7 +70,9 @@ def test_get_audio_path_returns_cached_file(tmp_path, monkeypatch):
 
 def test_get_available_engines():
     """Test get_available_engines returns correct engine availability."""
-    engine = SpeechEngine(native_audio_dir="/tmp", cache_dir="/tmp/cache", online_mode=False)
+    engine = SpeechEngine(
+        native_audio_dir="/tmp", cache_dir="/tmp/cache", online_mode=False
+    )
     available = engine.get_available_engines()
 
     assert "mode" in available
@@ -71,7 +83,9 @@ def test_get_available_engines():
 
 def test_get_available_engines_online_mode():
     """Test get_available_engines in online mode."""
-    engine = SpeechEngine(native_audio_dir="/tmp", cache_dir="/tmp/cache", online_mode=True)
+    engine = SpeechEngine(
+        native_audio_dir="/tmp", cache_dir="/tmp/cache", online_mode=True
+    )
     available = engine.get_available_engines()
 
     assert available["mode"] == "online"
@@ -79,10 +93,12 @@ def test_get_available_engines_online_mode():
 
 def test_generate_with_pyttsx3_success(tmp_path):
     """Test pyttsx3 audio generation."""
-    engine = SpeechEngine(native_audio_dir="/tmp", cache_dir=str(tmp_path), online_mode=False)
+    engine = SpeechEngine(
+        native_audio_dir="/tmp", cache_dir=str(tmp_path), online_mode=False
+    )
 
     # Mock the pyttsx3 module and its init function
-    with patch('src.services.speech_engine.pyttsx3') as mock_pyttsx3:
+    with patch("src.services.speech_engine.pyttsx3") as mock_pyttsx3:
         mock_engine = MagicMock()
         mock_pyttsx3.init.return_value = mock_engine
 
@@ -90,7 +106,7 @@ def test_generate_with_pyttsx3_success(tmp_path):
         engine._pyttsx3_engine = mock_engine
 
         # Mock the file operations to avoid actual file creation
-        with patch('builtins.open', create=True) as mock_open:
+        with patch("builtins.open", create=True) as mock_open:
             mock_file = MagicMock()
             mock_open.return_value.__enter__.return_value = mock_file
 
@@ -103,10 +119,12 @@ def test_generate_with_pyttsx3_success(tmp_path):
 
 def test_generate_with_pyttsx3_failure(tmp_path):
     """Test pyttsx3 audio generation failure."""
-    engine = SpeechEngine(native_audio_dir="/tmp", cache_dir=str(tmp_path), online_mode=False)
+    engine = SpeechEngine(
+        native_audio_dir="/tmp", cache_dir=str(tmp_path), online_mode=False
+    )
 
     # Mock the pyttsx3 module and its init function
-    with patch('src.services.speech_engine.pyttsx3') as mock_pyttsx3:
+    with patch("src.services.speech_engine.pyttsx3") as mock_pyttsx3:
         mock_engine = MagicMock()
         mock_engine.save_to_file.side_effect = Exception("TTS error")
         mock_pyttsx3.init.return_value = mock_engine
@@ -121,7 +139,9 @@ def test_generate_with_pyttsx3_failure(tmp_path):
 
 def test_adjust_speed_with_pydub(tmp_path):
     """Test audio speed adjustment."""
-    engine = SpeechEngine(native_audio_dir="/tmp", cache_dir=str(tmp_path), online_mode=False)
+    engine = SpeechEngine(
+        native_audio_dir="/tmp", cache_dir=str(tmp_path), online_mode=False
+    )
 
     # Create a dummy input file
     input_path = tmp_path / "input.mp3"
@@ -130,7 +150,7 @@ def test_adjust_speed_with_pydub(tmp_path):
     output_path = tmp_path / "output.mp3"
 
     # Mock the entire pydub chain
-    with patch('src.services.speech_engine.AudioSegment') as mock_audio_segment_class:
+    with patch("src.services.speech_engine.AudioSegment") as mock_audio_segment_class:
         mock_audio = MagicMock()
         mock_audio_segment_class.from_file.return_value = mock_audio
         mock_audio._spawn.return_value = mock_audio
@@ -140,7 +160,9 @@ def test_adjust_speed_with_pydub(tmp_path):
 
         mock_audio._spawn.assert_called_once()
         mock_audio.set_frame_rate.assert_called_once()
-        mock_audio.export.assert_called_once_with(str(output_path), format="mp3", bitrate="128k")
+        mock_audio.export.assert_called_once_with(
+            str(output_path), format="mp3", bitrate="128k"
+        )
 
 
 def test_cleanup_cache_method_exists(tmp_path):
@@ -148,7 +170,9 @@ def test_cleanup_cache_method_exists(tmp_path):
     cache_dir = tmp_path / "cache"
     cache_dir.mkdir()
 
-    engine = SpeechEngine(native_audio_dir="/tmp", cache_dir=str(cache_dir), online_mode=False)
+    engine = SpeechEngine(
+        native_audio_dir="/tmp", cache_dir=str(cache_dir), online_mode=False
+    )
 
     # Just test that the method can be called without errors
     removed_count = engine.cleanup_cache(max_age_days=30)
@@ -160,14 +184,22 @@ def test_cleanup_cache_method_exists(tmp_path):
 
 def test_generate_audio_fallback_chain(tmp_path):
     """Test _generate_audio tries fallback engines in correct order."""
-    engine = SpeechEngine(native_audio_dir="/tmp", cache_dir=str(tmp_path), online_mode=False)
+    engine = SpeechEngine(
+        native_audio_dir="/tmp", cache_dir=str(tmp_path), online_mode=False
+    )
 
     # Mock all generation methods to fail except the last one
-    with patch.object(engine, '_generate_with_gpt4_tts', return_value=None), \
-         patch.object(engine, '_generate_with_elevenlabs', return_value=None), \
-         patch.object(engine, '_generate_with_coqui', return_value=None), \
-         patch.object(engine, '_generate_with_gtts', return_value=None), \
-         patch.object(engine, '_generate_with_pyttsx3', return_value=tmp_path / "test.mp3") as mock_pyttsx3:
+    with patch.object(
+        engine, "_generate_with_gpt4_tts", return_value=None
+    ), patch.object(
+        engine, "_generate_with_elevenlabs", return_value=None
+    ), patch.object(
+        engine, "_generate_with_coqui", return_value=None
+    ), patch.object(
+        engine, "_generate_with_gtts", return_value=None
+    ), patch.object(
+        engine, "_generate_with_pyttsx3", return_value=tmp_path / "test.mp3"
+    ) as mock_pyttsx3:
 
         result = engine._generate_audio("Test text", 1.0, "default")
 
@@ -177,16 +209,23 @@ def test_generate_audio_fallback_chain(tmp_path):
 
 def test_generate_audio_all_fail(tmp_path):
     """Test _generate_audio when all engines fail."""
-    engine = SpeechEngine(native_audio_dir="/tmp", cache_dir=str(tmp_path), online_mode=False)
+    engine = SpeechEngine(
+        native_audio_dir="/tmp", cache_dir=str(tmp_path), online_mode=False
+    )
 
     # Mock all generation methods to fail
-    with patch.object(engine, '_generate_with_gpt4_tts', return_value=None), \
-         patch.object(engine, '_generate_with_elevenlabs', return_value=None), \
-         patch.object(engine, '_generate_with_coqui', return_value=None), \
-         patch.object(engine, '_generate_with_gtts', return_value=None), \
-         patch.object(engine, '_generate_with_pyttsx3', return_value=None):
+    with patch.object(
+        engine, "_generate_with_gpt4_tts", return_value=None
+    ), patch.object(
+        engine, "_generate_with_elevenlabs", return_value=None
+    ), patch.object(
+        engine, "_generate_with_coqui", return_value=None
+    ), patch.object(
+        engine, "_generate_with_gtts", return_value=None
+    ), patch.object(
+        engine, "_generate_with_pyttsx3", return_value=None
+    ):
 
         result = engine._generate_audio("Test text", 1.0, "default")
 
         assert result == (None, "none")
-

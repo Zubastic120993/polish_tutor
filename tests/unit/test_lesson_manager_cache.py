@@ -19,7 +19,11 @@ def _write_lesson(path: Path, lesson_id: str, with_default: bool = True):
                 "expected": ["Cześć!"],
                 "audio": f"{lesson_id}_d1.mp3",
                 "options": [
-                    {"match": "hej", "next": f"{lesson_id}_d2", "default": with_default},
+                    {
+                        "match": "hej",
+                        "next": f"{lesson_id}_d2",
+                        "default": with_default,
+                    },
                 ],
             },
             {
@@ -63,7 +67,9 @@ def test_branch_validation_requires_single_default(tmp_path):
     lessons_dir.mkdir()
     bad_lesson = _write_lesson(lessons_dir, "broken_lesson", with_default=False)
     bad_lesson["dialogues"][0]["options"].append({"match": "inne", "next": "missing"})
-    (lessons_dir / "broken_lesson.json").write_text(json.dumps(bad_lesson), encoding="utf-8")
+    (lessons_dir / "broken_lesson.json").write_text(
+        json.dumps(bad_lesson), encoding="utf-8"
+    )
 
     manager = LessonManager(
         lessons_dir=str(lessons_dir),

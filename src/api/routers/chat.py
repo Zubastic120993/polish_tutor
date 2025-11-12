@@ -1,4 +1,5 @@
 """Chat API endpoints."""
+
 import logging
 from fastapi import APIRouter, HTTPException
 
@@ -13,16 +14,16 @@ router = APIRouter(prefix="/api/chat", tags=["chat"])
 @router.post("/respond", response_model=ChatRespondResponse, status_code=200)
 async def chat_respond(request: ChatRespondRequest):
     """Process user message and return tutor response.
-    
+
     Args:
         request: Chat request with user_id, text, lesson_id, dialogue_id, etc.
-        
+
     Returns:
         Chat response with tutor reply, score, feedback, and audio URLs
     """
     try:
         tutor = app_context.tutor
-        
+
         # Call Tutor.respond() method
         response = tutor.respond(
             user_id=request.user_id,
@@ -32,23 +33,18 @@ async def chat_respond(request: ChatRespondRequest):
             speed=request.speed or 1.0,
             confidence=request.confidence,
         )
-        
+
         # Tutor.respond() already returns the correct format
         # Check if it's an error response
         if response.get("status") == "error":
             raise HTTPException(
-                status_code=400,
-                detail=response.get("message", "Invalid request")
+                status_code=400, detail=response.get("message", "Invalid request")
             )
-        
+
         return response
-        
+
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error in chat_respond: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=500,
-            detail=f"Internal server error: {str(e)}"
-        )
-
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")

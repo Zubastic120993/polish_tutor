@@ -1,4 +1,5 @@
 """TTS job queue tasks using RQ (Redis Queue)."""
+
 import logging
 import time
 from typing import Dict, Optional, Any
@@ -41,7 +42,7 @@ def synthesize_speech_task(
     format: str = "mp3",
     request_id: Optional[str] = None,
     correlation_id: Optional[str] = None,
-    **kwargs
+    **kwargs,
 ) -> Dict[str, Any]:
     """RQ task to synthesize speech using Murf API.
 
@@ -70,18 +71,21 @@ def synthesize_speech_task(
     # Create job-specific logger with job ID context
     job_logger = get_logger(__name__)
     # Add job_id to all log records for this job
-    job_logger.extra.update({'job_id': job.id})
+    job_logger.extra.update({"job_id": job.id})
 
     job_start_time = time.time()
 
     try:
-        job_logger.info("Starting TTS synthesis task", extra={
-            "cache_key": cache_key,
-            "text_length": len(text),
-            "voice_id": voice_id,
-            "language": language,
-            "format": format,
-        })
+        job_logger.info(
+            "Starting TTS synthesis task",
+            extra={
+                "cache_key": cache_key,
+                "text_length": len(text),
+                "voice_id": voice_id,
+                "language": language,
+                "format": format,
+            },
+        )
 
         # Initialize clients
         murf_client = MurfClient()
@@ -89,10 +93,13 @@ def synthesize_speech_task(
 
         # Check if already cached
         if cache_manager.is_cached(cache_key, format):
-            job_logger.info("Audio already cached, returning existing result", extra={
-                "cache_key": cache_key,
-                "format": format,
-            })
+            job_logger.info(
+                "Audio already cached, returning existing result",
+                extra={
+                    "cache_key": cache_key,
+                    "format": format,
+                },
+            )
             audio_url = cache_manager.get_audio_url(cache_key, format)
             return {
                 "status": "completed",
@@ -106,10 +113,13 @@ def synthesize_speech_task(
         job.meta["progress"] = "submitting_to_murf"
         job.save_meta()
 
-        job_logger.info("Submitting synthesis job to Murf API", extra={
-            "cache_key": cache_key,
-            "text_preview": text[:100] + "..." if len(text) > 100 else text,
-        })
+        job_logger.info(
+            "Submitting synthesis job to Murf API",
+            extra={
+                "cache_key": cache_key,
+                "text_preview": text[:100] + "..." if len(text) > 100 else text,
+            },
+        )
 
         # Submit synthesis job to Murf
         synthesis_result = murf_client.synthesize_speech(
@@ -118,7 +128,7 @@ def synthesize_speech_task(
             language=language,
             style=style,
             format=format,
-            **kwargs
+            **kwargs,
         )
 
         murf_job_id = synthesis_result["job_id"]
@@ -126,30 +136,37 @@ def synthesize_speech_task(
         job.meta["progress"] = "waiting_for_murf"
         job.save_meta()
 
-        job_logger.info("Murf job submitted successfully", extra={
-            "murf_job_id": murf_job_id,
-            "cache_key": cache_key,
-        })
+        job_logger.info(
+            "Murf job submitted successfully",
+            extra={
+                "murf_job_id": murf_job_id,
+                "cache_key": cache_key,
+            },
+        )
 
         # Wait for completion
-        job_logger.info("Waiting for Murf job completion", extra={
-            "murf_job_id": murf_job_id,
-            "max_wait_time": 300,
-        })
+        job_logger.info(
+            "Waiting for Murf job completion",
+            extra={
+                "murf_job_id": murf_job_id,
+                "max_wait_time": 300,
+            },
+        )
 
         final_status = murf_client.wait_for_completion(
-            murf_job_id,
-            poll_interval=2.0,
-            max_wait_time=300.0  # 5 minutes
+            murf_job_id, poll_interval=2.0, max_wait_time=300.0  # 5 minutes
         )
 
         job.meta["progress"] = "downloading_audio"
         job.save_meta()
 
-        job_logger.info("Murf job completed, downloading audio", extra={
-            "murf_job_id": murf_job_id,
-            "cache_key": cache_key,
-        })
+        job_logger.info(
+            "Murf job completed, downloading audio",
+            extra={
+                "murf_job_id": murf_job_id,
+                "cache_key": cache_key,
+            },
+        )
 
         # Download audio
         cache_path = cache_manager.get_cache_path(cache_key, format)
@@ -167,7 +184,7 @@ def synthesize_speech_task(
             "format": format,
             "murf_job_id": murf_job_id,
             "text_length": len(text),
-            **kwargs
+            **kwargs,
         }
 
         cache_manager.store_audio(audio_data, cache_key, format, metadata)
@@ -178,17 +195,21 @@ def synthesize_speech_task(
 
         job_duration = time.time() - job_start_time
 
-        job_logger.info("TTS synthesis completed successfully", extra={
-            "cache_key": cache_key,
-            "audio_url": audio_url,
-            "file_size": len(audio_data),
-            "murf_job_id": murf_job_id,
-            "duration_seconds": round(job_duration, 2),
-        })
+        job_logger.info(
+            "TTS synthesis completed successfully",
+            extra={
+                "cache_key": cache_key,
+                "audio_url": audio_url,
+                "file_size": len(audio_data),
+                "murf_job_id": murf_job_id,
+                "duration_seconds": round(job_duration, 2),
+            },
+        )
 
         # Record metrics (lazy import to avoid circular dependency)
         try:
             from src.core.metrics import record_tts_job_completed
+
             record_tts_job_completed(duration_seconds=job_duration)
         except ImportError:
             pass
@@ -206,16 +227,21 @@ def synthesize_speech_task(
     except Exception as e:
         job_duration = time.time() - job_start_time
 
-        job_logger.error("TTS synthesis failed", extra={
-            "cache_key": cache_key,
-            "error_type": type(e).__name__,
-            "error_message": str(e),
-            "duration_seconds": round(job_duration, 2),
-        }, exc_info=True)
+        job_logger.error(
+            "TTS synthesis failed",
+            extra={
+                "cache_key": cache_key,
+                "error_type": type(e).__name__,
+                "error_message": str(e),
+                "duration_seconds": round(job_duration, 2),
+            },
+            exc_info=True,
+        )
 
         # Record metrics (lazy import to avoid circular dependency)
         try:
             from src.core.metrics import record_tts_job_failed
+
             record_tts_job_failed(error_type=type(e).__name__)
         except ImportError:
             pass
@@ -313,7 +339,9 @@ def cleanup_failed_jobs(max_age_hours: int = 24) -> int:
             try:
                 job = Job.fetch(job_id, connection=queue.connection)
                 if job.ended_at:
-                    age_hours = (datetime.utcnow() - job.ended_at).total_seconds() / 3600
+                    age_hours = (
+                        datetime.utcnow() - job.ended_at
+                    ).total_seconds() / 3600
                     if age_hours > max_age_hours:
                         job.delete()
                         cleaned_count += 1

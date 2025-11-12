@@ -1,4 +1,5 @@
 """JWT Authentication utilities."""
+
 import secrets
 from datetime import datetime, timedelta
 from typing import Optional
@@ -29,12 +30,14 @@ security = HTTPBearer()
 
 class TokenData(BaseModel):
     """JWT token payload data."""
+
     user_id: int
     username: str
 
 
 class TokenResponse(BaseModel):
     """Response model for token endpoints."""
+
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
@@ -83,7 +86,7 @@ def create_tokens(user: User) -> TokenResponse:
     return TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
-        expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
 
 
@@ -99,7 +102,9 @@ def verify_token(token: str, token_type: str = "access") -> TokenData:
             raise JWTError("Missing user data in token")
 
         if token_type_check != token_type:
-            raise JWTError(f"Invalid token type: expected {token_type}, got {token_type_check}")
+            raise JWTError(
+                f"Invalid token type: expected {token_type}, got {token_type_check}"
+            )
 
         return TokenData(user_id=user_id, username=username)
     except JWTError as e:
@@ -112,7 +117,7 @@ def verify_token(token: str, token_type: str = "access") -> TokenData:
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
-    db_service: Database = Depends()
+    db_service: Database = Depends(),
 ) -> User:
     """FastAPI dependency to get current authenticated user."""
     token_data = verify_token(credentials.credentials, "access")
@@ -133,7 +138,7 @@ async def get_current_user(
 
 async def get_current_user_optional(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
-    db_service: Database = Depends()
+    db_service: Database = Depends(),
 ) -> Optional[User]:
     """FastAPI dependency to get current user if authenticated (optional)."""
     if credentials is None:
@@ -145,7 +150,9 @@ async def get_current_user_optional(
         return None
 
 
-def authenticate_user(db_service: Database, username: str, password: str) -> Optional[User]:
+def authenticate_user(
+    db_service: Database, username: str, password: str
+) -> Optional[User]:
     """Authenticate a user with username and password."""
     with db_service.get_session() as session:
         user = session.query(User).filter(User.name == username).first()

@@ -28,7 +28,9 @@ class StubFeedbackEngine:
         return text.lower().strip()
 
     def calculate_similarity(self, text: str, expected: str) -> float:
-        return SequenceMatcher(None, self.normalize_text(text), self.normalize_text(expected)).ratio()
+        return SequenceMatcher(
+            None, self.normalize_text(text), self.normalize_text(expected)
+        ).ratio()
 
     def generate_feedback(self, **kwargs: Any) -> Dict[str, Any]:
         self.last_generate_feedback_args = kwargs
@@ -64,7 +66,9 @@ class StubLessonManager:
 
 
 class StubSpeechEngine:
-    def __init__(self, audio_map: Optional[Dict[str, Tuple[Optional[str], str]]] = None):
+    def __init__(
+        self, audio_map: Optional[Dict[str, Tuple[Optional[str], str]]] = None
+    ):
         self.audio_map = audio_map or {}
 
     def get_audio_path(self, *, phrase_id: str, **__) -> Tuple[Optional[str], str]:
@@ -132,7 +136,9 @@ def test_determine_next_dialogue_prefers_exact_match():
     lesson_data = {"dialogues": [dialogue, {"id": "turn_exact"}]}
 
     tutor = _build_tutor({"lesson_a": lesson_data})
-    next_id = tutor._determine_next_dialogue(" świetnie ", dialogue, lesson_data, score=1.0)
+    next_id = tutor._determine_next_dialogue(
+        " świetnie ", dialogue, lesson_data, score=1.0
+    )
 
     assert next_id == "turn_exact"
 
@@ -149,7 +155,9 @@ def test_determine_next_dialogue_uses_fuzzy_match_when_close():
     lesson_data = {"dialogues": [dialogue, {"id": "turn_fuzzy"}]}
 
     tutor = _build_tutor({"lesson_a": lesson_data})
-    next_id = tutor._determine_next_dialogue("swientie", dialogue, lesson_data, score=0.8)
+    next_id = tutor._determine_next_dialogue(
+        "swientie", dialogue, lesson_data, score=0.8
+    )
 
     assert next_id == "turn_fuzzy"
 
@@ -165,7 +173,9 @@ def test_determine_next_dialogue_falls_back_to_default():
     lesson_data = {"dialogues": [dialogue, {"id": "turn_default"}]}
 
     tutor = _build_tutor({"lesson_a": lesson_data})
-    next_id = tutor._determine_next_dialogue("nie wiem", dialogue, lesson_data, score=0.2)
+    next_id = tutor._determine_next_dialogue(
+        "nie wiem", dialogue, lesson_data, score=0.2
+    )
 
     assert next_id == "turn_default"
 
@@ -179,7 +189,9 @@ def test_determine_next_dialogue_without_options_advances_sequentially():
     lesson_data = {"dialogues": [dialogue, next_dialogue]}
 
     tutor = _build_tutor({"lesson_a": lesson_data})
-    next_id = tutor._determine_next_dialogue("cokolwiek", dialogue, lesson_data, score=0.5)
+    next_id = tutor._determine_next_dialogue(
+        "cokolwiek", dialogue, lesson_data, score=0.5
+    )
 
     assert next_id == "turn_2"
 
@@ -204,7 +216,9 @@ def test_respond_rejects_empty_input(monkeypatch):
     tutor = _build_tutor({"lesson_a": {"dialogues": []}})
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
 
-    result = tutor.respond(user_id=1, text="   ", lesson_id="lesson_a", dialogue_id="turn_1")
+    result = tutor.respond(
+        user_id=1, text="   ", lesson_id="lesson_a", dialogue_id="turn_1"
+    )
 
     assert result["status"] == "error"
     assert "text cannot be empty" in result["message"]
@@ -216,17 +230,29 @@ def test_respond_handles_direct_lesson_request(monkeypatch):
             "title": "Powitania",
             "level": "A1",
             "dialogues": [
-                {"id": "turn_1", "tutor": "Cześć", "expected": ["Cześć"], "options": []},
+                {
+                    "id": "turn_1",
+                    "tutor": "Cześć",
+                    "expected": ["Cześć"],
+                    "options": [],
+                },
             ],
         }
     }
-    lesson_manager = StubLessonManager(lessons, catalog=[{"id": "A1_L01", "title_pl": "Powitania"}])
+    lesson_manager = StubLessonManager(
+        lessons, catalog=[{"id": "A1_L01", "title_pl": "Powitania"}]
+    )
     tutor = _build_tutor(lessons, lesson_manager=lesson_manager)
     tutor.lesson_generator = StubLessonGenerator(can_generate=False)
     tutor._lesson_catalog = lesson_manager.load_lesson_catalog()
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
 
-    result = tutor.respond(user_id=5, text="Can we do A1_L01 next?", lesson_id="A1_L01", dialogue_id="turn_1")
+    result = tutor.respond(
+        user_id=5,
+        text="Can we do A1_L01 next?",
+        lesson_id="A1_L01",
+        dialogue_id="turn_1",
+    )
 
     assert result["status"] == "success"
     assert result["data"]["command"] == "load_lesson"
@@ -305,7 +331,11 @@ def test_respond_logs_attempt_and_updates_srs(monkeypatch):
 
 def test_execute_ai_detected_command_change_topic_needs_info(monkeypatch):
     lessons = {
-        "A1_L01": {"dialogues": [{"id": "turn_1", "tutor": "Cześć", "expected": [], "options": []}]}
+        "A1_L01": {
+            "dialogues": [
+                {"id": "turn_1", "tutor": "Cześć", "expected": [], "options": []}
+            ]
+        }
     }
     lesson_manager = StubLessonManager(
         lessons,
@@ -372,13 +402,23 @@ def test_get_known_lesson_ids():
     catalog = [
         {"id": "A1_L01", "title_pl": "Powitania", "status": "completed"},
         {"id": "A1_L02", "title_pl": "Przedstawianie", "status": "completed"},
-        {"id": "B1_L03", "title_pl": "Zaawansowane", "status": "pending"}
+        {"id": "B1_L03", "title_pl": "Zaawansowane", "status": "pending"},
     ]
     lesson_manager = StubLessonManager(catalog=catalog)
     tutor = _build_tutor({}, lesson_manager=lesson_manager)
 
     known_ids = tutor._get_known_lesson_ids()
-    assert known_ids == {"A1_L01", "A1_L02", "B1_L03", "a1_l01", "a1_l02", "b1_l03", "A1_L01", "A1_L02", "B1_L03"}
+    assert known_ids == {
+        "A1_L01",
+        "A1_L02",
+        "B1_L03",
+        "a1_l01",
+        "a1_l02",
+        "b1_l03",
+        "A1_L01",
+        "A1_L02",
+        "B1_L03",
+    }
 
 
 def test_get_dialogue():
@@ -402,45 +442,66 @@ def test_detect_confusion():
     tutor = _build_tutor({})
 
     # Should detect confusion with many consecutive lows
-    assert tutor._detect_confusion(
-        user_id=1,
-        text="I don't understand",
-        expected_phrases=["Hello", "Hi"],
-        consecutive_lows=3
-    ) is True
+    assert (
+        tutor._detect_confusion(
+            user_id=1,
+            text="I don't understand",
+            expected_phrases=["Hello", "Hi"],
+            consecutive_lows=3,
+        )
+        is True
+    )
 
     # Should not detect confusion with few consecutive lows
-    assert tutor._detect_confusion(
-        user_id=1,
-        text="I don't understand",
-        expected_phrases=["Hello", "Hi"],
-        consecutive_lows=1
-    ) is False
+    assert (
+        tutor._detect_confusion(
+            user_id=1,
+            text="I don't understand",
+            expected_phrases=["Hello", "Hi"],
+            consecutive_lows=1,
+        )
+        is False
+    )
 
     # Should detect confusion even for clear matches when consecutive lows are high
-    assert tutor._detect_confusion(
-        user_id=1,
-        text="Hello",
-        expected_phrases=["Hello", "Hi"],
-        consecutive_lows=3
-    ) is True
+    assert (
+        tutor._detect_confusion(
+            user_id=1,
+            text="Hello",
+            expected_phrases=["Hello", "Hi"],
+            consecutive_lows=3,
+        )
+        is True
+    )
 
     # Should not detect confusion for clear matches with low consecutive lows
-    assert tutor._detect_confusion(
-        user_id=2,  # Different user to avoid history interference
-        text="Hello",
-        expected_phrases=["Hello", "Hi"],
-        consecutive_lows=0
-    ) is False
+    assert (
+        tutor._detect_confusion(
+            user_id=2,  # Different user to avoid history interference
+            text="Hello",
+            expected_phrases=["Hello", "Hi"],
+            consecutive_lows=0,
+        )
+        is False
+    )
 
 
 def test_is_conversational_query():
     tutor = _build_tutor({})
 
     # Should detect conversational queries about Polish language
-    assert tutor._is_conversational_query("What does this mean in Polish?", user_id=1) is True
-    assert tutor._is_conversational_query("Can you explain Polish grammar?", user_id=2) is True
-    assert tutor._is_conversational_query("Why is this Polish word important?", user_id=3) is True
+    assert (
+        tutor._is_conversational_query("What does this mean in Polish?", user_id=1)
+        is True
+    )
+    assert (
+        tutor._is_conversational_query("Can you explain Polish grammar?", user_id=2)
+        is True
+    )
+    assert (
+        tutor._is_conversational_query("Why is this Polish word important?", user_id=3)
+        is True
+    )
 
     # Should not detect practice responses as conversational
     assert tutor._is_conversational_query("Dzień dobry", user_id=4) is False
@@ -457,4 +518,3 @@ def test_score_to_quality_edge_cases():
     assert tutor._score_to_quality(0.65, "medium") == 2  # Good medium score
     assert tutor._score_to_quality(0.35, "low") == 1  # Borderline low score
     assert tutor._score_to_quality(0.15, "low") == 0  # Poor low score
-

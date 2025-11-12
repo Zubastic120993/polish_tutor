@@ -1,4 +1,5 @@
 """Session Manager for user conversation state."""
+
 import logging
 from typing import Dict, Optional, Set
 import difflib
@@ -99,7 +100,7 @@ class SessionManager:
         lesson_id: str,
         dialogue_id: str,
         next_dialogue_id: Optional[str],
-        speed: float = 1.0
+        speed: float = 1.0,
     ) -> Dict[str, str]:
         """Get audio file paths for dialogue.
 
@@ -151,15 +152,20 @@ class SessionManager:
     def _detect_direct_lesson_request(self, text: str) -> Optional[str]:
         """Detect if user is requesting a specific lesson by ID."""
         import re
+
         # Match patterns like "lesson L01", "L01", "lesson 1", etc.
         patterns = [
-            r'\blesson\s+(L\d+|\d+)\b',
-            r'\b(L\d+)\b',
+            r"\blesson\s+(L\d+|\d+)\b",
+            r"\b(L\d+)\b",
         ]
         for pattern in patterns:
             match = re.search(pattern, text, re.IGNORECASE)
             if match:
-                lesson_id = match.group(1) if match.group(1).startswith('L') else f"L{match.group(1).zfill(2)}"
+                lesson_id = (
+                    match.group(1)
+                    if match.group(1).startswith("L")
+                    else f"L{match.group(1).zfill(2)}"
+                )
                 return lesson_id
         return None
 
@@ -169,9 +175,10 @@ class SessionManager:
             return ""
         # Convert to lowercase, strip whitespace, normalize punctuation
         import re
+
         text = text.lower().strip()
         # Remove extra whitespace
-        text = re.sub(r'\s+', ' ', text)
+        text = re.sub(r"\s+", " ", text)
         # Normalize common punctuation
-        text = re.sub(r'[.!?]+$', '', text)
+        text = re.sub(r"[.!?]+$", "", text)
         return text

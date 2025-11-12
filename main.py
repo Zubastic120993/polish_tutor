@@ -1,4 +1,5 @@
 """Main FastAPI application entry point."""
+
 import logging
 from pathlib import Path
 
@@ -10,11 +11,25 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from src.api.routers import audio, auth, backup, chat, error, lesson, review, settings, user
+from src.api.routers import (
+    audio,
+    auth,
+    backup,
+    chat,
+    error,
+    lesson,
+    review,
+    settings,
+    user,
+)
 from backend.api.routers import tts
 from src.core.app_context import app_context
 from src.core.logging_config import setup_structured_logging
-from src.core.middleware import RequestIDMiddleware, StructuredLoggingMiddleware, ExceptionLoggingMiddleware
+from src.core.middleware import (
+    RequestIDMiddleware,
+    StructuredLoggingMiddleware,
+    ExceptionLoggingMiddleware,
+)
 from src.core.metrics import MetricsMiddleware, metrics_endpoint
 
 logger = logging.getLogger(__name__)
@@ -27,7 +42,7 @@ setup_structured_logging(
     log_dir="./logs",
     log_level=config.get("log_level", "INFO"),
     json_output=json_logging,
-    console_output=console_logging
+    console_output=console_logging,
 )
 
 # Create FastAPI app
@@ -90,11 +105,13 @@ app.include_router(backup.router)
 app.include_router(error.router)
 app.include_router(tts.router)
 
+
 # WebSocket endpoint
 @app.websocket("/ws/chat")
 async def websocket_endpoint(websocket: WebSocket):
     """WebSocket endpoint for real-time chat."""
     from src.api.routers.websocket import websocket_chat
+
     await websocket_chat(websocket)
 
 
@@ -107,8 +124,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content={
             "status": "error",
             "message": "Invalid request: " + str(exc.errors()),
-            "data": None
-        }
+            "data": None,
+        },
     )
 
 
@@ -121,17 +138,17 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
             content={
                 "status": "error",
                 "message": f"Resource not found: {request.url.path}",
-                "data": None
-            }
+                "data": None,
+            },
         )
     # For other HTTP exceptions, return the default response
     return JSONResponse(
         status_code=exc.status_code,
         content={
             "status": "error",
-            "message": exc.detail if hasattr(exc, 'detail') else "An error occurred",
-            "data": None
-        }
+            "message": exc.detail if hasattr(exc, "detail") else "An error occurred",
+            "data": None,
+        },
     )
 
 
@@ -141,22 +158,14 @@ async def general_exception_handler(request: Request, exc: Exception):
     logger.error(f"Unhandled exception: {exc}", exc_info=True)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={
-            "status": "error",
-            "message": "Internal server error",
-            "data": None
-        }
+        content={"status": "error", "message": "Internal server error", "data": None},
     )
 
 
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
-    return {
-        "status": "healthy",
-        "service": "Patient Polish Tutor",
-        "version": "0.1.0"
-    }
+    return {"status": "healthy", "service": "Patient Polish Tutor", "version": "0.1.0"}
 
 
 @app.get("/")
@@ -172,7 +181,7 @@ async def api_info():
         "message": "Patient Polish Tutor API",
         "docs": "/docs",
         "health": "/health",
-        "metrics": "/metrics"
+        "metrics": "/metrics",
     }
 
 
@@ -184,10 +193,10 @@ async def get_metrics():
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     host = config.get("host", "0.0.0.0")
     port = config.get("port", 8000)
-    
+
     uvicorn.run(
         "main:app",
         host=host,
@@ -195,4 +204,3 @@ if __name__ == "__main__":
         reload=config.get("debug", False),
         log_level=config.get("log_level", "INFO").lower(),
     )
-

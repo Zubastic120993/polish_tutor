@@ -12,6 +12,7 @@ def srs_memory_stub(monkeypatch):
 
     class MockColumn:
         """Mock SQLAlchemy column that supports comparison operations."""
+
         def __init__(self, name):
             self.name = name
 
@@ -40,6 +41,7 @@ def srs_memory_stub(monkeypatch):
 
     class Memory(SimpleNamespace):
         """Mock SRSMemory model with column-like attributes."""
+
         user_id = MockColumn("user_id")
         phrase_id = MockColumn("phrase_id")
         next_review = MockColumn("next_review")
@@ -67,10 +69,10 @@ class StubSession:
     def query(self, *_):
         return self
 
-    def filter(self, *_ , **__):
+    def filter(self, *_, **__):
         return self
 
-    def order_by(self, *_ , **__):
+    def order_by(self, *_, **__):
         return self
 
     def all(self):
@@ -196,4 +198,3 @@ def test_create_or_update_creates_new_memory(monkeypatch):
     assert created in session.added
     assert created.review_count == 1
     assert session.commits == 1
-

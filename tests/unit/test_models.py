@@ -1,4 +1,5 @@
 """Unit tests for model imports and basic functionality."""
+
 import pytest
 
 
@@ -15,14 +16,14 @@ def test_model_imports():
         from src.models.meta import Meta
 
         # Test that they are classes
-        assert hasattr(User, '__tablename__')
-        assert hasattr(Lesson, '__tablename__')
-        assert hasattr(Phrase, '__tablename__')
-        assert hasattr(LessonProgress, '__tablename__')
-        assert hasattr(Attempt, '__tablename__')
-        assert hasattr(SRSMemory, '__tablename__')
-        assert hasattr(Setting, '__tablename__')
-        assert hasattr(Meta, '__tablename__')
+        assert hasattr(User, "__tablename__")
+        assert hasattr(Lesson, "__tablename__")
+        assert hasattr(Phrase, "__tablename__")
+        assert hasattr(LessonProgress, "__tablename__")
+        assert hasattr(Attempt, "__tablename__")
+        assert hasattr(SRSMemory, "__tablename__")
+        assert hasattr(Setting, "__tablename__")
+        assert hasattr(Meta, "__tablename__")
 
     except ImportError as e:
         pytest.skip(f"Model import failed (expected in unit test environment): {e}")
@@ -61,18 +62,18 @@ def test_model_relationships():
         from src.models.phrase import Phrase
 
         # Check that User has relationships defined
-        assert hasattr(User, 'lesson_progresses')
-        assert hasattr(User, 'attempts')
-        assert hasattr(User, 'srs_memories')
-        assert hasattr(User, 'settings')
+        assert hasattr(User, "lesson_progresses")
+        assert hasattr(User, "attempts")
+        assert hasattr(User, "srs_memories")
+        assert hasattr(User, "settings")
 
         # Check that Lesson has relationships defined
-        assert hasattr(Lesson, 'phrases')
+        assert hasattr(Lesson, "phrases")
 
         # Check that Phrase has relationships defined
-        assert hasattr(Phrase, 'lesson')
-        assert hasattr(Phrase, 'attempts')
-        assert hasattr(Phrase, 'srs_memories')
+        assert hasattr(Phrase, "lesson")
+        assert hasattr(Phrase, "attempts")
+        assert hasattr(Phrase, "srs_memories")
 
     except ImportError as e:
         pytest.skip(f"Model import failed (expected in unit test environment): {e}")

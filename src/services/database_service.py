@@ -1,4 +1,5 @@
 """Database service layer with CRUD operations."""
+
 from contextlib import contextmanager
 from typing import Any, Dict, List, Optional, Type, TypeVar
 
@@ -25,7 +26,7 @@ class Database:
 
     def __init__(self, session_factory=SessionLocal):
         """Initialize database service.
-        
+
         Args:
             session_factory: SQLAlchemy session factory (default: SessionLocal)
         """
@@ -34,7 +35,7 @@ class Database:
     @contextmanager
     def get_session(self):
         """Context manager for database sessions with automatic cleanup.
-        
+
         Yields:
             Session: SQLAlchemy database session
         """
@@ -50,11 +51,11 @@ class Database:
 
     def _expunge_instance(self, session: Session, instance: ModelType) -> ModelType:
         """Expunge instance from session to make it usable after session closes.
-        
+
         Args:
             session: SQLAlchemy session
             instance: Model instance to expunge
-            
+
         Returns:
             Expunged instance
         """
@@ -65,11 +66,11 @@ class Database:
 
     def create(self, model_class: Type[ModelType], **kwargs) -> ModelType:
         """Create a new record.
-        
+
         Args:
             model_class: SQLAlchemy model class
             **kwargs: Model attributes
-            
+
         Returns:
             Created model instance
         """
@@ -82,11 +83,11 @@ class Database:
 
     def get_by_id(self, model_class: Type[ModelType], id: Any) -> Optional[ModelType]:
         """Get a record by ID.
-        
+
         Args:
             model_class: SQLAlchemy model class
             id: Record ID
-            
+
         Returns:
             Model instance or None
         """
@@ -96,13 +97,15 @@ class Database:
                 return self._expunge_instance(session, instance)
             return None
 
-    def get_all(self, model_class: Type[ModelType], limit: Optional[int] = None) -> List[ModelType]:
+    def get_all(
+        self, model_class: Type[ModelType], limit: Optional[int] = None
+    ) -> List[ModelType]:
         """Get all records.
-        
+
         Args:
             model_class: SQLAlchemy model class
             limit: Optional limit on number of records
-            
+
         Returns:
             List of model instances
         """
@@ -113,14 +116,16 @@ class Database:
             instances = query.all()
             return [self._expunge_instance(session, inst) for inst in instances]
 
-    def update(self, model_class: Type[ModelType], id: Any, **kwargs) -> Optional[ModelType]:
+    def update(
+        self, model_class: Type[ModelType], id: Any, **kwargs
+    ) -> Optional[ModelType]:
         """Update a record.
-        
+
         Args:
             model_class: SQLAlchemy model class
             id: Record ID
             **kwargs: Attributes to update
-            
+
         Returns:
             Updated model instance or None
         """
@@ -137,11 +142,11 @@ class Database:
 
     def delete(self, model_class: Type[ModelType], id: Any) -> bool:
         """Delete a record.
-        
+
         Args:
             model_class: SQLAlchemy model class
             id: Record ID
-            
+
         Returns:
             True if deleted, False if not found
         """
@@ -201,9 +206,13 @@ class Database:
 
     # Phrase CRUD operations
 
-    def create_phrase(self, phrase_id: str, lesson_id: str, text: str, **kwargs) -> Phrase:
+    def create_phrase(
+        self, phrase_id: str, lesson_id: str, text: str, **kwargs
+    ) -> Phrase:
         """Create a new phrase."""
-        return self.create(Phrase, id=phrase_id, lesson_id=lesson_id, text=text, **kwargs)
+        return self.create(
+            Phrase, id=phrase_id, lesson_id=lesson_id, text=text, **kwargs
+        )
 
     def get_phrase(self, phrase_id: str) -> Optional[Phrase]:
         """Get phrase by ID."""
@@ -229,28 +238,43 @@ class Database:
     ) -> LessonProgress:
         """Create a new lesson progress."""
         return self.create(
-            LessonProgress, user_id=user_id, lesson_id=lesson_id, status=status, **kwargs
+            LessonProgress,
+            user_id=user_id,
+            lesson_id=lesson_id,
+            status=status,
+            **kwargs
         )
 
     def get_lesson_progress(self, progress_id: int) -> Optional[LessonProgress]:
         """Get lesson progress by ID."""
         return self.get_by_id(LessonProgress, progress_id)
 
-    def get_user_lesson_progress(self, user_id: int, lesson_id: str) -> Optional[LessonProgress]:
+    def get_user_lesson_progress(
+        self, user_id: int, lesson_id: str
+    ) -> Optional[LessonProgress]:
         """Get lesson progress for a specific user and lesson."""
         with self.get_session() as session:
             return (
                 session.query(LessonProgress)
-                .filter(LessonProgress.user_id == user_id, LessonProgress.lesson_id == lesson_id)
+                .filter(
+                    LessonProgress.user_id == user_id,
+                    LessonProgress.lesson_id == lesson_id,
+                )
                 .first()
             )
 
     def get_user_progresses(self, user_id: int) -> List[LessonProgress]:
         """Get all lesson progresses for a user."""
         with self.get_session() as session:
-            return session.query(LessonProgress).filter(LessonProgress.user_id == user_id).all()
+            return (
+                session.query(LessonProgress)
+                .filter(LessonProgress.user_id == user_id)
+                .all()
+            )
 
-    def update_lesson_progress(self, progress_id: int, **kwargs) -> Optional[LessonProgress]:
+    def update_lesson_progress(
+        self, progress_id: int, **kwargs
+    ) -> Optional[LessonProgress]:
         """Update lesson progress."""
         return self.update(LessonProgress, progress_id, **kwargs)
 
@@ -284,11 +308,15 @@ class Database:
         """Get attempt by ID."""
         return self.get_by_id(Attempt, attempt_id)
 
-    def get_user_attempts(self, user_id: int, limit: Optional[int] = None) -> List[Attempt]:
+    def get_user_attempts(
+        self, user_id: int, limit: Optional[int] = None
+    ) -> List[Attempt]:
         """Get all attempts for a user."""
         with self.get_session() as session:
-            query = session.query(Attempt).filter(Attempt.user_id == user_id).order_by(
-                Attempt.created_at.desc()
+            query = (
+                session.query(Attempt)
+                .filter(Attempt.user_id == user_id)
+                .order_by(Attempt.created_at.desc())
             )
             if limit:
                 query = query.limit(limit)
@@ -304,11 +332,15 @@ class Database:
                 session.expunge(attempt)
             return attempts
 
-    def get_phrase_attempts(self, phrase_id: str, limit: Optional[int] = None) -> List[Attempt]:
+    def get_phrase_attempts(
+        self, phrase_id: str, limit: Optional[int] = None
+    ) -> List[Attempt]:
         """Get all attempts for a phrase."""
         with self.get_session() as session:
-            query = session.query(Attempt).filter(Attempt.phrase_id == phrase_id).order_by(
-                Attempt.created_at.desc()
+            query = (
+                session.query(Attempt)
+                .filter(Attempt.phrase_id == phrase_id)
+                .order_by(Attempt.created_at.desc())
             )
             if limit:
                 query = query.limit(limit)
@@ -374,7 +406,8 @@ class Database:
             items = (
                 session.query(SRSMemory)
                 .filter(
-                    SRSMemory.user_id == user_id, SRSMemory.next_review <= datetime.utcnow()
+                    SRSMemory.user_id == user_id,
+                    SRSMemory.next_review <= datetime.utcnow(),
                 )
                 .order_by(SRSMemory.next_review.asc())
                 .all()
@@ -393,7 +426,9 @@ class Database:
     def get_user_srs_memories(self, user_id: int) -> List[SRSMemory]:
         """Get all SRS memories for a user."""
         with self.get_session() as session:
-            memories = session.query(SRSMemory).filter(SRSMemory.user_id == user_id).all()
+            memories = (
+                session.query(SRSMemory).filter(SRSMemory.user_id == user_id).all()
+            )
             for memory in memories:
                 _ = memory.phrase_id
                 _ = memory.next_review

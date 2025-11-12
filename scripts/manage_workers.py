@@ -36,6 +36,7 @@ WORKER_POOLS = {
 
 logger = logging.getLogger(__name__)
 
+
 class WorkerManager:
     """Manages RQ worker processes."""
 
@@ -66,12 +67,18 @@ class WorkerManager:
 
             queues = ",".join(config["queues"])
             cmd = [
-                sys.executable, "-m", "rq", "worker",
-                "--url", self.redis_url,
-                "--name", worker_name,
-                "--timeout", str(config["timeout"]),
+                sys.executable,
+                "-m",
+                "rq",
+                "worker",
+                "--url",
+                self.redis_url,
+                "--name",
+                worker_name,
+                "--timeout",
+                str(config["timeout"]),
                 "--verbose",
-                queues
+                queues,
             ]
 
             logger.info(f"Starting worker {worker_name} with command: {' '.join(cmd)}")
@@ -81,7 +88,7 @@ class WorkerManager:
                     cmd,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
-                    cwd=project_root
+                    cwd=project_root,
                 )
                 self.workers[worker_name] = process
                 started_workers.append(worker_name)
@@ -105,7 +112,9 @@ class WorkerManager:
         timeout = 30 if graceful else 5
 
         # Find workers in this pool
-        pool_workers = [name for name in self.workers.keys() if name.startswith(f"{pool_name}_")]
+        pool_workers = [
+            name for name in self.workers.keys() if name.startswith(f"{pool_name}_")
+        ]
 
         for worker_name in pool_workers:
             if worker_name not in self.workers:
@@ -127,7 +136,9 @@ class WorkerManager:
                     process.wait(timeout=timeout)
                     logger.info(f"Worker {worker_name} stopped successfully")
                 except subprocess.TimeoutExpired:
-                    logger.warning(f"Worker {worker_name} didn't stop gracefully, force killing")
+                    logger.warning(
+                        f"Worker {worker_name} didn't stop gracefully, force killing"
+                    )
                     process.kill()
                     process.wait(timeout=5)
                     logger.info(f"Worker {worker_name} force killed")
@@ -182,7 +193,7 @@ class WorkerManager:
                         "status": "running",
                         "pid": process.pid,
                         "pool": worker_name.split("_")[0],
-                        "exit_code": None
+                        "exit_code": None,
                     }
                 else:
                     # Process has exited
@@ -190,7 +201,7 @@ class WorkerManager:
                         "status": "stopped",
                         "pid": process.pid,
                         "pool": worker_name.split("_")[0],
-                        "exit_code": process.returncode
+                        "exit_code": process.returncode,
                     }
                     # Remove from workers dict
                     del self.workers[worker_name]
@@ -200,7 +211,7 @@ class WorkerManager:
                 status[worker_name] = {
                     "status": "error",
                     "error": str(e),
-                    "pool": worker_name.split("_")[0]
+                    "pool": worker_name.split("_")[0],
                 }
 
         return status
@@ -225,10 +236,7 @@ class WorkerManager:
         # Start the pool again
         started = self.start_pool(pool_name)
 
-        return {
-            "stopped": stopped,
-            "started": started
-        }
+        return {"stopped": stopped, "started": started}
 
     def health_check(self) -> Dict[str, any]:
         """Perform health check on worker manager.
@@ -238,7 +246,9 @@ class WorkerManager:
         """
         status = self.get_status()
 
-        running_count = sum(1 for worker in status.values() if worker["status"] == "running")
+        running_count = sum(
+            1 for worker in status.values() if worker["status"] == "running"
+        )
         total_expected = sum(config["worker_count"] for config in WORKER_POOLS.values())
 
         health = {
@@ -246,8 +256,8 @@ class WorkerManager:
             "workers": {
                 "running": running_count,
                 "expected": total_expected,
-                "details": status
-            }
+                "details": status,
+            },
         }
 
         return health
@@ -257,18 +267,28 @@ def setup_logging():
     """Setup logging for the worker manager."""
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
 
 
 def main():
     parser = argparse.ArgumentParser(description="TTS Worker Manager")
-    parser.add_argument("action", choices=["start", "stop", "restart", "status", "health"],
-                       help="Action to perform")
-    parser.add_argument("--pool", choices=list(WORKER_POOLS.keys()) + ["all"],
-                       default="all", help="Worker pool to manage (default: all)")
-    parser.add_argument("--force", action="store_true",
-                       help="Force immediate shutdown (don't wait for graceful)")
+    parser.add_argument(
+        "action",
+        choices=["start", "stop", "restart", "status", "health"],
+        help="Action to perform",
+    )
+    parser.add_argument(
+        "--pool",
+        choices=list(WORKER_POOLS.keys()) + ["all"],
+        default="all",
+        help="Worker pool to manage (default: all)",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Force immediate shutdown (don't wait for graceful)",
+    )
 
     args = parser.parse_args()
 
@@ -317,12 +337,16 @@ def main():
             status = manager.get_status()
             print("Worker Status:")
             for worker_name, info in status.items():
-                print(f"  {worker_name}: {info['status']} (PID: {info.get('pid', 'N/A')})")
+                print(
+                    f"  {worker_name}: {info['status']} (PID: {info.get('pid', 'N/A')})"
+                )
 
         elif args.action == "health":
             health = manager.health_check()
             print(f"Health Status: {health['status']}")
-            print(f"Workers: {health['workers']['running']}/{health['workers']['expected']} running")
+            print(
+                f"Workers: {health['workers']['running']}/{health['workers']['expected']} running"
+            )
 
     except KeyboardInterrupt:
         print("\nShutting down gracefully...")

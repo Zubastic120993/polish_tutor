@@ -1,4 +1,5 @@
 """TTS API router for Murf integration."""
+
 import logging
 from typing import Dict, Optional, Any
 from fastapi import APIRouter, HTTPException, BackgroundTasks
@@ -66,7 +67,7 @@ async def speak_text(
                     "audio_url": audio_url,
                     "cached": True,
                     "cache_key": cache_key,
-                }
+                },
             }
 
         # Submit job using enhanced queue manager
@@ -92,14 +93,16 @@ async def speak_text(
                 "job_id": job_id,
                 "cache_key": cache_key,
                 "estimated_time": "30-60 seconds",
-            }
+            },
         }
 
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Failed to queue TTS job: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to start TTS synthesis: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to start TTS synthesis: {str(e)}"
+        )
 
 
 @router.get("/status/{job_id}")
@@ -122,14 +125,16 @@ async def get_tts_status(job_id: str) -> Dict[str, Any]:
         return {
             "status": "success",
             "message": f"Job status: {status['status']}",
-            "data": status
+            "data": status,
         }
 
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Failed to get job status: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to get job status: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to get job status: {str(e)}"
+        )
 
 
 @router.delete("/jobs/{job_id}")
@@ -150,13 +155,13 @@ async def cancel_tts_job(job_id: str) -> Dict[str, Any]:
             return {
                 "status": "success",
                 "message": "Job cancelled successfully",
-                "data": {"job_id": job_id}
+                "data": {"job_id": job_id},
             }
         else:
             return {
                 "status": "error",
                 "message": "Job could not be cancelled (may already be completed)",
-                "data": {"job_id": job_id}
+                "data": {"job_id": job_id},
             }
 
     except Exception as e:
@@ -181,7 +186,7 @@ async def get_available_voices(language: Optional[str] = None) -> Dict[str, Any]
         return {
             "status": "success",
             "message": "Retrieved available voices",
-            "data": voices
+            "data": voices,
         }
 
     except Exception as e:
@@ -203,12 +208,14 @@ async def get_cache_stats() -> Dict[str, Any]:
         return {
             "status": "success",
             "message": "Retrieved cache statistics",
-            "data": stats
+            "data": stats,
         }
 
     except Exception as e:
         logger.error(f"Failed to get cache stats: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to get cache stats: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to get cache stats: {str(e)}"
+        )
 
 
 @router.post("/cache/cleanup")
@@ -225,12 +232,14 @@ async def cleanup_cache() -> Dict[str, Any]:
         return {
             "status": "success",
             "message": f"Cleaned up {removed_count} expired cache entries",
-            "data": {"removed_count": removed_count}
+            "data": {"removed_count": removed_count},
         }
 
     except Exception as e:
         logger.error(f"Failed to cleanup cache: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to cleanup cache: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to cleanup cache: {str(e)}"
+        )
 
 
 @router.delete("/cache")
@@ -247,7 +256,7 @@ async def clear_cache(confirm: bool = False) -> Dict[str, Any]:
         if not confirm:
             raise HTTPException(
                 status_code=400,
-                detail="Please set confirm=true to clear the entire cache"
+                detail="Please set confirm=true to clear the entire cache",
             )
 
         cache_manager = AudioCacheManager()
@@ -256,7 +265,7 @@ async def clear_cache(confirm: bool = False) -> Dict[str, Any]:
         return {
             "status": "success",
             "message": f"Cleared {removed_count} files from cache",
-            "data": {"removed_count": removed_count}
+            "data": {"removed_count": removed_count},
         }
 
     except HTTPException:
@@ -283,7 +292,7 @@ async def tts_health_check() -> Dict[str, Any]:
         return {
             "status": "success",
             "message": f"TTS service is {health['status']}",
-            "data": health
+            "data": health,
         }
 
     except Exception as e:
@@ -291,7 +300,7 @@ async def tts_health_check() -> Dict[str, Any]:
         return {
             "status": "error",
             "message": "TTS health check failed",
-            "data": {"error": str(e)}
+            "data": {"error": str(e)},
         }
 
 
@@ -309,9 +318,11 @@ async def get_queue_stats() -> Dict[str, Any]:
         return {
             "status": "success",
             "message": "Queue statistics retrieved",
-            "data": stats
+            "data": stats,
         }
 
     except Exception as e:
         logger.error(f"Failed to get queue stats: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to get queue stats: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to get queue stats: {str(e)}"
+        )

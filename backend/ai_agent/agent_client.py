@@ -1,4 +1,5 @@
 """Agent Client for external AI service communication."""
+
 import logging
 from typing import Dict, Optional, Any
 import httpx
@@ -39,7 +40,7 @@ class AgentClient:
         text: str,
         lesson_id: str,
         dialogue_id: str,
-        context: Optional[Dict[str, Any]] = None
+        context: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Detect user intent using AI.
 
@@ -84,7 +85,7 @@ class AgentClient:
         self,
         user_id: int,
         question: str,
-        lesson_context: Optional[Dict[str, Any]] = None
+        lesson_context: Optional[Dict[str, Any]] = None,
     ) -> str:
         """Generate conversational response to user question.
 
@@ -103,7 +104,7 @@ class AgentClient:
         self,
         command: str,
         parameters: Dict[str, Any],
-        context: Optional[Dict[str, Any]] = None
+        context: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Execute an AI-detected command.
 

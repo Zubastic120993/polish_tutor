@@ -1,4 +1,5 @@
 """Backup API endpoints."""
+
 import json
 import logging
 from datetime import datetime
@@ -17,20 +18,20 @@ router = APIRouter(prefix="/api/backup", tags=["backup"])
 @router.get("/export", response_model=BackupExportResponse, status_code=200)
 async def backup_export(
     user_id: int = Query(..., description="User ID", gt=0),
-    format: str = Query("json", description="Export format: 'json' or 'csv'")
+    format: str = Query("json", description="Export format: 'json' or 'csv'"),
 ):
     """Download latest progress backup (JSON or CSV).
-    
+
     Args:
         user_id: User identifier
         format: Export format ('json' or 'csv')
-        
+
     Returns:
         Backup data in requested format
     """
     try:
         database = app_context.database
-        
+
         # Collect all user data
         attempts = database.get_user_attempts(user_id)
         lesson_progress = database.get_user_progresses(user_id)
@@ -60,7 +61,9 @@ async def backup_export(
                     "lesson_id": lp.lesson_id,
                     "current_dialogue_id": lp.current_dialogue_id,
                     "completed": lp.completed,
-                    "last_accessed": lp.last_accessed.isoformat() + "Z" if lp.last_accessed else None,
+                    "last_accessed": (
+                        lp.last_accessed.isoformat() + "Z" if lp.last_accessed else None
+                    ),
                 }
                 for lp in lesson_progress
             ],
@@ -71,18 +74,25 @@ async def backup_export(
                     "interval_days": sm.interval_days,
                     "review_count": sm.review_count,
                     "repetitions": sm.review_count,  # legacy key retained for compatibility
-                    "next_review": sm.next_review.isoformat() + "Z" if sm.next_review else None,
-                    "last_review": sm.last_review.isoformat() + "Z" if sm.last_review else None,
-                    "last_reviewed": sm.last_review.isoformat() + "Z" if sm.last_review else None,
+                    "next_review": (
+                        sm.next_review.isoformat() + "Z" if sm.next_review else None
+                    ),
+                    "last_review": (
+                        sm.last_review.isoformat() + "Z" if sm.last_review else None
+                    ),
+                    "last_reviewed": (
+                        sm.last_review.isoformat() + "Z" if sm.last_review else None
+                    ),
                 }
                 for sm in srs_memories
             ],
-            "settings": {
-                setting.key: setting.value
-                for setting in settings_list
-            } if settings_list else {},
+            "settings": (
+                {setting.key: setting.value for setting in settings_list}
+                if settings_list
+                else {}
+            ),
         }
-        
+
         if format.lower() == "csv":
             # Convert to CSV format (simplified - just return JSON for now)
             # Full CSV conversion would require additional processing
@@ -90,19 +100,16 @@ async def backup_export(
                 content={
                     "status": "success",
                     "message": "CSV format not yet implemented, returning JSON",
-                    "data": backup_data
+                    "data": backup_data,
                 }
             )
         else:
             return {
                 "status": "success",
                 "message": "Backup exported successfully",
-                "data": backup_data
+                "data": backup_data,
             }
-        
+
     except Exception as e:
         logger.error(f"Error in backup_export: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=500,
-            detail=f"Internal server error: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")

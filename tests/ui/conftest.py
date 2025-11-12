@@ -1,4 +1,5 @@
 """Shared fixtures for UI smoke tests."""
+
 import os
 import pytest
 

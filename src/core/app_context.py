@@ -1,4 +1,5 @@
 """Application context for dependency injection."""
+
 from typing import Optional
 
 from src.core.database import SessionLocal
@@ -28,9 +29,12 @@ class AppContext:
         if self._config is None:
             import os
             from dotenv import load_dotenv
+
             load_dotenv()
             self._config = {
-                "database_url": os.getenv("DATABASE_URL", "sqlite:///./data/polish_tutor.db"),
+                "database_url": os.getenv(
+                    "DATABASE_URL", "sqlite:///./data/polish_tutor.db"
+                ),
                 "debug": os.getenv("DEBUG", "False").lower() == "true",
                 "log_level": os.getenv("LOG_LEVEL", "INFO"),
                 "host": os.getenv("HOST", "0.0.0.0"),
@@ -60,4 +64,3 @@ class AppContext:
 
 # Global app context instance
 app_context = AppContext()
-

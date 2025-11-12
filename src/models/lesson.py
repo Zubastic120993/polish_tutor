@@ -1,4 +1,5 @@
 """Lesson model."""
+
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, Index, String, Text
@@ -20,9 +21,12 @@ class Lesson(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     # Relationships
-    phrases = relationship("Phrase", back_populates="lesson", cascade="all, delete-orphan")
-    lesson_progresses = relationship("LessonProgress", back_populates="lesson", cascade="all, delete-orphan")
+    phrases = relationship(
+        "Phrase", back_populates="lesson", cascade="all, delete-orphan"
+    )
+    lesson_progresses = relationship(
+        "LessonProgress", back_populates="lesson", cascade="all, delete-orphan"
+    )
 
     # Indexes
     __table_args__ = (Index("idx_lessons_level", "level"),)
-

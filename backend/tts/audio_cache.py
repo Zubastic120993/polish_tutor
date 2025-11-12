@@ -1,4 +1,5 @@
 """Audio cache manager with hash-based deduplication."""
+
 import hashlib
 import logging
 import os
@@ -49,7 +50,7 @@ class AudioCacheManager:
         provider: str = "murf",
         speed: float = 1.0,
         language: str = "pl",
-        **kwargs
+        **kwargs,
     ) -> str:
         """Generate a unique cache key for audio content.
 
@@ -116,7 +117,7 @@ class AudioCacheManager:
         audio_data: bytes,
         cache_key: str,
         extension: str = "mp3",
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[Dict[str, Any]] = None,
     ) -> Path:
         """Store audio data in cache.
 
@@ -143,7 +144,7 @@ class AudioCacheManager:
             "size": len(audio_data),
             "created_at": datetime.utcnow().isoformat() + "Z",
             "last_accessed": datetime.utcnow().isoformat() + "Z",
-            **(metadata or {})
+            **(metadata or {}),
         }
 
         self.metadata["entries"][cache_key] = entry
@@ -153,10 +154,7 @@ class AudioCacheManager:
         return cache_path
 
     def get_audio(
-        self,
-        cache_key: str,
-        extension: str = "mp3",
-        update_access_time: bool = True
+        self, cache_key: str, extension: str = "mp3", update_access_time: bool = True
     ) -> Optional[Path]:
         """Retrieve cached audio file.
 
@@ -176,7 +174,9 @@ class AudioCacheManager:
         if update_access_time:
             # Update last accessed time
             if cache_key in self.metadata["entries"]:
-                self.metadata["entries"][cache_key]["last_accessed"] = datetime.utcnow().isoformat() + "Z"
+                self.metadata["entries"][cache_key]["last_accessed"] = (
+                    datetime.utcnow().isoformat() + "Z"
+                )
                 self._save_metadata()
 
         return cache_path
@@ -211,7 +211,9 @@ class AudioCacheManager:
         entries_to_remove = []
 
         for cache_key, entry in self.metadata["entries"].items():
-            created_at = datetime.fromisoformat(entry["created_at"].replace("Z", "+00:00"))
+            created_at = datetime.fromisoformat(
+                entry["created_at"].replace("Z", "+00:00")
+            )
             if now - created_at > max_age:
                 # Remove file
                 cache_path = self.cache_dir / entry["path"]

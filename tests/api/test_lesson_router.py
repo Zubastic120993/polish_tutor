@@ -33,7 +33,9 @@ class StubLessonGenerator:
         return self.available
 
     def generate_lesson(self, *, topic, level, num_dialogues):
-        self.calls.append({"topic": topic, "level": level, "num_dialogues": num_dialogues})
+        self.calls.append(
+            {"topic": topic, "level": level, "num_dialogues": num_dialogues}
+        )
         return self.generated_data
 
 

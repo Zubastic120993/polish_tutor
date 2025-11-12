@@ -1,4 +1,5 @@
 """SRS Manager for spaced repetition system using SM-2 algorithm."""
+
 import logging
 from datetime import datetime, timedelta
 from typing import List, Optional, TYPE_CHECKING
@@ -308,7 +309,5 @@ class SRSManager:
                 .all()
             )
 
-        logger.info(
-            f"Found {len(forgotten_items)} forgotten items for user {user_id}"
-        )
+        logger.info(f"Found {len(forgotten_items)} forgotten items for user {user_id}")
         return forgotten_items

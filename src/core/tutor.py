@@ -1,4 +1,5 @@
 """Tutor class for orchestrating conversation flow."""
+
 import logging
 import os
 from datetime import datetime
@@ -61,10 +62,10 @@ class Tutor:
 
         # Track consecutive low scores per user/phrase for auto-reveal
         self._consecutive_lows: Dict[Tuple[int, str], int] = {}
-        
+
         # Track recent user inputs that might indicate confusion (non-Polish, low scores)
         self._confusion_indicators: Dict[int, List[str]] = {}
-        
+
         # Track if user is in conversational mode (free chat vs lesson practice)
         self._conversation_mode: Dict[int, bool] = {}
 
@@ -109,19 +110,23 @@ class Tutor:
 
         # 🤖 AI-POWERED INTENT DETECTION (with local fallback)
         intent = self._detect_intent(user_id, text, lesson_id, dialogue_id)
-        logger.info(f"🤖 AI detected intent: {intent['type']} - {intent.get('action', 'N/A')}")
-        
+        logger.info(
+            f"🤖 AI detected intent: {intent['type']} - {intent.get('action', 'N/A')}"
+        )
+
         # Route based on AI-detected intent
-        if intent['type'] == 'command':
+        if intent["type"] == "command":
             # User wants to execute a command (restart, next, change topic, etc.)
-            return self._execute_ai_detected_command(intent, text, lesson_id, dialogue_id, user_id, speed)
-        
-        elif intent['type'] == 'question':
+            return self._execute_ai_detected_command(
+                intent, text, lesson_id, dialogue_id, user_id, speed
+            )
+
+        elif intent["type"] == "question":
             # User has a question about Polish (conversational mode)
             return self._handle_conversational_response(user_id, text, lesson_id)
-        
+
         # Otherwise, it's practice - continue with normal lesson evaluation
-        
+
         # Load lesson and get current dialogue
         try:
             lesson_data = self.lesson_manager.get_lesson(lesson_id)
@@ -152,9 +157,11 @@ class Tutor:
 
         # Track consecutive lows for auto-reveal
         consecutive_lows = self._consecutive_lows.get((user_id, dialogue_id), 0)
-        
+
         # Check if user seems confused (multiple low scores, non-Polish input)
-        is_confused = self._detect_confusion(user_id, text, expected_phrases, consecutive_lows)
+        is_confused = self._detect_confusion(
+            user_id, text, expected_phrases, consecutive_lows
+        )
 
         # Generate feedback
         feedback = self.feedback_engine.generate_feedback(
@@ -207,7 +214,7 @@ class Tutor:
 
         # Format response - include the tutor's Polish phrase so user knows what they're learning
         tutor_phrase = dialogue.get("tutor", "")
-        
+
         return {
             "status": "success",
             "message": feedback["reply_text"],
@@ -243,16 +250,18 @@ class Tutor:
         logger.debug("Using offline intent detection: %s", fallback_intent)
         return fallback_intent
 
-    def _detect_intent_with_ai(self, user_id: int, text: str, lesson_id: str, dialogue_id: str) -> Optional[Dict]:
+    def _detect_intent_with_ai(
+        self, user_id: int, text: str, lesson_id: str, dialogue_id: str
+    ) -> Optional[Dict]:
         """Use AI to understand user's intent and generate appropriate response.
-        
+
         This is a TRUE AI ASSISTANT - conversational, intelligent, context-aware.
-        
+
         Args:
             text: User's input text
             lesson_id: Current lesson ID
             dialogue_id: Current dialogue ID
-            
+
         Returns:
             Dict with 'type', optional 'action', and 'ai_response' for conversational replies
         """
@@ -260,7 +269,7 @@ class Tutor:
             # Check if OpenAI client is available
             if not self._openai_client:
                 return None
-            
+
             # Use OpenAI to understand intent AND generate response
             system_prompt = """You are a Patient Polish Tutor - an AI assistant that helps people learn Polish.
 
@@ -309,33 +318,36 @@ Examples:
 - "Poproszę kawę" → It's practice"""
 
             user_prompt = f"User input: '{text}'\n\nAnalyze and respond."
-            
+
             response = self._openai_client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
+                    {"role": "user", "content": user_prompt},
                 ],
                 temperature=0.7,  # More conversational
                 max_tokens=200,
             )
-            
+
             # Parse AI response
             ai_response = response.choices[0].message.content.strip()
-            
+
             # Extract JSON from potential markdown
             if "```json" in ai_response:
                 ai_response = ai_response.split("```json")[1].split("```")[0].strip()
             elif "```" in ai_response:
                 ai_response = ai_response.split("```")[1].split("```")[0].strip()
-            
+
             import json
+
             intent = json.loads(ai_response)
-            
+
             return intent
-            
+
         except Exception as e:
-            logger.warning(f"AI intent detection failed: {e}; using fallback heuristics")
+            logger.warning(
+                f"AI intent detection failed: {e}; using fallback heuristics"
+            )
             return None
 
     def _detect_intent_offline(self, text: str) -> Dict:
@@ -358,12 +370,32 @@ Examples:
         )
 
         command_checks = [
-            (("help", "pomoc", "commands", "co mogę", "jak używać"), "help", help_message, False),
-            (("restart", "zacznij od początku", "start over", "od nowa"), "restart", None, False),
+            (
+                ("help", "pomoc", "commands", "co mogę", "jak używać"),
+                "help",
+                help_message,
+                False,
+            ),
+            (
+                ("restart", "zacznij od początku", "start over", "od nowa"),
+                "restart",
+                None,
+                False,
+            ),
             (("next", "dalej", "skip", "kolejne", "continue"), "next", None, False),
-            (("repeat", "powtórz", "again please", "jeszcze raz"), "repeat", None, False),
+            (
+                ("repeat", "powtórz", "again please", "jeszcze raz"),
+                "repeat",
+                None,
+                False,
+            ),
             (("clear chat", "wyczyść", "czyść rozmowę"), "clear", None, False),
-            (("lesson info", "informacje o lekcji", "which lesson", "jaka lekcja"), "lesson_info", None, False),
+            (
+                ("lesson info", "informacje o lekcji", "which lesson", "jaka lekcja"),
+                "lesson_info",
+                None,
+                False,
+            ),
         ]
 
         for keywords, action, ai_response, needs_info in command_checks:
@@ -375,7 +407,15 @@ Examples:
                     "needs_info": needs_info,
                 }
 
-        if contains("change topic", "inny temat", "another topic", "different lesson", "new lesson", "list lessons", "show lessons") or self._is_catalog_request(text):
+        if contains(
+            "change topic",
+            "inny temat",
+            "another topic",
+            "different lesson",
+            "new lesson",
+            "list lessons",
+            "show lessons",
+        ) or self._is_catalog_request(text):
             return {
                 "type": "command",
                 "action": "change_topic",
@@ -385,20 +425,29 @@ Examples:
 
         # Treat obvious questions about Polish as conversational Q&A
         question_triggers = [
-            "what does", "co znaczy", "jak powiedzieć", "how do you say",
-            "why", "dlaczego", "kiedy", "when", "?", "explain", "wytłumacz"
+            "what does",
+            "co znaczy",
+            "jak powiedzieć",
+            "how do you say",
+            "why",
+            "dlaczego",
+            "kiedy",
+            "when",
+            "?",
+            "explain",
+            "wytłumacz",
         ]
         if any(trigger in lowered for trigger in question_triggers):
             return {"type": "question"}
 
         return {"type": "practice"}
-    
+
     def _extract_topic_with_ai(self, text: str) -> str:
         """Use AI to extract the topic from user's request.
-        
+
         Args:
             text: User's input text
-            
+
         Returns:
             Extracted topic string
         """
@@ -407,7 +456,7 @@ Examples:
             if not self._openai_client:
                 logger.warning("OpenAI client not available for topic extraction")
                 return "conversation"
-            
+
             prompt = f"""Extract the topic/subject the user wants to learn about from this text:
 
 "{text}"
@@ -421,36 +470,40 @@ Examples:
 - "can we do something about travel?" → "travel"
 
 Topic:"""
-            
+
             response = self._openai_client.chat.completions.create(
                 model="gpt-4o-mini",
-                messages=[
-                    {"role": "user", "content": prompt}
-                ],
+                messages=[{"role": "user", "content": prompt}],
                 temperature=0.3,
                 max_tokens=20,
             )
-            
+
             topic = response.choices[0].message.content.strip().lower()
-            
+
             # Clean up quotes and extra words
-            topic = topic.replace('"', '').replace("'", '').strip()
-            
+            topic = topic.replace('"', "").replace("'", "").strip()
+
             if not topic or len(topic) < 2:
                 topic = "conversation"
-            
+
             logger.info(f"🎯 Extracted topic: '{topic}'")
             return topic
-            
+
         except Exception as e:
             logger.warning(f"Topic extraction failed: {e}, using default")
             return "conversation"
-    
+
     def _execute_ai_detected_command(
-        self, intent: Dict, text: str, lesson_id: str, dialogue_id: str, user_id: int, speed: float
+        self,
+        intent: Dict,
+        text: str,
+        lesson_id: str,
+        dialogue_id: str,
+        user_id: int,
+        speed: float,
     ) -> Dict:
         """Execute command detected by AI - with conversational responses.
-        
+
         Args:
             intent: Intent dict from AI (includes 'action', 'ai_response', 'needs_info')
             text: Original user text
@@ -458,17 +511,21 @@ Topic:"""
             dialogue_id: Current dialogue ID
             user_id: User ID
             speed: Audio speed
-            
+
         Returns:
             Command response dict
         """
-        action = intent.get('action', 'unknown')
-        ai_response = intent.get('ai_response', '')
-        needs_info = intent.get('needs_info', False)
-        
+        action = intent.get("action", "unknown")
+        ai_response = intent.get("ai_response", "")
+        needs_info = intent.get("needs_info", False)
+
         # If AI needs more information, try to infer if user wants the lesson list
         if needs_info:
-            should_show_catalog = intent.get("action") in {"lesson_info", "change_topic"} or self._is_catalog_request(text) or (ai_response and self._is_catalog_request(ai_response))
+            should_show_catalog = (
+                intent.get("action") in {"lesson_info", "change_topic"}
+                or self._is_catalog_request(text)
+                or (ai_response and self._is_catalog_request(ai_response))
+            )
             if should_show_catalog:
                 lesson_message = self._build_lesson_suggestion_message(limit=6)
                 if lesson_message:
@@ -488,7 +545,9 @@ Topic:"""
                             "timestamp": datetime.utcnow().isoformat() + "Z",
                         },
                     }
-                logger.warning("Lesson catalog unavailable when clarification requested")
+                logger.warning(
+                    "Lesson catalog unavailable when clarification requested"
+                )
                 return {
                     "status": "success",
                     "message": "I can't reach the lesson list right now, but you can still ask for a topic like 'travel' or 'food'.",
@@ -521,9 +580,9 @@ Topic:"""
                     "timestamp": datetime.utcnow().isoformat() + "Z",
                 },
             }
-        
+
         # Handle different command actions
-        if action == 'change_topic':
+        if action == "change_topic":
             # User wants to change topic/lesson
             wants_catalog = needs_info or self._is_catalog_request(text)
             if wants_catalog:
@@ -546,8 +605,12 @@ Topic:"""
                         },
                     }
 
-                logger.warning("Lesson catalog unavailable; falling back to clarification prompt")
-                fallback_message = ai_response or "What topic would you like to practice?"
+                logger.warning(
+                    "Lesson catalog unavailable; falling back to clarification prompt"
+                )
+                fallback_message = (
+                    ai_response or "What topic would you like to practice?"
+                )
                 return {
                     "status": "success",
                     "message": fallback_message,
@@ -567,9 +630,11 @@ Topic:"""
             if self.lesson_generator.can_generate():
                 # Use AI to extract the topic from user's text
                 topic = self._extract_topic_with_ai(text)
-                
-                logger.info(f"🎓 AI understood: User wants to change topic to '{topic}'")
-                
+
+                logger.info(
+                    f"🎓 AI understood: User wants to change topic to '{topic}'"
+                )
+
                 return {
                     "status": "success",
                     "message": f"🎓 Great! Let me create a new lesson about '{topic}'...\n\nThis will take a few seconds. The AI is generating realistic Polish dialogues for you!",
@@ -602,8 +667,8 @@ Topic:"""
                         "timestamp": datetime.utcnow().isoformat() + "Z",
                     },
                 }
-        
-        elif action == 'restart':
+
+        elif action == "restart":
             return {
                 "status": "success",
                 "message": "Okay! Let's restart the lesson from the beginning.",
@@ -619,13 +684,16 @@ Topic:"""
                     "timestamp": datetime.utcnow().isoformat() + "Z",
                 },
             }
-        
-        elif action == 'next' or action == 'skip':
+
+        elif action == "next" or action == "skip":
             # Get next dialogue
             lesson_data = self.lesson_manager.get_lesson(lesson_id)
             if lesson_data:
                 dialogues = lesson_data.get("dialogues", [])
-                current_index = next((i for i, d in enumerate(dialogues) if d.get("id") == dialogue_id), -1)
+                current_index = next(
+                    (i for i, d in enumerate(dialogues) if d.get("id") == dialogue_id),
+                    -1,
+                )
                 if current_index >= 0 and current_index < len(dialogues) - 1:
                     next_dialogue = dialogues[current_index + 1]
                     next_id = next_dialogue.get("id")
@@ -644,8 +712,8 @@ Topic:"""
                             "timestamp": datetime.utcnow().isoformat() + "Z",
                         },
                     }
-        
-        elif action == 'repeat':
+
+        elif action == "repeat":
             return {
                 "status": "success",
                 "message": "Let me repeat that.",
@@ -661,8 +729,8 @@ Topic:"""
                     "timestamp": datetime.utcnow().isoformat() + "Z",
                 },
             }
-        
-        elif action == 'clear':
+
+        elif action == "clear":
             return {
                 "status": "success",
                 "message": "Chat cleared! Ready to continue.",
@@ -678,16 +746,20 @@ Topic:"""
                     "timestamp": datetime.utcnow().isoformat() + "Z",
                 },
             }
-        
-        elif action == 'help':
+
+        elif action == "help":
             # Use AI response if provided, otherwise use default
-            help_text = ai_response if ai_response else (
-                "I'm your AI Polish tutor! You can:\n"
-                "• Ask me to teach you about any topic (restaurants, travel, shopping, etc.)\n"
-                "• Say 'restart', 'next', 'repeat' to control the lesson\n"
-                "• Ask questions like 'what does X mean?'\n"
-                "• Just respond in Polish to practice!\n\n"
-                "I'll understand what you want - just talk to me naturally! 😊"
+            help_text = (
+                ai_response
+                if ai_response
+                else (
+                    "I'm your AI Polish tutor! You can:\n"
+                    "• Ask me to teach you about any topic (restaurants, travel, shopping, etc.)\n"
+                    "• Say 'restart', 'next', 'repeat' to control the lesson\n"
+                    "• Ask questions like 'what does X mean?'\n"
+                    "• Just respond in Polish to practice!\n\n"
+                    "I'll understand what you want - just talk to me naturally! 😊"
+                )
             )
             return {
                 "status": "success",
@@ -704,17 +776,19 @@ Topic:"""
                     "timestamp": datetime.utcnow().isoformat() + "Z",
                 },
             }
-        
-        elif action == 'lesson_info':
+
+        elif action == "lesson_info":
             # Get lesson information
             try:
                 lesson_data = self.lesson_manager.get_lesson(lesson_id)
                 if lesson_data:
                     title = lesson_data.get("title", "Unknown Lesson")
                     level = lesson_data.get("level", "Unknown")
-                    description = lesson_data.get("description", "No description available.")
+                    description = lesson_data.get(
+                        "description", "No description available."
+                    )
                     total_dialogues = len(lesson_data.get("dialogues", []))
-                    
+
                     lesson_info = (
                         f"📚 Lesson Information:\n\n"
                         f"Title: {title}\n"
@@ -724,7 +798,7 @@ Topic:"""
                         f"You're currently practicing dialogue phrases. "
                         f"Try to respond in Polish based on the tutor's prompts!"
                     )
-                    
+
                     return {
                         "status": "success",
                         "message": lesson_info,
@@ -742,7 +816,7 @@ Topic:"""
                     }
             except Exception as e:
                 logger.error(f"Error getting lesson info: {e}")
-        
+
         # Default: acknowledge but don't know what to do
         return {
             "status": "success",
@@ -794,12 +868,14 @@ Topic:"""
             meta_text = f" — {' • '.join(meta_bits)}" if meta_bits else ""
             subtitle = f" ({title_en})" if title_en and title_en != title_pl else ""
 
-            lines.append(f"• {title_pl}{subtitle} — type `{lesson_id}` to start{meta_text}")
+            lines.append(
+                f"• {title_pl}{subtitle} — type `{lesson_id}` to start{meta_text}"
+            )
 
         lines.extend(
             [
                 "",
-                "Just reply with the lesson ID (for example: `A1_L03`) or say the topic you want, and I'll load it for you."
+                "Just reply with the lesson ID (for example: `A1_L03`) or say the topic you want, and I'll load it for you.",
             ]
         )
 
@@ -970,149 +1046,234 @@ Topic:"""
 
         return any(phrase in lowered for phrase in keywords)
 
-    def _detect_confusion(self, user_id: int, text: str, expected_phrases: List[str], consecutive_lows: int) -> bool:
+    def _detect_confusion(
+        self,
+        user_id: int,
+        text: str,
+        expected_phrases: List[str],
+        consecutive_lows: int,
+    ) -> bool:
         """Detect if user seems confused and might need command suggestions.
-        
+
         Indicators of confusion:
         - Multiple consecutive low scores (3+)
         - Input contains mostly English words (not Polish)
         - Input is very short or doesn't match expected patterns
         - Recent inputs suggest user is trying to control the lesson
-        
+
         Args:
             user_id: User ID
             text: User's input text
             expected_phrases: Expected phrases for current dialogue
             consecutive_lows: Number of consecutive low scores
-            
+
         Returns:
             True if user seems confused, False otherwise
         """
         # Track recent inputs for this user
         if user_id not in self._confusion_indicators:
             self._confusion_indicators[user_id] = []
-        
+
         # Add current input to history (keep last 5)
         self._confusion_indicators[user_id].append(text.lower().strip())
         if len(self._confusion_indicators[user_id]) > 5:
             self._confusion_indicators[user_id].pop(0)
-        
+
         # Check multiple indicators
         confusion_score = 0
-        
+
         # Indicator 1: Many consecutive low scores
         if consecutive_lows >= 3:
             confusion_score += 2
-        
+
         # Indicator 2: Input contains English words that look like commands
-        english_command_words = ['start', 'restart', 'clear', 'next', 'skip', 'repeat', 'help', 
-                                'begin', 'reset', 'stop', 'end', 'quit', 'exit', 'back']
+        english_command_words = [
+            "start",
+            "restart",
+            "clear",
+            "next",
+            "skip",
+            "repeat",
+            "help",
+            "begin",
+            "reset",
+            "stop",
+            "end",
+            "quit",
+            "exit",
+            "back",
+        ]
         text_lower = text.lower()
         if any(word in text_lower for word in english_command_words):
             confusion_score += 1
-        
+
         # Indicator 3: Very short input that doesn't match expected phrases
         if len(text.strip()) < 5 and expected_phrases:
             # Check if it's similar to any expected phrase
             normalized_text = self.feedback_engine.normalize_text(text)
             min_similarity = min(
-                self.feedback_engine.calculate_similarity(normalized_text, exp) 
+                self.feedback_engine.calculate_similarity(normalized_text, exp)
                 for exp in expected_phrases
             )
             if min_similarity < 0.3:
                 confusion_score += 1
-        
+
         # Indicator 4: Recent inputs suggest confusion (multiple non-Polish inputs)
         recent_inputs = self._confusion_indicators[user_id][-3:]  # Last 3 inputs
-        non_polish_count = sum(1 for inp in recent_inputs 
-                              if any(word in inp for word in english_command_words))
+        non_polish_count = sum(
+            1
+            for inp in recent_inputs
+            if any(word in inp for word in english_command_words)
+        )
         if non_polish_count >= 2:
             confusion_score += 1
-        
+
         # User is confused if score >= 2
         return confusion_score >= 2
-    
+
     def _is_conversational_query(self, text: str, user_id: int) -> bool:
         """Detect if user wants to have a free conversation (not practicing a specific phrase).
-        
+
         Indicators:
         - Questions about Polish language, grammar, vocabulary
         - General questions not related to current dialogue
         - User explicitly asks to chat or have a conversation
         - User is in conversation mode (from previous interaction)
-        
+
         Args:
             text: User's input text
             user_id: User ID
-            
+
         Returns:
             True if this should be treated as conversational, False otherwise
         """
         text_lower = text.lower().strip()
-        
+
         # Check if user is already in conversation mode
         if self._conversation_mode.get(user_id, False):
             # Stay in conversation mode unless user explicitly wants to practice
-            if any(word in text_lower for word in ['practice', 'lesson', 'exercise', 'ćwicz', 'lekcja']):
+            if any(
+                word in text_lower
+                for word in ["practice", "lesson", "exercise", "ćwicz", "lekcja"]
+            ):
                 self._conversation_mode[user_id] = False
                 return False
             return True
-        
+
         # Question patterns that indicate conversational queries
         question_patterns = [
-            'what is', 'what are', 'what does', 'what do', 'how do', 'how to', 'how is',
-            'why', 'when', 'where', 'can you explain', 'can you tell', 'tell me about',
-            'what does mean', 'what means', 'co to znaczy', 'co znaczy', 'jak powiedzieć',
-            'jak się mówi', 'what is the difference', 'what\'s the difference',
-            'explain', 'help me understand', 'pomóż mi zrozumieć'
+            "what is",
+            "what are",
+            "what does",
+            "what do",
+            "how do",
+            "how to",
+            "how is",
+            "why",
+            "when",
+            "where",
+            "can you explain",
+            "can you tell",
+            "tell me about",
+            "what does mean",
+            "what means",
+            "co to znaczy",
+            "co znaczy",
+            "jak powiedzieć",
+            "jak się mówi",
+            "what is the difference",
+            "what's the difference",
+            "explain",
+            "help me understand",
+            "pomóż mi zrozumieć",
         ]
-        
+
         # Check if it's a question
         if any(pattern in text_lower for pattern in question_patterns):
             # Check if it's about Polish language/grammar/culture
-            polish_topics = ['polish', 'polski', 'grammar', 'gramatyka', 'vocabulary', 
-                           'słownictwo', 'pronunciation', 'wymowa', 'word', 'słowo',
-                           'phrase', 'fraza', 'sentence', 'zdanie', 'verb', 'czasownik',
-                           'noun', 'rzeczownik', 'adjective', 'przymiotnik', 'culture',
-                           'kultura', 'meaning', 'znaczenie', 'translation', 'tłumaczenie']
-            
+            polish_topics = [
+                "polish",
+                "polski",
+                "grammar",
+                "gramatyka",
+                "vocabulary",
+                "słownictwo",
+                "pronunciation",
+                "wymowa",
+                "word",
+                "słowo",
+                "phrase",
+                "fraza",
+                "sentence",
+                "zdanie",
+                "verb",
+                "czasownik",
+                "noun",
+                "rzeczownik",
+                "adjective",
+                "przymiotnik",
+                "culture",
+                "kultura",
+                "meaning",
+                "znaczenie",
+                "translation",
+                "tłumaczenie",
+            ]
+
             if any(topic in text_lower for topic in polish_topics):
                 self._conversation_mode[user_id] = True
                 return True
-        
+
         # Explicit conversation requests (but exclude restart-related "let's" phrases)
         conversation_requests = [
-            'let\'s chat', 'can we chat', 'chat with me', 'talk to me', 'rozmawiajmy',
-            'porozmawiajmy', 'pogadajmy', 'conversation mode', 'chat mode'
+            "let's chat",
+            "can we chat",
+            "chat with me",
+            "talk to me",
+            "rozmawiajmy",
+            "porozmawiajmy",
+            "pogadajmy",
+            "conversation mode",
+            "chat mode",
         ]
-        
+
         # Check for conversation requests, but exclude if it's a restart command
-        restart_keywords = ['start', 'restart', 'begin', 'from start', 'from the start', 'over']
+        restart_keywords = [
+            "start",
+            "restart",
+            "begin",
+            "from start",
+            "from the start",
+            "over",
+        ]
         if any(req in text_lower for req in conversation_requests):
             # Make sure it's not a restart command in disguise
             if not any(keyword in text_lower for keyword in restart_keywords):
                 self._conversation_mode[user_id] = True
                 return True
-        
+
         # If text is very long or contains multiple sentences, might be conversational
-        if len(text.split('.')) > 2 or len(text.split('?')) > 1:
+        if len(text.split(".")) > 2 or len(text.split("?")) > 1:
             # Check if it doesn't look like a practice response
-            if not any(word in text_lower for word in ['proszę', 'dziękuję', 'poproszę', 'kawa', 'herbata']):
+            if not any(
+                word in text_lower
+                for word in ["proszę", "dziękuję", "poproszę", "kawa", "herbata"]
+            ):
                 # Might be conversational, but be conservative
                 pass
-        
+
         return False
-    
+
     def _handle_conversational_response(
         self, user_id: int, text: str, lesson_id: str
     ) -> Dict:
         """Handle conversational mode - free chat about Polish language.
-        
+
         Args:
             user_id: User ID
             text: User's input text
             lesson_id: Current lesson ID (for context)
-            
+
         Returns:
             Response dictionary with conversational reply
         """
@@ -1124,16 +1285,14 @@ Topic:"""
                 lesson_context = f"Lesson: {lesson_data.get('title', lesson_id)}"
         except Exception:
             pass
-        
+
         # Generate conversational response
         conversational_reply = self.feedback_engine.generate_conversational_response(
-            user_text=text,
-            user_id=user_id,
-            lesson_context=lesson_context
+            user_text=text, user_id=user_id, lesson_context=lesson_context
         )
-        
+
         logger.info(f"Conversational mode - User {user_id}: '{text[:50]}...'")
-        
+
         return {
             "status": "success",
             "message": conversational_reply,
@@ -1152,7 +1311,7 @@ Topic:"""
                 "timestamp": datetime.utcnow().isoformat() + "Z",
             },
         }
-    
+
     def _get_dialogue(self, lesson_data: Dict, dialogue_id: str) -> Optional[Dict]:
         """Get dialogue from lesson data.
 
@@ -1266,11 +1425,15 @@ Topic:"""
                 if rel_path.startswith("./"):
                     rel_path = rel_path[2:]
                 audio_paths.append(f"/{rel_path}")
-                logger.info(f"✅ Audio found for dialogue {dialogue_id}: {rel_path} (source: {source})")
+                logger.info(
+                    f"✅ Audio found for dialogue {dialogue_id}: {rel_path} (source: {source})"
+                )
             else:
                 # Audio generation failed - log warning
                 # Frontend will generate on-demand when user clicks the audio button
-                logger.warning(f"⚠️ No audio available for dialogue {dialogue_id}, text: '{tutor_text[:50]}...' - will generate on-demand")
+                logger.warning(
+                    f"⚠️ No audio available for dialogue {dialogue_id}, text: '{tutor_text[:50]}...' - will generate on-demand"
+                )
 
         # Also include audio for next dialogue if available
         if next_dialogue_id:

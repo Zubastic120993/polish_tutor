@@ -4,6 +4,7 @@ Priority Chain:
 - Online Mode: GPT-4-TTS → ElevenLabs → gTTS (legacy)
 - Offline Mode: Coqui-TTS → pyttsx3 (emergency)
 """
+
 import hashlib
 import logging
 import os
@@ -109,14 +110,14 @@ class SpeechEngine:
         if pyttsx3:
             try:
                 self._pyttsx3_engine = pyttsx3.init()
-                
+
                 # Set slower, more natural rate
                 try:
                     self._pyttsx3_engine.setProperty("rate", 150)
                     self._pyttsx3_engine.setProperty("volume", 0.9)
                 except Exception:
                     pass
-                
+
                 # Try to find Polish voice
                 try:
                     voices = self._pyttsx3_engine.getProperty("voices")
@@ -127,14 +128,18 @@ class SpeechEngine:
                             break
                 except Exception:
                     pass
-                    
+
                 logger.info("✅ pyttsx3 initialized (emergency fallback)")
             except Exception as e:
                 logger.warning(f"Failed to initialize pyttsx3: {e}")
                 self._pyttsx3_engine = None
 
     def generate_cache_key(
-        self, text: str, voice_id: str = "default", speed: float = 1.0, engine: str = "auto"
+        self,
+        text: str,
+        voice_id: str = "default",
+        speed: float = 1.0,
+        engine: str = "auto",
     ) -> str:
         """Generate MD5 cache key for audio.
 
@@ -288,12 +293,18 @@ class SpeechEngine:
             return None
 
         try:
-            logger.info(f"🎤 Generating audio with GPT-4-TTS for text: '{text[:50]}...'")
-            
+            logger.info(
+                f"🎤 Generating audio with GPT-4-TTS for text: '{text[:50]}...'"
+            )
+
             # Determine voice (alloy, echo, fable, onyx, nova, shimmer)
             # For Polish, 'alloy' and 'nova' work well
-            voice = voice_id if voice_id in ["alloy", "echo", "fable", "onyx", "nova", "shimmer"] else "alloy"
-            
+            voice = (
+                voice_id
+                if voice_id in ["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
+                else "alloy"
+            )
+
             # Generate audio
             response = self._openai_client.audio.speech.create(
                 model="tts-1-hd",  # High quality model (tts-1-hd is better than tts-1)
@@ -301,16 +312,18 @@ class SpeechEngine:
                 input=text,
                 speed=speed,  # OpenAI supports speed parameter directly
             )
-            
+
             # Save to cache
             cache_key = self.generate_cache_key(text, voice_id, speed, "gpt4")
             output_path = self.cache_dir / f"{cache_key}.mp3"
-            
+
             response.stream_to_file(str(output_path))
-            
-            logger.info(f"✅ Successfully generated audio with GPT-4-TTS: {output_path}")
+
+            logger.info(
+                f"✅ Successfully generated audio with GPT-4-TTS: {output_path}"
+            )
             return output_path
-            
+
         except Exception as e:
             logger.error(f"❌ GPT-4-TTS generation failed: {e}", exc_info=True)
             return None
@@ -323,69 +336,75 @@ class SpeechEngine:
             return None
 
         try:
-            logger.info(f"🎤 Generating audio with ElevenLabs for text: '{text[:50]}...'")
-            
+            logger.info(
+                f"🎤 Generating audio with ElevenLabs for text: '{text[:50]}...'"
+            )
+
             # Use ElevenLabs multilingual v2 model
             # Voice IDs: You can use pre-made voices or custom ones
             # For Polish, "Adam" (pNInz6obpgDQGcFmaJgB) works well
             voice = voice_id if len(voice_id) > 10 else "pNInz6obpgDQGcFmaJgB"
-            
+
             # Generate audio
             audio_generator = self._elevenlabs_client.generate(
                 text=text,
                 voice=voice,
                 model="eleven_multilingual_v2",
             )
-            
+
             # Save to cache
             cache_key = self.generate_cache_key(text, voice_id, speed, "elevenlabs")
             temp_path = self.cache_dir / f"{cache_key}_temp.mp3"
             output_path = self.cache_dir / f"{cache_key}.mp3"
-            
+
             # Save the audio
             save(audio_generator, str(temp_path))
-            
+
             # Adjust speed if needed
             if speed != 1.0 and AudioSegment:
                 self._adjust_speed(temp_path, output_path, speed)
                 temp_path.unlink()
             else:
                 temp_path.rename(output_path)
-            
-            logger.info(f"✅ Successfully generated audio with ElevenLabs: {output_path}")
+
+            logger.info(
+                f"✅ Successfully generated audio with ElevenLabs: {output_path}"
+            )
             return output_path
-            
+
         except Exception as e:
             logger.error(f"❌ ElevenLabs generation failed: {e}", exc_info=True)
             return None
 
     def _ensure_coqui_initialized(self) -> bool:
         """Lazily initialize Coqui-TTS when needed.
-        
+
         Returns:
             True if Coqui-TTS is available and initialized, False otherwise
         """
         if self._coqui_tts_initialized:
             return self._coqui_tts is not None
-        
+
         if not self._coqui_tts_available:
             return False
-        
+
         self._coqui_tts_initialized = True
-        
+
         try:
             # Use a multi-lingual model that supports Polish
             # Model: "tts_models/multilingual/multi-dataset/xtts_v2"
             # Note: COQUI_TOS_AGREED is set at module level to accept license non-interactively
             logger.info("🔄 Initializing Coqui-TTS (this may take a moment)...")
-            self._coqui_tts = TTS(model_name="tts_models/multilingual/multi-dataset/xtts_v2")
+            self._coqui_tts = TTS(
+                model_name="tts_models/multilingual/multi-dataset/xtts_v2"
+            )
             logger.info("✅ Coqui-TTS initialized (offline mode)")
             return True
         except Exception as e:
             logger.warning(f"Failed to initialize Coqui-TTS: {e}")
             self._coqui_tts = None
             return False
-    
+
     def _generate_with_coqui(
         self, text: str, speed: float, voice_id: str
     ) -> Optional[Path]:
@@ -394,74 +413,86 @@ class SpeechEngine:
             return None
 
         try:
-            logger.info(f"🔊 Generating audio with Coqui-TTS (offline) for text: '{text[:50]}...'")
-            
+            logger.info(
+                f"🔊 Generating audio with Coqui-TTS (offline) for text: '{text[:50]}...'"
+            )
+
             # Generate cache key
             cache_key = self.generate_cache_key(text, voice_id, speed, "coqui")
             temp_path = self.cache_dir / f"{cache_key}_temp.wav"
             output_path = self.cache_dir / f"{cache_key}.mp3"
-            
+
             # Generate audio with Coqui XTTS v2
             # XTTS v2 requires either speaker_wav (reference audio) or speaker_id
             # Since we don't have pre-recorded reference audio, we'll generate a simple
             # reference audio using pyttsx3 first, then use it for voice cloning
             # This creates a consistent voice for Polish TTS
-            
+
             # Create a reference audio file for voice cloning (if not exists)
             ref_audio_dir = self.cache_dir / "coqui_ref"
             ref_audio_dir.mkdir(exist_ok=True)
             ref_audio_path = ref_audio_dir / "polish_ref.wav"
-            
+
             # Generate reference audio if it doesn't exist
             if not ref_audio_path.exists() and self._pyttsx3_engine:
                 try:
                     ref_text = "Dzień dobry"  # Simple Polish reference text
                     self._pyttsx3_engine.save_to_file(ref_text, str(ref_audio_path))
                     self._pyttsx3_engine.runAndWait()
-                    logger.info(f"Created reference audio for Coqui-TTS: {ref_audio_path}")
+                    logger.info(
+                        f"Created reference audio for Coqui-TTS: {ref_audio_path}"
+                    )
                 except Exception as e:
                     logger.warning(f"Failed to create reference audio: {e}")
                     # Fall back to pyttsx3 if we can't create reference
                     return None
-            
+
             # Use reference audio for voice cloning
             if ref_audio_path.exists():
                 self._coqui_tts.tts_to_file(
                     text=text,
                     file_path=str(temp_path),
                     language="pl",
-                    speaker_wav=str(ref_audio_path),  # Use reference audio for voice cloning
+                    speaker_wav=str(
+                        ref_audio_path
+                    ),  # Use reference audio for voice cloning
                 )
             else:
                 # If no reference audio, try without speaker (may not work)
-                logger.warning("No reference audio available, trying without speaker_wav")
+                logger.warning(
+                    "No reference audio available, trying without speaker_wav"
+                )
                 self._coqui_tts.tts_to_file(
                     text=text,
                     file_path=str(temp_path),
                     language="pl",
                 )
-            
+
             # Convert WAV to MP3 and adjust speed
             if temp_path.exists() and AudioSegment:
                 audio = AudioSegment.from_file(str(temp_path))
-                
+
                 # Adjust speed if needed
                 if speed != 1.0:
                     audio = audio._spawn(
-                        audio.raw_data, 
-                        overrides={"frame_rate": int(audio.frame_rate * speed)}
+                        audio.raw_data,
+                        overrides={"frame_rate": int(audio.frame_rate * speed)},
                     )
                     audio = audio.set_frame_rate(audio.frame_rate)
-                
+
                 audio.export(str(output_path), format="mp3", bitrate="128k")
                 temp_path.unlink()
-                
-                logger.info(f"✅ Successfully generated audio with Coqui-TTS: {output_path}")
+
+                logger.info(
+                    f"✅ Successfully generated audio with Coqui-TTS: {output_path}"
+                )
                 return output_path
             else:
-                logger.error("Coqui-TTS temp file was not created or AudioSegment not available")
+                logger.error(
+                    "Coqui-TTS temp file was not created or AudioSegment not available"
+                )
                 return None
-            
+
         except Exception as e:
             logger.error(f"❌ Coqui-TTS generation failed: {e}", exc_info=True)
             return None
@@ -474,16 +505,18 @@ class SpeechEngine:
             return None
 
         try:
-            logger.info(f"🎤 Generating audio with gTTS (legacy) for text: '{text[:50]}...'")
-            
+            logger.info(
+                f"🎤 Generating audio with gTTS (legacy) for text: '{text[:50]}...'"
+            )
+
             # gTTS slow=True is approximately 0.75x speed
             use_slow = speed <= 0.8
             tts = gTTS(text=text, lang=self.language, slow=use_slow)
-            
+
             cache_key = self.generate_cache_key(text, voice_id, speed, "gtts")
             temp_path = self.cache_dir / f"{cache_key}_temp.mp3"
             output_path = self.cache_dir / f"{cache_key}.mp3"
-            
+
             tts.save(str(temp_path))
 
             # Adjust speed if needed
@@ -496,13 +529,13 @@ class SpeechEngine:
                     temp_path.unlink()
                 else:
                     temp_path.rename(output_path)
-                    
+
                 logger.info(f"✅ Successfully generated audio with gTTS: {output_path}")
                 return output_path
             else:
                 logger.error("gTTS temp file was not created")
                 return None
-                
+
         except Exception as e:
             logger.error(f"❌ gTTS generation failed: {e}", exc_info=True)
             return None
@@ -515,8 +548,10 @@ class SpeechEngine:
             return None
 
         try:
-            logger.info(f"🔊 Generating audio with pyttsx3 (emergency) for text: '{text[:50]}...'")
-            
+            logger.info(
+                f"🔊 Generating audio with pyttsx3 (emergency) for text: '{text[:50]}...'"
+            )
+
             # Adjust rate based on speed
             base_rate = 150
             if speed == 0.75:
@@ -525,16 +560,16 @@ class SpeechEngine:
                 rate = int(base_rate * 1.1)
             else:
                 rate = base_rate
-            
+
             try:
                 self._pyttsx3_engine.setProperty("rate", rate)
             except Exception:
                 pass
-            
+
             cache_key = self.generate_cache_key(text, voice_id, speed, "pyttsx3")
             temp_path = self.cache_dir / f"{cache_key}_temp.wav"
             output_path = self.cache_dir / f"{cache_key}.mp3"
-            
+
             self._pyttsx3_engine.save_to_file(text, str(temp_path))
             self._pyttsx3_engine.runAndWait()
 
@@ -545,15 +580,18 @@ class SpeechEngine:
                     audio.export(str(output_path), format="mp3", bitrate="128k")
                 else:
                     import shutil
+
                     shutil.copy(temp_path, output_path)
                 temp_path.unlink()
-                
-                logger.info(f"✅ Successfully generated audio with pyttsx3: {output_path}")
+
+                logger.info(
+                    f"✅ Successfully generated audio with pyttsx3: {output_path}"
+                )
                 return output_path
             else:
                 logger.error("pyttsx3 temp file was not created")
                 return None
-                
+
         except Exception as e:
             logger.error(f"❌ pyttsx3 generation failed: {e}", exc_info=True)
             return None
@@ -562,6 +600,7 @@ class SpeechEngine:
         """Adjust audio playback speed using pydub."""
         if not AudioSegment:
             import shutil
+
             shutil.copy(input_path, output_path)
             return
 
@@ -569,13 +608,15 @@ class SpeechEngine:
             audio = AudioSegment.from_file(str(input_path))
             if speed != 1.0:
                 audio = audio._spawn(
-                    audio.raw_data, overrides={"frame_rate": int(audio.frame_rate * speed)}
+                    audio.raw_data,
+                    overrides={"frame_rate": int(audio.frame_rate * speed)},
                 )
                 audio = audio.set_frame_rate(audio.frame_rate)
             audio.export(str(output_path), format="mp3", bitrate="128k")
         except Exception as e:
             logger.warning(f"Speed adjustment failed: {e}")
             import shutil
+
             shutil.copy(input_path, output_path)
 
     def cleanup_cache(self, max_age_days: int = 30) -> int:
@@ -605,7 +646,7 @@ class SpeechEngine:
 
     def get_available_engines(self) -> dict:
         """Get information about available TTS engines.
-        
+
         Returns:
             Dictionary with engine availability and status
         """

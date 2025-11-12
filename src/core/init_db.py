@@ -1,4 +1,5 @@
 """Database initialization script."""
+
 import os
 import sys
 
@@ -18,18 +19,19 @@ def init_database():
     """Initialize database by running migrations."""
     # Load environment variables
     load_dotenv()
-    
+
     # Ensure data directory exists
     os.makedirs("data", exist_ok=True)
-    
+
     # Run Alembic migrations
     alembic_cfg = Config("alembic.ini")
     command.upgrade(alembic_cfg, "head")
-    
+
     print("✅ Database initialized successfully!")
-    print(f"📁 Database location: {os.getenv('DATABASE_URL', 'sqlite:///./data/polish_tutor.db')}")
+    print(
+        f"📁 Database location: {os.getenv('DATABASE_URL', 'sqlite:///./data/polish_tutor.db')}"
+    )
 
 
 if __name__ == "__main__":
     init_database()
-

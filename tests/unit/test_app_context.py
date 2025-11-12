@@ -1,4 +1,5 @@
 """Unit tests for application context."""
+
 import os
 from unittest.mock import patch, MagicMock
 import pytest
@@ -39,43 +40,47 @@ class TestAppContext:
 
         # Verify config structure
         assert isinstance(config, dict)
-        assert 'database_url' in config
-        assert 'debug' in config
-        assert 'log_level' in config
-        assert 'host' in config
-        assert 'port' in config
+        assert "database_url" in config
+        assert "debug" in config
+        assert "log_level" in config
+        assert "host" in config
+        assert "port" in config
 
-    @patch.dict(os.environ, {
-        'DATABASE_URL': 'sqlite:///./test.db',
-        'DEBUG': 'true',
-        'LOG_LEVEL': 'DEBUG',
-        'HOST': '127.0.0.1',
-        'PORT': '3000'
-    }, clear=True)
+    @patch.dict(
+        os.environ,
+        {
+            "DATABASE_URL": "sqlite:///./test.db",
+            "DEBUG": "true",
+            "LOG_LEVEL": "DEBUG",
+            "HOST": "127.0.0.1",
+            "PORT": "3000",
+        },
+        clear=True,
+    )
     def test_config_property_uses_environment_variables(self):
         """Test config property uses environment variables when set."""
         context = AppContext()
 
         config = context.config
 
-        assert config['database_url'] == 'sqlite:///./test.db'
-        assert config['debug'] is True
-        assert config['log_level'] == 'DEBUG'
-        assert config['host'] == '127.0.0.1'
-        assert config['port'] == 3000
+        assert config["database_url"] == "sqlite:///./test.db"
+        assert config["debug"] is True
+        assert config["log_level"] == "DEBUG"
+        assert config["host"] == "127.0.0.1"
+        assert config["port"] == 3000
 
-    @patch.dict(os.environ, {'DEBUG': 'False'}, clear=True)
+    @patch.dict(os.environ, {"DEBUG": "False"}, clear=True)
     def test_config_property_uses_defaults(self):
         """Test config property uses defaults when environment variables not set."""
         context = AppContext()
 
         config = context.config
 
-        assert config['database_url'] == 'sqlite:///./data/polish_tutor.db'
-        assert config['debug'] is False
-        assert config['log_level'] == 'INFO'
-        assert config['host'] == '0.0.0.0'
-        assert config['port'] == 8000
+        assert config["database_url"] == "sqlite:///./data/polish_tutor.db"
+        assert config["debug"] is False
+        assert config["log_level"] == "INFO"
+        assert config["host"] == "0.0.0.0"
+        assert config["port"] == 8000
 
     def test_config_property_caches_result(self):
         """Test config property caches the result."""
@@ -99,7 +104,7 @@ class TestAppContext:
         # Currently returns None as placeholder
         assert cache_manager is None
 
-    @patch('src.core.app_context.Database')
+    @patch("src.core.app_context.Database")
     def test_database_property_creates_database_instance(self, mock_database_class):
         """Test database property creates Database instance on first access."""
         mock_database_instance = MagicMock()
@@ -113,14 +118,18 @@ class TestAppContext:
         database2 = context.database
 
         # Should create instance only once
-        mock_database_class.assert_called_once_with(session_factory=context._db_session_factory)
+        mock_database_class.assert_called_once_with(
+            session_factory=context._db_session_factory
+        )
         assert database1 is mock_database_instance
         assert database2 is mock_database_instance
         assert database1 is database2
 
-    @patch('src.core.app_context.Tutor')
-    @patch('src.core.app_context.Database')
-    def test_tutor_property_creates_tutor_instance(self, mock_database_class, mock_tutor_class):
+    @patch("src.core.app_context.Tutor")
+    @patch("src.core.app_context.Database")
+    def test_tutor_property_creates_tutor_instance(
+        self, mock_database_class, mock_tutor_class
+    ):
         """Test tutor property creates Tutor instance on first access."""
         mock_database_instance = MagicMock()
         mock_database_class.return_value = mock_database_instance
@@ -150,8 +159,8 @@ class TestAppContext:
         assert isinstance(app_context, AppContext)
         assert app_context is not None
 
-    @patch('src.core.app_context.Database')
-    @patch('src.core.app_context.Tutor')
+    @patch("src.core.app_context.Database")
+    @patch("src.core.app_context.Tutor")
     def test_lazy_initialization_order(self, mock_tutor_class, mock_database_class):
         """Test that database is initialized before tutor."""
         mock_database_instance = MagicMock()

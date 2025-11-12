@@ -1,4 +1,5 @@
 """Playwright-based UI smoke tests."""
+
 import re
 
 import pytest
@@ -11,7 +12,6 @@ def _goto_home(page, app_base_url):
     page.goto(app_base_url, wait_until="networkidle")
     # Wait for main content to be visible (loading screen may stay visible)
     expect(page.locator("#chat-messages")).to_be_visible()
-
 
 
 def test_homepage_shell(page, app_base_url):
@@ -35,7 +35,9 @@ def test_settings_modal_toggle(page, app_base_url):
     page.evaluate("document.getElementById('loading-screen').style.display = 'none'")
 
     # Manually show the settings panel since JavaScript might not be loaded
-    page.evaluate("document.getElementById('settings-panel').classList.remove('hidden')")
+    page.evaluate(
+        "document.getElementById('settings-panel').classList.remove('hidden')"
+    )
 
     # Wait for panel to appear and check visibility
     panel = page.locator("#settings-panel")

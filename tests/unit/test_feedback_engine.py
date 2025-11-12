@@ -67,4 +67,3 @@ def test_generate_feedback_fallback_to_basic_matching(monkeypatch, engine):
     assert feedback["expected_phrase"] == "dzień dobry"
     assert feedback["hint"] == "Spróbuj formalnego powitania."
     assert "Grammar" in feedback["grammar_explanation"]
-

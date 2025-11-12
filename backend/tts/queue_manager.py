@@ -1,4 +1,5 @@
 """Enhanced TTS Queue Manager with monitoring, deduplication, and priority handling."""
+
 import hashlib
 import json
 import logging
@@ -58,11 +59,17 @@ class TTSQueueManager:
 
         # Initialize queues
         self.queues = {}
-        for queue_name in [QUEUE_STANDARD, QUEUE_HIGH_PRIORITY, QUEUE_BATCH, QUEUE_RETRY, QUEUE_DEAD_LETTER]:
+        for queue_name in [
+            QUEUE_STANDARD,
+            QUEUE_HIGH_PRIORITY,
+            QUEUE_BATCH,
+            QUEUE_RETRY,
+            QUEUE_DEAD_LETTER,
+        ]:
             self.queues[queue_name] = Queue(
                 queue_name,
                 connection=self.redis_queue,
-                default_timeout=config.get("tts_worker_timeout", 600)
+                default_timeout=config.get("tts_worker_timeout", 600),
             )
 
         # Configuration
@@ -84,7 +91,7 @@ class TTSQueueManager:
         voice_id: str,
         priority: str = "normal",
         user_id: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ) -> str:
         """Submit TTS job with deduplication, priority handling, and rate limiting.
 
@@ -111,6 +118,7 @@ class TTSQueueManager:
             # Record cache hit (lazy import to avoid circular dependency)
             try:
                 from src.core.metrics import record_cache_hit
+
                 record_cache_hit()
             except ImportError:
                 pass
@@ -120,7 +128,9 @@ class TTSQueueManager:
         # Check for existing job
         existing_job_id = self._get_existing_job(dedup_key)
         if existing_job_id:
-            logger.info(f"Reusing existing job {existing_job_id} for dedup key: {dedup_key}")
+            logger.info(
+                f"Reusing existing job {existing_job_id} for dedup key: {dedup_key}"
+            )
             return existing_job_id
 
         # Select queue based on priority
@@ -131,13 +141,12 @@ class TTSQueueManager:
             "text": text,
             "voice_id": voice_id,
             "cache_key": dedup_key,
-            **kwargs
+            **kwargs,
         }
 
         # Submit job with retry configuration
         retry = Retry(
-            max=self.config["max_retries"],
-            interval=self.config["retry_delay"]
+            max=self.config["max_retries"], interval=self.config["retry_delay"]
         )
 
         job = queue.enqueue(
@@ -146,7 +155,7 @@ class TTSQueueManager:
             job_timeout=self.config["job_ttl"],
             result_ttl=self.config["result_ttl"],
             ttl=self.config["job_ttl"],
-            retry=retry
+            retry=retry,
         )
 
         # Store deduplication mapping
@@ -156,11 +165,14 @@ class TTSQueueManager:
         # Record job submission (lazy import to avoid circular dependency)
         try:
             from src.core.metrics import record_tts_job_submitted
+
             record_tts_job_submitted(priority=priority, user_id=user_id)
         except ImportError:
             pass
 
-        logger.info(f"Submitted TTS job {job.id} to queue {queue.name} with dedup key {dedup_key}")
+        logger.info(
+            f"Submitted TTS job {job.id} to queue {queue.name} with dedup key {dedup_key}"
+        )
         return job.id
 
     def get_job_status(self, job_id: str) -> Optional[Dict[str, Any]]:
@@ -202,16 +214,28 @@ class TTSQueueManager:
                             "job_id": job_id,
                             "status": "completed",
                             "result": job.result,
-                            "completed_at": job.ended_at.isoformat() if job.ended_at else None,
-                            "started_at": job.started_at.isoformat() if job.started_at else None,
-                            "duration": (job.ended_at - job.started_at).total_seconds() if job.ended_at and job.started_at else None,
+                            "completed_at": (
+                                job.ended_at.isoformat() if job.ended_at else None
+                            ),
+                            "started_at": (
+                                job.started_at.isoformat() if job.started_at else None
+                            ),
+                            "duration": (
+                                (job.ended_at - job.started_at).total_seconds()
+                                if job.ended_at and job.started_at
+                                else None
+                            ),
                         }
                     elif job.is_failed:
                         return {
                             "job_id": job_id,
                             "status": "failed",
-                            "error": str(job.exc_info) if job.exc_info else "Unknown error",
-                            "failed_at": job.ended_at.isoformat() if job.ended_at else None,
+                            "error": (
+                                str(job.exc_info) if job.exc_info else "Unknown error"
+                            ),
+                            "failed_at": (
+                                job.ended_at.isoformat() if job.ended_at else None
+                            ),
                         }
                     else:
                         return {
@@ -219,7 +243,9 @@ class TTSQueueManager:
                             "status": "in_progress",
                             "progress": job.meta.get("progress", "unknown"),
                             "murf_job_id": job.meta.get("murf_job_id"),
-                            "started_at": job.started_at.isoformat() if job.started_at else None,
+                            "started_at": (
+                                job.started_at.isoformat() if job.started_at else None
+                            ),
                             "queue_position": self._get_queue_position(job_id),
                         }
                 except:
@@ -272,9 +298,9 @@ class TTSQueueManager:
                 "completed": 0,
                 "failed": 0,
                 "in_progress": 0,
-                "queued": 0
+                "queued": 0,
             },
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
         # Queue statistics
@@ -308,7 +334,7 @@ class TTSQueueManager:
         health = {
             "status": "healthy",
             "checks": {},
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
         # Redis connectivity
@@ -354,14 +380,18 @@ class TTSQueueManager:
 
         try:
             for queue in self.queues.values():
-                failed_registry = FailedJobRegistry(queue.name, connection=queue.connection)
+                failed_registry = FailedJobRegistry(
+                    queue.name, connection=queue.connection
+                )
                 failed_jobs = failed_registry.get_job_ids()
 
                 for job_id in failed_jobs:
                     try:
                         job = Job.fetch(job_id, connection=queue.connection)
                         if job.ended_at:
-                            age_hours = (datetime.utcnow() - job.ended_at).total_seconds() / 3600
+                            age_hours = (
+                                datetime.utcnow() - job.ended_at
+                            ).total_seconds() / 3600
                             if age_hours > max_age_hours:
                                 job.delete()
                                 cleaned_count += 1
@@ -379,12 +409,16 @@ class TTSQueueManager:
 
     # Private helper methods
 
-    def _generate_dedup_key(self, text: str, voice_id: str, params: Dict[str, Any]) -> str:
+    def _generate_dedup_key(
+        self, text: str, voice_id: str, params: Dict[str, Any]
+    ) -> str:
         """Generate deterministic deduplication key."""
         key_data = {
             "text": text.strip().lower()[:1000],  # Limit text length for key
             "voice_id": voice_id,
-            "params": {k: v for k, v in sorted(params.items()) if k not in ["cache_key"]}
+            "params": {
+                k: v for k, v in sorted(params.items()) if k not in ["cache_key"]
+            },
         }
         key_string = json.dumps(key_data, sort_keys=True, default=str)
         return hashlib.sha256(key_string.encode()).hexdigest()
@@ -423,7 +457,7 @@ class TTSQueueManager:
         return {
             "active_count": 0,  # Placeholder
             "total_registered": len(WORKER_POOLS),
-            "pools": WORKER_POOLS
+            "pools": WORKER_POOLS,
         }
 
     def _check_queues_healthy(self) -> bool:
@@ -454,7 +488,9 @@ class TTSQueueManager:
             failed_jobs = 0
 
             for queue in self.queues.values():
-                failed_registry = FailedJobRegistry(queue.name, connection=queue.connection)
+                failed_registry = FailedJobRegistry(
+                    queue.name, connection=queue.connection
+                )
                 failed_jobs += len(failed_registry)
 
                 # Estimate total jobs from finished registry
@@ -478,7 +514,9 @@ class TTSQueueManager:
         """
         try:
             # Use sliding window rate limiting
-            window_key = f"ratelimit:{user_id}:{int(time.time() / 60)}"  # Per minute window
+            window_key = (
+                f"ratelimit:{user_id}:{int(time.time() / 60)}"  # Per minute window
+            )
             count = self.redis_dedup.incr(window_key)
 
             # Set expiration on first request in this window
@@ -496,6 +534,7 @@ class TTSQueueManager:
 
 # Global queue manager instance
 _queue_manager = None
+
 
 def get_queue_manager() -> TTSQueueManager:
     """Get global queue manager instance."""

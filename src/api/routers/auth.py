@@ -1,4 +1,5 @@
 """Authentication router."""
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel, Field
@@ -21,17 +22,20 @@ router = APIRouter(prefix="/auth", tags=["authentication"])
 
 class LoginRequest(BaseModel):
     """Login request model."""
+
     username: str = Field(..., min_length=1, max_length=50)
     password: str = Field(..., min_length=1)
 
 
 class RefreshTokenRequest(BaseModel):
     """Refresh token request model."""
+
     refresh_token: str
 
 
 class UserResponse(BaseModel):
     """User response model."""
+
     id: int
     name: str
     profile_template: str
@@ -39,17 +43,12 @@ class UserResponse(BaseModel):
     @classmethod
     def from_user(cls, user: User) -> "UserResponse":
         """Create UserResponse from User model."""
-        return cls(
-            id=user.id,
-            name=user.name,
-            profile_template=user.profile_template
-        )
+        return cls(id=user.id, name=user.name, profile_template=user.profile_template)
 
 
 @router.post("/login", response_model=dict)
 async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db_service: Database = Depends()
+    form_data: OAuth2PasswordRequestForm = Depends(), db_service: Database = Depends()
 ):
     """Authenticate user and return JWT tokens."""
     user = authenticate_user(db_service, form_data.username, form_data.password)
@@ -74,18 +73,12 @@ async def login(
     return {
         "status": "success",
         "message": "Login successful",
-        "data": {
-            "user": UserResponse.from_user(user),
-            "tokens": tokens.dict()
-        }
+        "data": {"user": UserResponse.from_user(user), "tokens": tokens.dict()},
     }
 
 
 @router.post("/refresh", response_model=dict)
-async def refresh_token(
-    request: RefreshTokenRequest,
-    db_service: Database = Depends()
-):
+async def refresh_token(request: RefreshTokenRequest, db_service: Database = Depends()):
     """Refresh access token using refresh token."""
     try:
         # Verify the refresh token
@@ -120,9 +113,7 @@ async def refresh_token(
         return {
             "status": "success",
             "message": "Token refreshed successfully",
-            "data": {
-                "tokens": tokens.dict()
-            }
+            "data": {"tokens": tokens.dict()},
         }
 
     except Exception as e:
@@ -138,11 +129,7 @@ async def logout(current_user: User = Depends(get_current_user)):
     """Logout user by revoking their refresh token."""
     revoke_refresh_token(current_user.id)
 
-    return {
-        "status": "success",
-        "message": "Logged out successfully",
-        "data": None
-    }
+    return {"status": "success", "message": "Logged out successfully", "data": None}
 
 
 @router.get("/me", response_model=dict)
@@ -151,7 +138,5 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
     return {
         "status": "success",
         "message": "User information retrieved",
-        "data": {
-            "user": UserResponse.from_user(current_user)
-        }
+        "data": {"user": UserResponse.from_user(current_user)},
     }
