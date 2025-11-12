@@ -62,6 +62,7 @@ class StubSession:
         self.added = []
         self.commits = 0
         self.refreshed = []
+        self.expunge_calls = []
 
     def query(self, *_):
         return self
@@ -86,6 +87,9 @@ class StubSession:
 
     def refresh(self, obj):
         self.refreshed.append(obj)
+
+    def expunge(self, obj):
+        self.expunge_calls.append(obj)
 
 
 class StubDB:

@@ -151,6 +151,70 @@ The application includes comprehensive monitoring with structured logging, metri
 
 See `MONITORING_ALERTS.md` for complete SLO definitions, alert configurations, and runbooks.
 
+## 🐳 Docker Deployment
+
+The application includes complete Docker support for containerized deployment:
+
+### Quick Docker Start
+
+```bash
+# Start all services
+docker-compose up -d
+
+# View service status
+docker-compose ps
+
+# View logs
+docker-compose logs -f app
+
+# Run database migrations
+docker-compose exec app alembic upgrade head
+
+# Stop services
+docker-compose down
+```
+
+### Docker Services
+
+- **app**: FastAPI application server (port 8000)
+- **worker-standard** (x4): RQ workers for standard TTS jobs
+- **worker-priority** (x2): High-priority RQ workers
+- **worker-batch** (x1): Batch processing RQ workers
+- **redis**: Redis for queuing and caching (port 6379)
+- **prometheus**: Metrics collection (port 9090)
+
+### Docker Architecture
+
+- **Multi-stage builds** for optimized image sizes
+- **Health checks** for all services
+- **Volume mounts** for persistent data (database, cache, logs)
+- **Service dependencies** ensure proper startup order
+- **Prometheus metrics** collection from all services
+
+### Environment Variables
+
+Create a `.env` file or set environment variables:
+
+```bash
+# Required
+JWT_SECRET_KEY=your-secret-key-here
+
+# Optional
+REDIS_URL=redis://redis:6379
+DATABASE_URL=sqlite:///./data/polish_tutor.db
+PROMETHEUS_MULTIPROC_DIR=/tmp
+```
+
+### CI/CD Pipeline
+
+The repository includes GitHub Actions CI/CD pipeline:
+
+- **Lint**: Code quality checks (flake8, black, mypy)
+- **Test**: Unit and integration tests with coverage
+- **Build**: Multi-platform Docker image builds
+- **Push**: Automated container registry publishing
+- **Deploy**: Staging and production deployment triggers
+
 ## 🏗️ Project Structure
 
 ```

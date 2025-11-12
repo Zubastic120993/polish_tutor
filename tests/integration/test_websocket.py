@@ -14,8 +14,7 @@ logger = logging.getLogger(__name__)
 WS_URI = "ws://localhost:8000/ws/chat"
 
 
-@pytest.mark.asyncio
-async def test_websocket_disconnect():
+async def _run_websocket_disconnect():
     """Test that WebSocket disconnects are handled gracefully."""
     try:
         logger.info("Connecting to WebSocket...")
@@ -60,8 +59,7 @@ async def test_websocket_disconnect():
     assert True
 
 
-@pytest.mark.asyncio
-async def test_normal_disconnect():
+async def _run_normal_disconnect():
     """Test normal WebSocket disconnect (clean close)."""
     try:
         logger.info("Testing normal disconnect...")
@@ -97,8 +95,16 @@ async def test_normal_disconnect():
 
 
 # Manual entry point (optional)
+def test_websocket_disconnect():
+    asyncio.run(_run_websocket_disconnect())
+
+
+def test_normal_disconnect():
+    asyncio.run(_run_normal_disconnect())
+
+
 if __name__ == "__main__":
     print("Manual run: WebSocket disconnect tests")
-    asyncio.run(test_websocket_disconnect())
+    asyncio.run(_run_websocket_disconnect())
     asyncio.run(asyncio.sleep(1))
-    asyncio.run(test_normal_disconnect())
+    asyncio.run(_run_normal_disconnect())

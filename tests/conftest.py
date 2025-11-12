@@ -176,6 +176,9 @@ if "sqlalchemy" not in sys.modules:
         def query(self, *_):
             return self._query
 
+        def expunge(self, *_):
+            pass
+
     def sessionmaker(**_):
         def factory():
             return _DummySession()

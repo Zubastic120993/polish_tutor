@@ -111,6 +111,9 @@ def test_generate_with_pyttsx3_failure(tmp_path):
         mock_engine.save_to_file.side_effect = Exception("TTS error")
         mock_pyttsx3.init.return_value = mock_engine
 
+        # Force re-initialization of the engine to use our mock
+        engine._pyttsx3_engine = mock_engine
+
         result = engine._generate_with_pyttsx3("Test text", 1.0, "default")
 
         assert result is None

@@ -12,8 +12,8 @@ _Last updated: 2025-11-11 — Maintainer: @Zubastic120993_
 | Auth + JWT Setup | @Zubastic120993 | 🟢 Done | 2025-11-20 | [#105](https://github.com/Zubastic120993/polish_tutor/issues/105) |
 | Redis Queue (TTS Jobs) | @Zubastic120993 | 🟢 Done | 2025-11-22 | [#106](https://github.com/Zubastic120993/polish_tutor/issues/106) |
 | Monitoring + Logging | @Zubastic120993 | 🟢 Done | 2025-11-25 | [#107](https://github.com/Zubastic120993/polish_tutor/issues/107) |
-| Deployment Pipeline | @Zubastic120993 | ⚪ Pending | 2025-11-28 | [#108](https://github.com/Zubastic120993/polish_tutor/issues/108) |
-| Documentation & Sign-off | @Zubastic120993 | ⚪ Pending | 2025-12-01 | [#109](https://github.com/Zubastic120993/polish_tutor/issues/109) |
+| Deployment Pipeline | @Zubastic120993 | 🟢 Done | 2025-11-11 | [#108](https://github.com/Zubastic120993/polish_tutor/issues/108) |
+| Documentation & Sign-off | @Zubastic120993 | 🟡 In Progress | 2025-12-01 | [#109](https://github.com/Zubastic120993/polish_tutor/issues/109) |
 | Post-launch QA & Cleanup | @Zubastic120993 | ⚪ Pending | 2025-12-05 | [#110](https://github.com/Zubastic120993/polish_tutor/issues/110) |
 
 ---

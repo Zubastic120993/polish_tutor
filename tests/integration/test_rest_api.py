@@ -10,7 +10,9 @@ These tests verify the complete request-response cycle including:
 """
 import json
 import os
+import shutil
 import subprocess
+import tempfile
 import sys
 from pathlib import Path
 
@@ -21,30 +23,24 @@ INTEGRATION_TEST_SCRIPT = '''
 import json
 import os
 import sys
+import types
 from datetime import datetime, timedelta
 from pathlib import Path
 
 # Ensure reproducible caches for Matplotlib/fontconfig
-project_root = Path(__file__).resolve().parent
+project_root_env = os.environ.get("POLISH_TUTOR_PROJECT_ROOT")
+project_root = Path(project_root_env) if project_root_env else Path(__file__).resolve().parent
 mpl_dir = project_root / ".mplconfig"
 mpl_dir.mkdir(exist_ok=True)
 os.environ.setdefault("MPLCONFIGDIR", str(mpl_dir))
 os.environ.setdefault("FONTCONFIG_PATH", str(mpl_dir))
 
-# Add src to path
+# Add project root and src to path
+sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "src"))
 
 # Set up minimal environment
 os.environ.setdefault("DATABASE_URL", "sqlite:///./data/polish_tutor.db")
-
-from fastapi.testclient import TestClient
-from main import app
-from src.core.app_context import app_context
-
-# Patch SpeechEngine with a lightweight stub
-from src.services import speech_engine as speech_module
-
-TEST_PHRASE_ID = f"integration_phrase_{int(datetime.utcnow().timestamp()*1000)}"
 
 class DummySpeechEngine:
     def __init__(self, *_, **__):
@@ -62,7 +58,17 @@ class DummySpeechEngine:
             "offline": {"available": True, "quality": "medium"},
         }
 
-speech_module.SpeechEngine = DummySpeechEngine
+dummy_module = types.ModuleType("src.services.speech_engine")
+dummy_module.SpeechEngine = DummySpeechEngine
+sys.modules["src.services.speech_engine"] = dummy_module
+
+from fastapi.testclient import TestClient
+from main import app
+from src.core.app_context import app_context
+
+# Patch SpeechEngine with a lightweight stub (stub registered before import)
+
+TEST_PHRASE_ID = f"integration_phrase_{int(datetime.utcnow().timestamp()*1000)}"
 
 client = TestClient(app)
 
@@ -309,47 +315,50 @@ def integration_results():
     """Run integration tests in subprocess to avoid conftest.py interference."""
     project_root = Path(__file__).resolve().parents[2]
 
-    # Write test script to temp file
-    script_path = project_root / "temp_integration_test.py"
+    # Write test script to a writable temp directory (project root may be read-only)
+    temp_dir = Path(tempfile.gettempdir())
+    script_path = temp_dir / "polish_tutor_integration_test.py"
     script_path.write_text(INTEGRATION_TEST_SCRIPT)
+
+    temp_db_path = temp_dir / "polish_tutor_integration.db"
+    original_db = project_root / "data" / "polish_tutor.db"
+    if original_db.exists():
+        shutil.copy(original_db, temp_db_path)
 
     try:
         # Run the test script
         env = os.environ.copy()
         env["PYTHONPATH"] = str(project_root / "src")
+        env["POLISH_TUTOR_PROJECT_ROOT"] = str(project_root)
+        env["DISABLE_FILE_LOGS"] = "1"
+        env["DATABASE_URL"] = f"sqlite:///{temp_db_path}"
         venv_python = project_root / "venv" / "bin" / "python"
         python_exe = str(venv_python) if venv_python.exists() else sys.executable
 
-        # Use shell to source venv
+        command = [python_exe, str(script_path)]
         result = subprocess.run(
-            [f"source {project_root}/venv/bin/activate && {python_exe} {script_path}"],
-            cwd=project_root,
-            env=env,
-            capture_output=False,  # Don't capture so debug prints show up
-            text=True,
-            timeout=60,
-            shell=True
-        )
-        # Re-run to capture output for JSON parsing
-        result = subprocess.run(
-            [f"source {project_root}/venv/bin/activate && {python_exe} {script_path}"],
+            command,
             cwd=project_root,
             env=env,
             capture_output=True,
             text=True,
-            timeout=60,
-            shell=True
+            timeout=120,
+            check=False,
         )
 
         if result.returncode != 0:
             pytest.fail(f"Integration test script failed: {result.stderr}")
 
-        # Parse results
-        results = json.loads(result.stdout)
+        # Parse results (ignore log lines before JSON payload)
+        output_lines = [line for line in result.stdout.splitlines() if line.strip()]
+        if not output_lines:
+            pytest.fail("Integration test script produced no output")
+        results = json.loads(output_lines[-1])
         return results
 
     finally:
         script_path.unlink(missing_ok=True)
+        temp_db_path.unlink(missing_ok=True)
 
 
 class TestRestApiIntegration:

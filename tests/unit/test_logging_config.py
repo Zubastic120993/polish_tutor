@@ -97,8 +97,14 @@ def test_setup_logging_actual_logging_functionality(tmp_path):
 
     # Get a logger and log a message
     logger = logging.getLogger('test_logger')
+    logger.setLevel(logging.INFO)
     test_message = "Test message for logging functionality"
     logger.info(test_message)
+
+    for handler in logging.getLogger().handlers:
+        flush = getattr(handler, "flush", None)
+        if callable(flush):
+            flush()
 
     # Verify the message was written to the log file
     log_file = log_dir / "app.log"
@@ -118,7 +124,13 @@ def test_setup_logging_formatter_configuration(tmp_path):
 
     # Log a message and check format
     logger = logging.getLogger('format_test')
+    logger.setLevel(logging.WARNING)
     logger.warning("Format test message")
+
+    for handler in logging.getLogger().handlers:
+        flush = getattr(handler, "flush", None)
+        if callable(flush):
+            flush()
 
     log_file = log_dir / "app.log"
     content = log_file.read_text()
