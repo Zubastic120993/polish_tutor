@@ -21,7 +21,9 @@ async def backup_export(user_id: int = Query(..., description="User ID", gt=0)):
         database = app_context.database
 
         # Get user data
-        user_srs_memories: List[Dict[str, Any]] = database.get_user_srs_memories(user_id)
+        user_srs_memories: List[Dict[str, Any]] = database.get_user_srs_memories(
+            user_id
+        )
         user_settings: Dict[str, Any] = database.get_user_settings(user_id)
 
         # ----------------------------
@@ -77,4 +79,3 @@ async def backup_export(user_id: int = Query(..., description="User ID", gt=0)):
     except Exception as e:
         logger.error(f"Error exporting backup for user {user_id}: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
-        

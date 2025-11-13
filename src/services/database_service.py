@@ -134,7 +134,9 @@ class Database:
     # ------------------------------------------------------------------
     # Lesson CRUD
     # ------------------------------------------------------------------
-    def create_lesson(self, lesson_id: str, title: str, level: str, **kwargs: Any) -> Lesson:
+    def create_lesson(
+        self, lesson_id: str, title: str, level: str, **kwargs: Any
+    ) -> Lesson:
         return self.create(Lesson, id=lesson_id, title=title, level=level, **kwargs)
 
     def get_lesson(self, lesson_id: str) -> Optional[Lesson]:
@@ -153,8 +155,12 @@ class Database:
     # ------------------------------------------------------------------
     # Phrase CRUD
     # ------------------------------------------------------------------
-    def create_phrase(self, phrase_id: str, lesson_id: str, text: str, **kwargs: Any) -> Phrase:
-        return self.create(Phrase, id=phrase_id, lesson_id=lesson_id, text=text, **kwargs)
+    def create_phrase(
+        self, phrase_id: str, lesson_id: str, text: str, **kwargs: Any
+    ) -> Phrase:
+        return self.create(
+            Phrase, id=phrase_id, lesson_id=lesson_id, text=text, **kwargs
+        )
 
     def get_phrase(self, phrase_id: str) -> Optional[Phrase]:
         return self.get_by_id(Phrase, phrase_id)
@@ -175,24 +181,41 @@ class Database:
     def create_lesson_progress(
         self, user_id: int, lesson_id: str, status: str = "not_started", **kwargs: Any
     ) -> LessonProgress:
-        return self.create(LessonProgress, user_id=user_id, lesson_id=lesson_id, status=status, **kwargs)
+        return self.create(
+            LessonProgress,
+            user_id=user_id,
+            lesson_id=lesson_id,
+            status=status,
+            **kwargs,
+        )
 
     def get_lesson_progress(self, progress_id: int) -> Optional[LessonProgress]:
         return self.get_by_id(LessonProgress, progress_id)
 
-    def get_user_lesson_progress(self, user_id: int, lesson_id: str) -> Optional[LessonProgress]:
+    def get_user_lesson_progress(
+        self, user_id: int, lesson_id: str
+    ) -> Optional[LessonProgress]:
         with self.get_session() as session:
             return (
                 session.query(LessonProgress)
-                .filter(LessonProgress.user_id == user_id, LessonProgress.lesson_id == lesson_id)
+                .filter(
+                    LessonProgress.user_id == user_id,
+                    LessonProgress.lesson_id == lesson_id,
+                )
                 .first()
             )
 
     def get_user_progresses(self, user_id: int) -> List[LessonProgress]:
         with self.get_session() as session:
-            return session.query(LessonProgress).filter(LessonProgress.user_id == user_id).all()
+            return (
+                session.query(LessonProgress)
+                .filter(LessonProgress.user_id == user_id)
+                .all()
+            )
 
-    def update_lesson_progress(self, progress_id: int, **kwargs: Any) -> Optional[LessonProgress]:
+    def update_lesson_progress(
+        self, progress_id: int, **kwargs: Any
+    ) -> Optional[LessonProgress]:
         return self.update(LessonProgress, progress_id, **kwargs)
 
     def delete_lesson_progress(self, progress_id: int) -> bool:
@@ -223,7 +246,9 @@ class Database:
     def get_attempt(self, attempt_id: int) -> Optional[Attempt]:
         return self.get_by_id(Attempt, attempt_id)
 
-    def get_user_attempts(self, user_id: int, limit: Optional[int] = None) -> List[Attempt]:
+    def get_user_attempts(
+        self, user_id: int, limit: Optional[int] = None
+    ) -> List[Attempt]:
         with self.get_session() as session:
             query = (
                 session.query(Attempt)
@@ -234,12 +259,18 @@ class Database:
                 query = query.limit(limit)
             attempts = query.all()
             for a in attempts:
-                _ = a.id; _ = a.phrase_id; _ = a.user_input; _ = a.score
-                _ = a.feedback_type; _ = a.created_at
+                _ = a.id
+                _ = a.phrase_id
+                _ = a.user_input
+                _ = a.score
+                _ = a.feedback_type
+                _ = a.created_at
                 session.expunge(a)
             return attempts
 
-    def get_phrase_attempts(self, phrase_id: str, limit: Optional[int] = None) -> List[Attempt]:
+    def get_phrase_attempts(
+        self, phrase_id: str, limit: Optional[int] = None
+    ) -> List[Attempt]:
         with self.get_session() as session:
             query = (
                 session.query(Attempt)
@@ -250,8 +281,12 @@ class Database:
                 query = query.limit(limit)
             attempts = query.all()
             for a in attempts:
-                _ = a.id; _ = a.user_id; _ = a.user_input; _ = a.score
-                _ = a.feedback_type; _ = a.created_at
+                _ = a.id
+                _ = a.user_id
+                _ = a.user_input
+                _ = a.score
+                _ = a.feedback_type
+                _ = a.created_at
                 session.expunge(a)
             return attempts
 
@@ -298,11 +333,14 @@ class Database:
         """Return SRS items due for review."""
         with self.get_session() as session:
             items = session.query(SRSMemory).filter(SRSMemory.user_id == user_id).all()
-            return [dict(id=i.id, phrase_id=i.phrase_id, due_at=i.due_at) for i in items]
+            return [
+                dict(id=i.id, phrase_id=i.phrase_id, due_at=i.due_at) for i in items
+            ]
 
     def get_user_srs_memories(self, user_id: int) -> List[Dict[str, Any]]:
         """Return all SRS memories for a user."""
         with self.get_session() as session:
             items = session.query(SRSMemory).filter(SRSMemory.user_id == user_id).all()
-            return [dict(id=i.id, phrase_id=i.phrase_id, quality=i.quality) for i in items]
-            
+            return [
+                dict(id=i.id, phrase_id=i.phrase_id, quality=i.quality) for i in items
+            ]

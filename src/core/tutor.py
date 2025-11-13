@@ -91,15 +91,25 @@ class Tutor:
         # Normal practice mode
         lesson_data = self.lesson_manager.get_lesson(lesson_id)
         if not lesson_data:
-            return {"status": "error", "message": f"Lesson not found: {lesson_id}", "data": None}
+            return {
+                "status": "error",
+                "message": f"Lesson not found: {lesson_id}",
+                "data": None,
+            }
 
         dialogue = self._get_dialogue(lesson_data, dialogue_id)
         if not dialogue:
-            return {"status": "error", "message": f"Dialogue not found: {dialogue_id}", "data": None}
+            return {
+                "status": "error",
+                "message": f"Dialogue not found: {dialogue_id}",
+                "data": None,
+            }
 
         expected_phrases = dialogue.get("expected", [])
         consecutive_lows = self._consecutive_lows.get((user_id, dialogue_id), 0)
-        is_confused = self._detect_confusion(user_id, text, expected_phrases, consecutive_lows)
+        is_confused = self._detect_confusion(
+            user_id, text, expected_phrases, consecutive_lows
+        )
 
         # Generate feedback -------------------------------------------------
         feedback = self.feedback_engine.generate_feedback(
@@ -115,7 +125,9 @@ class Tutor:
         raw_score = feedback.get("score")
         raw_feedback_type = feedback.get("feedback_type")
         score: float = float(raw_score) if isinstance(raw_score, (int, float)) else 0.0
-        feedback_type: str = str(raw_feedback_type) if isinstance(raw_feedback_type, str) else "low"
+        feedback_type: str = (
+            str(raw_feedback_type) if isinstance(raw_feedback_type, str) else "low"
+        )
 
         # Update low counter
         if feedback_type == "low":
@@ -124,10 +136,14 @@ class Tutor:
             self._consecutive_lows.pop((user_id, dialogue_id), None)
 
         # Determine next dialogue
-        next_dialogue_id = self._determine_next_dialogue(text, dialogue, lesson_data, score)
+        next_dialogue_id = self._determine_next_dialogue(
+            text, dialogue, lesson_data, score
+        )
 
         # Audio generation
-        audio_paths = self._get_audio_paths(dialogue, lesson_id, dialogue_id, next_dialogue_id, speed)
+        audio_paths = self._get_audio_paths(
+            dialogue, lesson_id, dialogue_id, next_dialogue_id, speed
+        )
 
         # Log attempt
         attempt_id = self._log_attempt(user_id, dialogue_id, text, score, feedback_type)
@@ -162,7 +178,10 @@ class Tutor:
                 "tutor_phrase": tutor_phrase,
                 "dialogue_id": dialogue_id,
             },
-            "metadata": {"attempt_id": attempt_id, "timestamp": datetime.utcnow().isoformat() + "Z"},
+            "metadata": {
+                "attempt_id": attempt_id,
+                "timestamp": datetime.utcnow().isoformat() + "Z",
+            },
         }
 
     # ------------------------------------------------------------------
@@ -170,7 +189,11 @@ class Tutor:
     # ------------------------------------------------------------------
 
     def _determine_next_dialogue(
-        self, user_text: str, dialogue: Dict[str, Any], lesson_data: Dict[str, Any], score: float
+        self,
+        user_text: str,
+        dialogue: Dict[str, Any],
+        lesson_data: Dict[str, Any],
+        score: float,
     ) -> Optional[str]:
         """Determine next dialogue using branching logic."""
         options = dialogue.get("options", [])
@@ -200,7 +223,12 @@ class Tutor:
         return None
 
     def _log_attempt(
-        self, user_id: int, phrase_id: str, user_text: str, score: float, feedback_type: str
+        self,
+        user_id: int,
+        phrase_id: str,
+        user_text: str,
+        score: float,
+        feedback_type: str,
     ) -> Optional[int]:
         """Log attempt to database."""
         try:
@@ -229,7 +257,8 @@ class Tutor:
         if feedback_type == "medium":
             return 2
         return 0 if score < 0.3 else 1
-            # ------------------------------------------------------------------
+        # ------------------------------------------------------------------
+
     # TEMPORARY STUBS to satisfy Mypy (implementations exist elsewhere)
     # ------------------------------------------------------------------
 
@@ -245,8 +274,13 @@ class Tutor:
         return {"type": "practice"}
 
     def _execute_ai_detected_command(
-        self, intent: Dict[str, Any], text: str, lesson_id: str,
-        dialogue_id: str, user_id: int, speed: float
+        self,
+        intent: Dict[str, Any],
+        text: str,
+        lesson_id: str,
+        dialogue_id: str,
+        user_id: int,
+        speed: float,
     ) -> Dict[str, Any]:
         return {"status": "ok", "message": "stub", "data": {}}
 
@@ -255,16 +289,26 @@ class Tutor:
     ) -> Dict[str, Any]:
         return {"status": "ok", "message": "stub", "data": {}}
 
-    def _get_dialogue(self, lesson_data: Dict[str, Any], dialogue_id: str) -> Optional[Dict[str, Any]]:
+    def _get_dialogue(
+        self, lesson_data: Dict[str, Any], dialogue_id: str
+    ) -> Optional[Dict[str, Any]]:
         return None
 
     def _detect_confusion(
-        self, user_id: int, text: str, expected_phrases: List[str], consecutive_lows: int
+        self,
+        user_id: int,
+        text: str,
+        expected_phrases: List[str],
+        consecutive_lows: int,
     ) -> bool:
         return False
 
     def _get_audio_paths(
-        self, dialogue: Dict[str, Any], lesson_id: str,
-        dialogue_id: str, next_dialogue_id: Optional[str], speed: float
+        self,
+        dialogue: Dict[str, Any],
+        lesson_id: str,
+        dialogue_id: str,
+        next_dialogue_id: Optional[str],
+        speed: float,
     ) -> List[str]:
         return []

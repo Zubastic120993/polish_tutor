@@ -122,8 +122,12 @@ class FeedbackEngine:
             expected_norm = self.normalize_text(expected_text)
             if not user_norm or not expected_norm:
                 return 0.0
-            user_ph = phonemize(user_norm, backend=backend, language=self.language, strip=True)
-            exp_ph = phonemize(expected_norm, backend=backend, language=self.language, strip=True)
+            user_ph = phonemize(
+                user_norm, backend=backend, language=self.language, strip=True
+            )
+            exp_ph = phonemize(
+                expected_norm, backend=backend, language=self.language, strip=True
+            )
             if not user_ph or not exp_ph:
                 return None
             max_len = max(len(user_ph), len(exp_ph))
@@ -167,7 +171,10 @@ Respond in JSON:
             response = self._openai_client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
-                    {"role": "system", "content": "You are a helpful Polish tutor. Reply only with valid JSON."},
+                    {
+                        "role": "system",
+                        "content": "You are a helpful Polish tutor. Reply only with valid JSON.",
+                    },
                     {"role": "user", "content": prompt},
                 ],
                 temperature=0.3,
@@ -187,7 +194,9 @@ Respond in JSON:
     # -----------------------------------------------------------------
     # Combined methods
     # -----------------------------------------------------------------
-    def calculate_combined_similarity(self, user_text: str, expected_text: str) -> float:
+    def calculate_combined_similarity(
+        self, user_text: str, expected_text: str
+    ) -> float:
         """Combine text and phoneme similarity."""
         text_sim = self.calculate_similarity(user_text, expected_text)
         phoneme_sim = self.calculate_phoneme_similarity(user_text, expected_text)
@@ -232,11 +241,17 @@ Respond in JSON:
                 "expected_phrase": expected_phrases[0] if expected_phrases else None,
             }
 
-        ai_score, _ = self.evaluate_with_ai(user_text, expected_phrases, f"Grammar: {grammar}" if grammar else "")
+        ai_score, _ = self.evaluate_with_ai(
+            user_text, expected_phrases, f"Grammar: {grammar}" if grammar else ""
+        )
         if ai_score is not None:
             best_score = ai_score
             best_match = expected_phrases[0]
-            feedback_type = "high" if best_score >= 0.75 else "medium" if best_score >= 0.5 else "low"
+            feedback_type = (
+                "high"
+                if best_score >= 0.75
+                else "medium" if best_score >= 0.5 else "low"
+            )
         else:
             best_score = 0.0
             best_match = expected_phrases[0]
@@ -244,9 +259,13 @@ Respond in JSON:
                 s = self.calculate_combined_similarity(user_text, exp)
                 if s > best_score:
                     best_score, best_match = s, exp
-            feedback_type = self.get_feedback_type(best_score, self.calculate_threshold(len(best_match)))
+            feedback_type = self.get_feedback_type(
+                best_score, self.calculate_threshold(len(best_match))
+            )
 
-        reply = self._generate_reply_text(feedback_type, user_text, best_match, consecutive_lows, suggest_commands)
+        reply = self._generate_reply_text(
+            feedback_type, user_text, best_match, consecutive_lows, suggest_commands
+        )
         show_answer = consecutive_lows >= 2
         grammar_explanation = GRAMMAR_EXPLANATIONS.get(grammar) if grammar else None
 
@@ -274,17 +293,21 @@ Respond in JSON:
         base = random.choice(messages)
         cmd_tip = ""
         if suggest_commands:
-            cmd_tip = (
-                "\n\n💡 Tip: You can use commands like 'restart', 'next', or 'help' to control the lesson."
-            )
+            cmd_tip = "\n\n💡 Tip: You can use commands like 'restart', 'next', or 'help' to control the lesson."
         if feedback_type == "high":
             return base + cmd_tip
         elif feedback_type == "medium":
             return f"{base} Spróbuj jeszcze raz." + cmd_tip
         else:
             if consecutive_lows >= 2:
-                return f"{base} Poprawna odpowiedź to: '{expected_phrase}'. Spróbuj jeszcze raz!" + cmd_tip
-            return f"{base} Pomyśl o: '{expected_phrase[:len(expected_phrase)//2]}...'" + cmd_tip
+                return (
+                    f"{base} Poprawna odpowiedź to: '{expected_phrase}'. Spróbuj jeszcze raz!"
+                    + cmd_tip
+                )
+            return (
+                f"{base} Pomyśl o: '{expected_phrase[:len(expected_phrase)//2]}...'"
+                + cmd_tip
+            )
 
     # -----------------------------------------------------------------
     # Conversation mode
@@ -321,9 +344,14 @@ Respond in JSON:
             )
             answer = resp.choices[0].message.content.strip()
             self._conversation_history[user_id].extend(
-                [{"role": "user", "content": user_text}, {"role": "assistant", "content": answer}]
+                [
+                    {"role": "user", "content": user_text},
+                    {"role": "assistant", "content": answer},
+                ]
             )
-            self._conversation_history[user_id] = self._conversation_history[user_id][-20:]
+            self._conversation_history[user_id] = self._conversation_history[user_id][
+                -20:
+            ]
             return answer
         except Exception as e:
             logger.error(f"Conversational response failed: {e}")
@@ -334,5 +362,3 @@ Respond in JSON:
         if user_id in self._conversation_history:
             del self._conversation_history[user_id]
             logger.info(f"Conversation history cleared for user {user_id}")
-
-            

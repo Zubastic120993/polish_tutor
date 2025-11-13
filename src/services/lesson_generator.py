@@ -47,12 +47,17 @@ class LessonGenerator:
 
         try:
             prompt = self._build_lesson_prompt(topic, level, total_dialogues)
-            logger.info(f"🎓 Generating lesson: '{topic}' (Level: {level}, Dialogues: {total_dialogues})")
+            logger.info(
+                f"🎓 Generating lesson: '{topic}' (Level: {level}, Dialogues: {total_dialogues})"
+            )
 
             response = self._openai_client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
-                    {"role": "system", "content": "You are an expert Polish language teacher creating A0–A1 lessons."},
+                    {
+                        "role": "system",
+                        "content": "You are an expert Polish language teacher creating A0–A1 lessons.",
+                    },
                     {"role": "user", "content": prompt},
                 ],
                 temperature=0.7,
@@ -134,7 +139,9 @@ Make it engaging, practical, and beginner-friendly!"""
         safe_topic = (topic or "conversation").strip() or "conversation"
         topic_title = safe_topic.title()
         topic_simple = safe_topic.lower()
-        topic_slug = re.sub(r"[^a-z0-9]+", "_", topic_simple).strip("_") or "conversation"
+        topic_slug = (
+            re.sub(r"[^a-z0-9]+", "_", topic_simple).strip("_") or "conversation"
+        )
 
         templates: List[Dict[str, Any]] = [
             {
@@ -173,14 +180,22 @@ Make it engaging, practical, and beginner-friendly!"""
         for idx in range(num_dialogues):
             template = templates[min(idx, len(templates) - 1)]
             dialogue_id = f"offline_{topic_slug}_d{idx + 1:02d}"
-            next_id = f"offline_{topic_slug}_d{idx + 2:02d}" if idx + 1 < num_dialogues else None
+            next_id = (
+                f"offline_{topic_slug}_d{idx + 2:02d}"
+                if idx + 1 < num_dialogues
+                else None
+            )
 
-            tutor_line = template["tutor"].format(topic=topic_title, topic_simple=topic_simple)
+            tutor_line = template["tutor"].format(
+                topic=topic_title, topic_simple=topic_simple
+            )
             expected_lines = [
                 phrase.format(topic=topic_title, topic_simple=topic_simple)
                 for phrase in template.get("expected", [])
             ]
-            translation_line = template["translation"].format(topic=topic_title, topic_simple=topic_simple)
+            translation_line = template["translation"].format(
+                topic=topic_title, topic_simple=topic_simple
+            )
 
             dialogue = {
                 "id": dialogue_id,
@@ -194,7 +209,11 @@ Make it engaging, practical, and beginner-friendly!"""
 
             if next_id:
                 dialogue["options"] = [
-                    {"default": True, "next": next_id, "description": "Kontynuuj rozmowę"}
+                    {
+                        "default": True,
+                        "next": next_id,
+                        "description": "Kontynuuj rozmowę",
+                    }
                 ]
 
             dialogues.append(dialogue)
@@ -215,4 +234,3 @@ Make it engaging, practical, and beginner-friendly!"""
             len(dialogues),
         )
         return lesson
-        

@@ -264,7 +264,9 @@ class AudioGenerateResponse(APIResponse):
 class BackupExportResponse(APIResponse):
     """Response schema for GET /backup/export."""
 
-    data: Optional[Dict[str, Any]] = Field(None, description="Backup data or download URL")
+    data: Optional[Dict[str, Any]] = Field(
+        None, description="Backup data or download URL"
+    )
 
 
 # =========================================================
@@ -284,4 +286,3 @@ class ErrorReportResponse(APIResponse):
     """Response schema for POST /error/report."""
 
     data: Optional[Dict[str, Any]] = Field(None, description="Error report ID")
-    

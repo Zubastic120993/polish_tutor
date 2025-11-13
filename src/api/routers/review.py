@@ -64,6 +64,7 @@ async def review_get_due(user_id: int = Query(..., description="User ID", gt=0))
         }
 
     except Exception as e:
-        logger.error(f"Error retrieving due review items for user {user_id}: {e}", exc_info=True)
+        logger.error(
+            f"Error retrieving due review items for user {user_id}: {e}", exc_info=True
+        )
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
-        

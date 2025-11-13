@@ -141,7 +141,11 @@ class LessonManager:
         entries: List[Dict[str, Any]] = []
         seen: Set[str] = set()
 
-        def push_entry(entry: Dict[str, Any], part_title: Optional[str] = None, module_title: Optional[str] = None) -> None:
+        def push_entry(
+            entry: Dict[str, Any],
+            part_title: Optional[str] = None,
+            module_title: Optional[str] = None,
+        ) -> None:
             lesson_id = entry.get("id")
             if not lesson_id or lesson_id in seen:
                 return
@@ -272,4 +276,3 @@ class LessonManager:
                         missing.append(str(fpath))
         if missing:
             logger.warning(f"Audio files missing for {lesson_id}: {missing}")
-            
