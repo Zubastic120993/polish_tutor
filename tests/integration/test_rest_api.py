@@ -67,16 +67,21 @@ from fastapi.testclient import TestClient
 from main import app
 from src.core.app_context import app_context
 
+# Ensure database tables exist before running tests
+try:
+    from src.core.init_db import init_database
+    init_database()
+    print("✅ Database schema initialized successfully.")
+except Exception as e:
+    print(f"⚠️ WARNING: Could not initialize database automatically: {e}")
+
 # Patch SpeechEngine with a lightweight stub (stub registered before import)
-
 TEST_PHRASE_ID = f"integration_phrase_{int(datetime.now(timezone.utc).timestamp()*1000)}"
-
 client = TestClient(app)
 
 def ensure_review_data():
     db = app_context.database
     next_review = datetime.now(timezone.utc) - timedelta(days=1)
-    # FIX: use plural get_user_srs_memories
     existing_list = db.get_user_srs_memories(1)
     existing = next((item for item in existing_list if item.phrase_id == TEST_PHRASE_ID), None)
     if existing:
@@ -102,7 +107,6 @@ def ensure_review_data():
 
 ensure_review_data()
 
-
 def run_test(test_name, test_func):
     """Run a single test and return results."""
     try:
@@ -113,11 +117,10 @@ def run_test(test_name, test_func):
         error_details = {
             "error": str(e),
             "type": type(e).__name__,
-            "traceback": traceback.format_exc()
+            "traceback": traceback.format_exc(),
         }
         print(f"DEBUG: Test {test_name} failed with: {error_details}", file=sys.stderr)
         return {"test": test_name, "status": "failed", **error_details}
-
 
 def test_health_check():
     response = client.get("/health")
@@ -126,13 +129,12 @@ def test_health_check():
     assert data["status"] == "healthy"
     return data
 
-
 def test_chat_respond_basic():
     payload = {
         "user_id": 1,
         "text": "Poproszę kawę",
         "lesson_id": "coffee_001",
-        "dialogue_id": "coffee_001_d1"
+        "dialogue_id": "coffee_001_d1",
     }
     response = client.post("/api/chat/respond", json=payload)
     assert response.status_code == 200
@@ -140,14 +142,12 @@ def test_chat_respond_basic():
     assert data["status"] == "success"
     return data
 
-
 def test_lesson_get():
     response = client.get("/api/lesson/get", params={"lesson_id": "coffee_001"})
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
     return data
-
 
 def test_lesson_options():
     response = client.get(
@@ -159,7 +159,6 @@ def test_lesson_options():
     assert data["status"] == "success"
     return data
 
-
 def test_lesson_catalog():
     response = client.get("/api/lesson/catalog")
     assert response.status_code == 200
@@ -167,14 +166,12 @@ def test_lesson_catalog():
     assert data["status"] == "success"
     return data
 
-
 def test_settings_get():
     response = client.get("/api/settings/get", params={"user_id": 1})
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
     return data
-
 
 def test_settings_update():
     payload = {"user_id": 1, "voice_mode": "online", "theme": "dark"}
@@ -184,7 +181,6 @@ def test_settings_update():
     assert data["status"] == "success"
     return data
 
-
 def test_user_stats():
     response = client.get("/api/user/stats", params={"user_id": 1})
     assert response.status_code == 200
@@ -192,14 +188,12 @@ def test_user_stats():
     assert data["status"] == "success"
     return data
 
-
 def test_review_get():
     response = client.get("/api/review/get", params={"user_id": 1})
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
     return data
-
 
 def test_review_update():
     payload = {
@@ -214,14 +208,12 @@ def test_review_update():
     assert data["status"] == "success"
     return data
 
-
 def test_backup_export():
     response = client.get("/api/backup/export", params={"user_id": 1, "format": "json"})
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
     return data
-
 
 def test_audio_generate():
     payload = {
@@ -237,14 +229,12 @@ def test_audio_generate():
     assert data["status"] == "success"
     return data
 
-
 def test_audio_engines():
     response = client.get("/api/audio/engines")
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
     return data
-
 
 def test_audio_clear_cache():
     response = client.post("/api/audio/clear-cache")
@@ -253,20 +243,13 @@ def test_audio_clear_cache():
     assert data["status"] == "success"
     return data
 
-
 def test_error_report():
-    payload = {
-        "user_id": 1,
-        "error_type": "test",
-        "message": "Test error",
-        "context": {}
-    }
+    payload = {"user_id": 1, "error_type": "test", "message": "Test error", "context": {}}
     response = client.post("/api/error/report", json=payload)
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
     return data
-
 
 def test_websocket_chat():
     messages = []
@@ -284,8 +267,6 @@ def test_websocket_chat():
         messages.append(websocket.receive_json())  # response or error
     return messages
 
-
-# Run all tests
 tests = [
     ("health_check", test_health_check),
     ("chat_respond", test_chat_respond_basic),
@@ -318,7 +299,6 @@ def integration_results():
     """Run integration tests in subprocess to avoid conftest.py interference."""
     project_root = Path(__file__).resolve().parents[2]
 
-    # Write test script to a writable temp directory
     temp_dir = Path(tempfile.gettempdir())
     script_path = temp_dir / "polish_tutor_integration_test.py"
     script_path.write_text(INTEGRATION_TEST_SCRIPT)
@@ -367,61 +347,43 @@ class TestRestApiIntegration:
 
     @pytest.fixture(autouse=True)
     def setup_method(self, integration_results):
-        """Store integration results for test access."""
         self.results = {r["test"]: r for r in integration_results}
 
     def test_health_endpoint(self):
-        """Test health check endpoint."""
         result = self.results["health_check"]
-        assert (
-            result["status"] == "passed"
-        ), f"Health check failed: {result.get('error', 'Unknown error')}"
+        assert result["status"] == "passed", f"Health check failed: {result.get('error', 'Unknown error')}"
         assert result["result"]["status"] == "healthy"
 
     def test_chat_respond_endpoint(self):
         result = self.results["chat_respond"]
-        assert (
-            result["status"] == "passed"
-        ), f"Chat respond failed: {result.get('error', 'Unknown error')}"
+        assert result["status"] == "passed", f"Chat respond failed: {result.get('error', 'Unknown error')}"
         assert result["result"]["status"] == "success"
 
     def test_lesson_get_endpoint(self):
         result = self.results["lesson_get"]
-        assert (
-            result["status"] == "passed"
-        ), f"Lesson get failed: {result.get('error', 'Unknown error')}"
+        assert result["status"] == "passed", f"Lesson get failed: {result.get('error', 'Unknown error')}"
         assert result["result"]["status"] == "success"
 
     def test_settings_get_endpoint(self):
         result = self.results["settings_get"]
-        assert (
-            result["status"] == "passed"
-        ), f"Settings get failed: {result.get('error', 'Unknown error')}"
+        assert result["status"] == "passed", f"Settings get failed: {result.get('error', 'Unknown error')}"
         assert result["result"]["status"] == "success"
 
     def test_settings_update_endpoint(self):
         result = self.results["settings_update"]
-        assert (
-            result["status"] == "passed"
-        ), f"Settings update failed: {result.get('error', 'Unknown error')}"
+        assert result["status"] == "passed", f"Settings update failed: {result.get('error', 'Unknown error')}"
         assert result["result"]["status"] == "success"
 
     def test_user_stats_endpoint(self):
         result = self.results["user_stats"]
-        assert (
-            result["status"] == "passed"
-        ), f"User stats failed: {result.get('error', 'Unknown error')}"
+        assert result["status"] == "passed", f"User stats failed: {result.get('error', 'Unknown error')}"
         assert result["result"]["status"] == "success"
 
     def test_review_endpoints(self):
         get_result = self.results["review_get"]
         update_result = self.results["review_update"]
-        assert (
-            get_result["status"] == "passed"
-        ), f"Review get failed: {get_result.get('error', 'Unknown error')}"
-        assert (
-            update_result["status"] == "passed"
-        ), f"Review update failed: {update_result.get('error', 'Unknown error')}"
+        assert get_result["status"] == "passed", f"Review get failed: {get_result.get('error', 'Unknown error')}"
+        assert update_result["status"] == "passed", f"Review update failed: {update_result.get('error', 'Unknown error')}"
         assert get_result["result"]["status"] == "success"
         assert update_result["result"]["status"] == "success"
 
@@ -429,19 +391,12 @@ class TestRestApiIntegration:
         gen = self.results["audio_generate"]
         engines = self.results["audio_engines"]
         clear = self.results["audio_clear_cache"]
-        for r, name in [
-            (gen, "generate"),
-            (engines, "engines"),
-            (clear, "clear_cache"),
-        ]:
-            assert (
-                r["status"] == "passed"
-            ), f"Audio {name} failed: {r.get('error', 'Unknown error')}"
+        for r, name in [(gen, "generate"), (engines, "engines"), (clear, "clear_cache")]:
+            assert r["status"] == "passed", f"Audio {name} failed: {r.get('error', 'Unknown error')}"
             assert r["result"]["status"] == "success"
 
     def test_websocket_chat_endpoint(self):
         result = self.results["websocket_chat"]
-        assert (
-            result["status"] == "passed"
-        ), f"WebSocket failed: {result.get('error', 'Unknown error')}"
+        assert result["status"] == "passed", f"WebSocket failed: {result.get('error', 'Unknown error')}"
         assert isinstance(result["result"], list)
+        
