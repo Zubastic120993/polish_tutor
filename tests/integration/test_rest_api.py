@@ -20,7 +20,7 @@ from pathlib import Path
 import pytest
 
 # Integration test runner that bypasses conftest.py stubs
-INTEGRATION_TEST_SCRIPT = '''
+INTEGRATION_TEST_SCRIPT = """
 import json
 import os
 import sys
@@ -43,6 +43,9 @@ sys.path.insert(0, str(project_root / "src"))
 # Set up minimal environment
 os.environ.setdefault("DATABASE_URL", "sqlite:///./data/polish_tutor.db")
 
+# ----------------------------------------------------------
+# Dummy Speech Engine Stub (used to skip audio generation)
+# ----------------------------------------------------------
 class DummySpeechEngine:
     def __init__(self, *_, **__):
         self.cache_dir = Path("./audio_cache")
@@ -63,29 +66,41 @@ dummy_module = types.ModuleType("src.services.speech_engine")
 dummy_module.SpeechEngine = DummySpeechEngine
 sys.modules["src.services.speech_engine"] = dummy_module
 
+# ----------------------------------------------------------
+# FastAPI setup
+# ----------------------------------------------------------
 from fastapi.testclient import TestClient
 from main import app
 from src.core.app_context import app_context
 
-# Ensure database tables exist before running tests
+# Ensure database schema exists
 try:
     from src.core.init_db import init_database
     init_database()
     print("✅ Database schema initialized successfully.")
 except Exception as e:
-    print(f"⚠️ WARNING: Could not initialize database automatically: {e}")
+    print(f"⚠️ WARNING: Database initialization skipped: {e}")
 
-# Patch SpeechEngine with a lightweight stub (stub registered before import)
-TEST_PHRASE_ID = f"integration_phrase_{int(datetime.now(timezone.utc).timestamp()*1000)}"
 client = TestClient(app)
+TEST_PHRASE_ID = f"integration_phrase_{int(datetime.now(timezone.utc).timestamp() * 1000)}"
 
+# ----------------------------------------------------------
+# Helper to prepare review/test data
+# ----------------------------------------------------------
 def ensure_review_data():
     db = app_context.database
     next_review = datetime.now(timezone.utc) - timedelta(days=1)
-    existing_list = db.get_user_srs_memories(1)
-    existing = next((item for item in existing_list if item.phrase_id == TEST_PHRASE_ID), None)
-    if existing:
-        db.delete_srs_memory(existing.id)
+
+    # Fetch all SRS memories
+    try:
+        existing_list = db.get_user_srs_memories(1)
+    except Exception:
+        existing_list = []
+
+    existing = next((item for item in existing_list if item.get("phrase_id") == TEST_PHRASE_ID), None)
+    if existing and "id" in existing:
+        db.delete(SRSMemory, existing["id"])
+
     phrase = db.get_phrase(TEST_PHRASE_ID)
     if not phrase:
         try:
@@ -96,6 +111,8 @@ def ensure_review_data():
             )
         except Exception:
             pass
+
+    # ✅ Use correct method name from Database service
     db.create_srs_memory(
         user_id=1,
         phrase_id=TEST_PHRASE_ID,
@@ -107,21 +124,25 @@ def ensure_review_data():
 
 ensure_review_data()
 
+# ----------------------------------------------------------
+# Utility to run each test
+# ----------------------------------------------------------
 def run_test(test_name, test_func):
-    """Run a single test and return results."""
     try:
         result = test_func()
         return {"test": test_name, "status": "passed", "result": result}
     except Exception as e:
         import traceback
-        error_details = {
+        return {
+            "test": test_name,
+            "status": "failed",
             "error": str(e),
-            "type": type(e).__name__,
             "traceback": traceback.format_exc(),
         }
-        print(f"DEBUG: Test {test_name} failed with: {error_details}", file=sys.stderr)
-        return {"test": test_name, "status": "failed", **error_details}
 
+# ----------------------------------------------------------
+# Actual endpoint tests
+# ----------------------------------------------------------
 def test_health_check():
     response = client.get("/health")
     assert response.status_code == 200
@@ -130,12 +151,7 @@ def test_health_check():
     return data
 
 def test_chat_respond_basic():
-    payload = {
-        "user_id": 1,
-        "text": "Poproszę kawę",
-        "lesson_id": "coffee_001",
-        "dialogue_id": "coffee_001_d1",
-    }
+    payload = {"user_id": 1, "text": "Poproszę kawę", "lesson_id": "coffee_001", "dialogue_id": "coffee_001_d1"}
     response = client.post("/api/chat/respond", json=payload)
     assert response.status_code == 200
     data = response.json()
@@ -150,10 +166,7 @@ def test_lesson_get():
     return data
 
 def test_lesson_options():
-    response = client.get(
-        "/api/lesson/options",
-        params={"lesson_id": "coffee_001", "dialogue_id": "coffee_001_d1"},
-    )
+    response = client.get("/api/lesson/options", params={"lesson_id": "coffee_001", "dialogue_id": "coffee_001_d1"})
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
@@ -196,12 +209,7 @@ def test_review_get():
     return data
 
 def test_review_update():
-    payload = {
-        "user_id": 1,
-        "phrase_id": TEST_PHRASE_ID,
-        "quality": 4,
-        "confidence": 4,
-    }
+    payload = {"user_id": 1, "phrase_id": TEST_PHRASE_ID, "quality": 4, "confidence": 4}
     response = client.post("/api/review/update", json=payload)
     assert response.status_code == 200
     data = response.json()
@@ -216,13 +224,7 @@ def test_backup_export():
     return data
 
 def test_audio_generate():
-    payload = {
-        "text": "To jest test",
-        "lesson_id": "coffee_001",
-        "phrase_id": "coffee_001_d1",
-        "speed": 1.0,
-        "user_id": 1,
-    }
+    payload = {"text": "To jest test", "lesson_id": "coffee_001", "phrase_id": "coffee_001_d1", "speed": 1.0, "user_id": 1}
     response = client.post("/api/audio/generate", json=payload)
     assert response.status_code == 200
     data = response.json()
@@ -264,9 +266,12 @@ def test_websocket_chat():
             "speed": 1.0,
         })
         messages.append(websocket.receive_json())  # typing
-        messages.append(websocket.receive_json())  # response or error
+        messages.append(websocket.receive_json())  # response
     return messages
 
+# ----------------------------------------------------------
+# Run all tests
+# ----------------------------------------------------------
 tests = [
     ("health_check", test_health_check),
     ("chat_respond", test_chat_respond_basic),
@@ -286,12 +291,9 @@ tests = [
     ("websocket_chat", test_websocket_chat),
 ]
 
-results = []
-for test_name, test_func in tests:
-    results.append(run_test(test_name, test_func))
-
+results = [run_test(name, func) for name, func in tests]
 print(json.dumps(results))
-'''
+"""
 
 
 @pytest.fixture(scope="session")
@@ -317,9 +319,8 @@ def integration_results():
         venv_python = project_root / "venv" / "bin" / "python"
         python_exe = str(venv_python) if venv_python.exists() else sys.executable
 
-        command = [python_exe, str(script_path)]
         result = subprocess.run(
-            command,
+            [python_exe, str(script_path)],
             cwd=project_root,
             env=env,
             capture_output=True,
@@ -334,8 +335,7 @@ def integration_results():
         output_lines = [line for line in result.stdout.splitlines() if line.strip()]
         if not output_lines:
             pytest.fail("Integration test script produced no output")
-        results = json.loads(output_lines[-1])
-        return results
+        return json.loads(output_lines[-1])
 
     finally:
         script_path.unlink(missing_ok=True)
@@ -353,42 +353,38 @@ class TestRestApiIntegration:
         result = self.results["health_check"]
         assert (
             result["status"] == "passed"
-        ), f"Health check failed: {result.get('error', 'Unknown error')}"
+        ), f"Health check failed: {result.get('error')}"
         assert result["result"]["status"] == "healthy"
 
     def test_chat_respond_endpoint(self):
         result = self.results["chat_respond"]
         assert (
             result["status"] == "passed"
-        ), f"Chat respond failed: {result.get('error', 'Unknown error')}"
+        ), f"Chat respond failed: {result.get('error')}"
         assert result["result"]["status"] == "success"
 
     def test_lesson_get_endpoint(self):
         result = self.results["lesson_get"]
-        assert (
-            result["status"] == "passed"
-        ), f"Lesson get failed: {result.get('error', 'Unknown error')}"
+        assert result["status"] == "passed", f"Lesson get failed: {result.get('error')}"
         assert result["result"]["status"] == "success"
 
     def test_settings_get_endpoint(self):
         result = self.results["settings_get"]
         assert (
             result["status"] == "passed"
-        ), f"Settings get failed: {result.get('error', 'Unknown error')}"
+        ), f"Settings get failed: {result.get('error')}"
         assert result["result"]["status"] == "success"
 
     def test_settings_update_endpoint(self):
         result = self.results["settings_update"]
         assert (
             result["status"] == "passed"
-        ), f"Settings update failed: {result.get('error', 'Unknown error')}"
+        ), f"Settings update failed: {result.get('error')}"
         assert result["result"]["status"] == "success"
 
     def test_user_stats_endpoint(self):
         result = self.results["user_stats"]
-        assert (
-            result["status"] == "passed"
-        ), f"User stats failed: {result.get('error', 'Unknown error')}"
+        assert result["status"] == "passed", f"User stats failed: {result.get('error')}"
         assert result["result"]["status"] == "success"
 
     def test_review_endpoints(self):
@@ -396,30 +392,20 @@ class TestRestApiIntegration:
         update_result = self.results["review_update"]
         assert (
             get_result["status"] == "passed"
-        ), f"Review get failed: {get_result.get('error', 'Unknown error')}"
+        ), f"Review get failed: {get_result.get('error')}"
         assert (
             update_result["status"] == "passed"
-        ), f"Review update failed: {update_result.get('error', 'Unknown error')}"
+        ), f"Review update failed: {update_result.get('error')}"
         assert get_result["result"]["status"] == "success"
         assert update_result["result"]["status"] == "success"
 
     def test_audio_endpoints(self):
-        gen = self.results["audio_generate"]
-        engines = self.results["audio_engines"]
-        clear = self.results["audio_clear_cache"]
-        for r, name in [
-            (gen, "generate"),
-            (engines, "engines"),
-            (clear, "clear_cache"),
-        ]:
-            assert (
-                r["status"] == "passed"
-            ), f"Audio {name} failed: {r.get('error', 'Unknown error')}"
+        for name in ["audio_generate", "audio_engines", "audio_clear_cache"]:
+            r = self.results[name]
+            assert r["status"] == "passed", f"Audio {name} failed: {r.get('error')}"
             assert r["result"]["status"] == "success"
 
     def test_websocket_chat_endpoint(self):
         result = self.results["websocket_chat"]
-        assert (
-            result["status"] == "passed"
-        ), f"WebSocket failed: {result.get('error', 'Unknown error')}"
+        assert result["status"] == "passed", f"WebSocket failed: {result.get('error')}"
         assert isinstance(result["result"], list)
