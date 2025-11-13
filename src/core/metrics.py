@@ -11,11 +11,12 @@ from prometheus_client import (
     CONTENT_TYPE_LATEST,
 )
 from starlette.middleware.base import BaseHTTPMiddleware
-
 from src.core.app_context import app_context
 
+# -------------------------------------------------------------------
+# Metrics definitions
+# -------------------------------------------------------------------
 
-# HTTP Request Metrics
 http_requests_total = Counter(
     "http_requests_total",
     "Total number of HTTP requests",
@@ -43,23 +44,15 @@ http_response_size_bytes = Histogram(
     buckets=[100, 1000, 10000, 100000, 1000000],
 )
 
-# Application Metrics
 active_connections = Gauge("app_active_connections", "Number of active connections")
 
-# TTS Queue Metrics
 tts_jobs_submitted_total = Counter(
-    "tts_jobs_submitted_total",
-    "Total number of TTS jobs submitted",
-    ["priority", "user_id"],
+    "tts_jobs_submitted_total", "Total number of TTS jobs submitted", ["priority", "user_id"]
 )
 
-tts_jobs_completed_total = Counter(
-    "tts_jobs_completed_total", "Total number of TTS jobs completed successfully"
-)
+tts_jobs_completed_total = Counter("tts_jobs_completed_total", "Total number of TTS jobs completed")
 
-tts_jobs_failed_total = Counter(
-    "tts_jobs_failed_total", "Total number of TTS jobs that failed", ["error_type"]
-)
+tts_jobs_failed_total = Counter("tts_jobs_failed_total", "Total number of TTS jobs failed", ["error_type"])
 
 tts_job_duration_seconds = Histogram(
     "tts_job_duration_seconds",
@@ -67,36 +60,21 @@ tts_job_duration_seconds = Histogram(
     buckets=[10, 30, 60, 120, 300, 600, 1800],
 )
 
-tts_queue_length = Gauge(
-    "tts_queue_length", "Current length of TTS queues", ["queue_name"]
-)
+tts_queue_length = Gauge("tts_queue_length", "Current length of TTS queues", ["queue_name"])
 
-tts_active_workers = Gauge(
-    "tts_active_workers", "Number of active TTS workers", ["pool_name"]
-)
+tts_active_workers = Gauge("tts_active_workers", "Number of active TTS workers", ["pool_name"])
 
-# Cache Metrics
 tts_cache_hits_total = Counter("tts_cache_hits_total", "Total number of TTS cache hits")
-
-tts_cache_misses_total = Counter(
-    "tts_cache_misses_total", "Total number of TTS cache misses"
-)
-
+tts_cache_misses_total = Counter("tts_cache_misses_total", "Total number of TTS cache misses")
 tts_cache_size_bytes = Gauge("tts_cache_size_bytes", "Total size of TTS cache in bytes")
 
-# Authentication Metrics
-auth_logins_total = Counter(
-    "auth_logins_total",
-    "Total number of authentication attempts",
-    ["result"],  # 'success', 'failure'
-)
+auth_logins_total = Counter("auth_logins_total", "Total authentication attempts", ["result"])
+auth_tokens_issued_total = Counter("auth_tokens_issued_total", "Total JWT tokens issued", ["token_type"])
 
-auth_tokens_issued_total = Counter(
-    "auth_tokens_issued_total",
-    "Total number of JWT tokens issued",
-    ["token_type"],  # 'access', 'refresh'
-)
 
+# -------------------------------------------------------------------
+# Middleware
+# -------------------------------------------------------------------
 
 class MetricsMiddleware(BaseHTTPMiddleware):
     """Middleware to collect HTTP metrics."""
@@ -105,18 +83,13 @@ class MetricsMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
 
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
-        """Collect metrics for each HTTP request."""
         start_time = time.time()
-
         endpoint = self._get_endpoint_path(request.url.path)
 
-        # Record request size
-        content_length = request.headers.get("content-length", "0")
+        # record request size
         try:
-            request_size = int(content_length)
-            http_request_size_bytes.labels(
-                method=request.method, endpoint=endpoint
-            ).observe(request_size)
+            request_size = int(request.headers.get("content-length", "0"))
+            http_request_size_bytes.labels(method=request.method, endpoint=endpoint).observe(request_size)
         except (ValueError, TypeError):
             pass
 
@@ -124,27 +97,19 @@ class MetricsMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
             duration = time.time() - start_time
 
-            # Record metrics
             http_requests_total.labels(
-                method=request.method,
-                endpoint=endpoint,
-                status_code=str(response.status_code),
+                method=request.method, endpoint=endpoint, status_code=str(response.status_code)
             ).inc()
 
-            http_request_duration_seconds.labels(
-                method=request.method, endpoint=endpoint
-            ).observe(duration)
+            http_request_duration_seconds.labels(method=request.method, endpoint=endpoint).observe(duration)
 
-            # Record response size
-            response_content_length = response.headers.get("content-length")
-            if response_content_length:
+            # record response size
+            if response.headers.get("content-length"):
                 try:
-                    response_size = int(response_content_length)
+                    resp_size = int(response.headers["content-length"])
                     http_response_size_bytes.labels(
-                        method=request.method,
-                        endpoint=endpoint,
-                        status_code=str(response.status_code),
-                    ).observe(response_size)
+                        method=request.method, endpoint=endpoint, status_code=str(response.status_code)
+                    ).observe(resp_size)
                 except (ValueError, TypeError):
                     pass
 
@@ -152,43 +117,34 @@ class MetricsMiddleware(BaseHTTPMiddleware):
 
         except Exception:
             duration = time.time() - start_time
-            http_requests_total.labels(
-                method=request.method, endpoint=endpoint, status_code="500"
-            ).inc()
-
-            http_request_duration_seconds.labels(
-                method=request.method, endpoint=endpoint
-            ).observe(duration)
+            http_requests_total.labels(method=request.method, endpoint=endpoint, status_code="500").inc()
+            http_request_duration_seconds.labels(method=request.method, endpoint=endpoint).observe(duration)
             raise
 
     def _get_endpoint_path(self, path: str) -> str:
-        """Convert actual path to endpoint pattern for metrics."""
         parts = path.strip("/").split("/")
-
-        if len(parts) >= 2 and parts[0] == "api":
-            if len(parts) == 4 and parts[1] == "tts" and parts[2] == "status":
-                return "/api/tts/status/{job_id}"
-            elif len(parts) == 4 and parts[1] == "user":
-                return "/api/user/{user_id}"
-
+        if len(parts) >= 3 and parts[0] == "api" and parts[1] == "tts" and parts[2] == "status":
+            return "/api/tts/status/{job_id}"
         return path
 
 
-def update_queue_metrics() -> None:
-    """Update TTS queue metrics from current queue state."""
-    try:
-        from backend.tts.queue_manager import get_queue_manager  # type: ignore
+# -------------------------------------------------------------------
+# Dynamic Metrics
+# -------------------------------------------------------------------
 
+def update_queue_metrics() -> None:
+    """Update TTS queue metrics."""
+    try:
+        from backend.tts.queue_manager import get_queue_manager
         queue_manager = get_queue_manager()
         stats = queue_manager.get_queue_stats()
 
-        for queue_name, queue_stats in stats.get("queues", {}).items():
-            tts_queue_length.labels(queue_name=queue_name).set(queue_stats["queued"])
+        for qname, qstats in stats.get("queues", {}).items():
+            tts_queue_length.labels(queue_name=qname).set(qstats.get("queued", 0))
 
         workers = stats.get("workers", {})
-        active_count = workers.get("active_count", 0)
-        tts_active_workers.labels(pool_name="all").set(active_count)
-
+        active = workers.get("active_count", 0)
+        tts_active_workers.labels(pool_name="all").set(active)
     except Exception as e:
         print(f"Failed to update queue metrics: {e}")
 
@@ -196,67 +152,52 @@ def update_queue_metrics() -> None:
 def update_cache_metrics() -> None:
     """Update TTS cache metrics."""
     try:
-        from backend.tts.audio_cache import AudioCacheManager  # type: ignore
-
-        cache_manager = AudioCacheManager()
-        stats = cache_manager.get_cache_stats()
-
+        from backend.tts.audio_cache import AudioCacheManager
+        cache = AudioCacheManager()
+        stats = cache.get_cache_stats()
         tts_cache_size_bytes.set(stats.get("total_size_bytes", 0))
-
     except Exception as e:
         print(f"Failed to update cache metrics: {e}")
 
 
 async def metrics_endpoint() -> Response:
-    """Prometheus metrics endpoint."""
+    """Expose Prometheus metrics."""
     update_queue_metrics()
     update_cache_metrics()
     output = generate_latest()
     return Response(content=output, media_type=CONTENT_TYPE_LATEST)
 
 
-# --------------------------------------------------------------------------
-# Metrics recording functions (corrected type hints)
-# --------------------------------------------------------------------------
+# -------------------------------------------------------------------
+# Recorders (✅ type safe)
+# -------------------------------------------------------------------
 
-
-def record_tts_job_submitted(
-    priority: str = "normal", user_id: Optional[str] = None
-) -> None:
-    """Record a TTS job submission."""
-    tts_jobs_submitted_total.labels(
-        priority=priority, user_id=user_id or "anonymous"
-    ).inc()
+def record_tts_job_submitted(priority: str = "normal", user_id: Optional[str] = None) -> None:
+    tts_jobs_submitted_total.labels(priority=priority, user_id=user_id or "anonymous").inc()
 
 
 def record_tts_job_completed(duration_seconds: Optional[float] = None) -> None:
-    """Record a TTS job completion."""
     tts_jobs_completed_total.inc()
     if duration_seconds is not None:
         tts_job_duration_seconds.observe(duration_seconds)
 
 
 def record_tts_job_failed(error_type: str = "unknown") -> None:
-    """Record a TTS job failure."""
     tts_jobs_failed_total.labels(error_type=error_type).inc()
 
 
 def record_auth_login(success: bool) -> None:
-    """Record an authentication attempt."""
-    result = "success" if success else "failure"
-    auth_logins_total.labels(result=result).inc()
+    auth_logins_total.labels(result="success" if success else "failure").inc()
 
 
 def record_auth_token_issued(token_type: str) -> None:
-    """Record JWT token issuance."""
     auth_tokens_issued_total.labels(token_type=token_type).inc()
 
 
 def record_cache_hit() -> None:
-    """Record a cache hit."""
     tts_cache_hits_total.inc()
 
 
 def record_cache_miss() -> None:
-    """Record a cache miss."""
     tts_cache_misses_total.inc()
+    

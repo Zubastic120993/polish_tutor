@@ -25,13 +25,12 @@ class Database:
     """Database service layer providing CRUD operations for all tables."""
 
     def __init__(self, session_factory=SessionLocal):
-        """Initialize database service.
-
-        Args:
-            session_factory: SQLAlchemy session factory (default: SessionLocal)
-        """
+        """Initialize database service."""
         self.session_factory = session_factory
 
+    # ------------------------------------------------------------------
+    # Context manager for sessions
+    # ------------------------------------------------------------------
     @contextmanager
     def get_session(self):
         """Context manager for database sessions with automatic cleanup."""
@@ -46,14 +45,14 @@ class Database:
             session.close()
 
     def _expunge_instance(self, session: Session, instance: ModelType) -> ModelType:
-        """Expunge instance from session to make it usable after session closes."""
+        """Detach instance from session to make it usable after commit."""
         session.expunge(instance)
         return instance
 
-    # ------------------- Generic CRUD operations -------------------
-
+    # ------------------------------------------------------------------
+    # Generic CRUD
+    # ------------------------------------------------------------------
     def create(self, model_class: Type[ModelType], **kwargs: Any) -> ModelType:
-        """Create a new record."""
         with self.get_session() as session:
             instance = model_class(**kwargs)
             session.add(instance)
@@ -62,7 +61,6 @@ class Database:
             return self._expunge_instance(session, instance)
 
     def get_by_id(self, model_class: Type[ModelType], id: Any) -> Optional[ModelType]:
-        """Get a record by ID."""
         with self.get_session() as session:
             instance = (
                 session.query(model_class)
@@ -76,171 +74,133 @@ class Database:
     def get_all(
         self, model_class: Type[ModelType], limit: Optional[int] = None
     ) -> List[ModelType]:
-        """Get all records."""
         with self.get_session() as session:
             query = session.query(model_class)
             if limit:
                 query = query.limit(limit)
-            instances = query.all()
-            return [self._expunge_instance(session, inst) for inst in instances]
+            items = query.all()
+            return [self._expunge_instance(session, i) for i in items]
 
     def update(
         self, model_class: Type[ModelType], id: Any, **kwargs: Any
     ) -> Optional[ModelType]:
-        """Update a record."""
         with self.get_session() as session:
             instance = (
                 session.query(model_class)
                 .filter(model_class.id == id)  # type: ignore[attr-defined]
                 .first()
             )
-            if instance:
-                for key, value in kwargs.items():
-                    if hasattr(instance, key):
-                        setattr(instance, key, value)
-                session.flush()
-                session.refresh(instance)
-                return self._expunge_instance(session, instance)
-            return None
+            if not instance:
+                return None
+            for key, value in kwargs.items():
+                if hasattr(instance, key):
+                    setattr(instance, key, value)
+            session.flush()
+            session.refresh(instance)
+            return self._expunge_instance(session, instance)
 
     def delete(self, model_class: Type[ModelType], id: Any) -> bool:
-        """Delete a record."""
         with self.get_session() as session:
             instance = (
                 session.query(model_class)
                 .filter(model_class.id == id)  # type: ignore[attr-defined]
                 .first()
             )
-            if instance:
-                session.delete(instance)
-                session.commit()
-                return True
-            return False
+            if not instance:
+                return False
+            session.delete(instance)
+            session.commit()
+            return True
 
-    # ------------------- User CRUD operations -------------------
-
+    # ------------------------------------------------------------------
+    # User CRUD
+    # ------------------------------------------------------------------
     def create_user(self, name: str, profile_template: str = "adult") -> User:
-        """Create a new user."""
         return self.create(User, name=name, profile_template=profile_template)
 
     def get_user(self, user_id: int) -> Optional[User]:
-        """Get user by ID."""
         return self.get_by_id(User, user_id)
 
     def get_user_by_name(self, name: str) -> Optional[User]:
-        """Get user by name."""
         with self.get_session() as session:
             return session.query(User).filter(User.name == name).first()
 
     def update_user(self, user_id: int, **kwargs: Any) -> Optional[User]:
-        """Update user."""
         return self.update(User, user_id, **kwargs)
 
     def delete_user(self, user_id: int) -> bool:
-        """Delete user."""
         return self.delete(User, user_id)
 
-    # ------------------- Lesson CRUD operations -------------------
-
+    # ------------------------------------------------------------------
+    # Lesson CRUD
+    # ------------------------------------------------------------------
     def create_lesson(self, lesson_id: str, title: str, level: str, **kwargs: Any) -> Lesson:
-        """Create a new lesson."""
         return self.create(Lesson, id=lesson_id, title=title, level=level, **kwargs)
 
     def get_lesson(self, lesson_id: str) -> Optional[Lesson]:
-        """Get lesson by ID."""
         return self.get_by_id(Lesson, lesson_id)
 
     def get_lessons_by_level(self, level: str) -> List[Lesson]:
-        """Get all lessons by level."""
         with self.get_session() as session:
             return session.query(Lesson).filter(Lesson.level == level).all()
 
     def update_lesson(self, lesson_id: str, **kwargs: Any) -> Optional[Lesson]:
-        """Update lesson."""
         return self.update(Lesson, lesson_id, **kwargs)
 
     def delete_lesson(self, lesson_id: str) -> bool:
-        """Delete lesson."""
         return self.delete(Lesson, lesson_id)
 
-    # ------------------- Phrase CRUD operations -------------------
-
-    def create_phrase(
-        self, phrase_id: str, lesson_id: str, text: str, **kwargs: Any
-    ) -> Phrase:
-        """Create a new phrase."""
+    # ------------------------------------------------------------------
+    # Phrase CRUD
+    # ------------------------------------------------------------------
+    def create_phrase(self, phrase_id: str, lesson_id: str, text: str, **kwargs: Any) -> Phrase:
         return self.create(Phrase, id=phrase_id, lesson_id=lesson_id, text=text, **kwargs)
 
     def get_phrase(self, phrase_id: str) -> Optional[Phrase]:
-        """Get phrase by ID."""
         return self.get_by_id(Phrase, phrase_id)
 
     def get_phrases_by_lesson(self, lesson_id: str) -> List[Phrase]:
-        """Get all phrases for a lesson."""
         with self.get_session() as session:
             return session.query(Phrase).filter(Phrase.lesson_id == lesson_id).all()
 
     def update_phrase(self, phrase_id: str, **kwargs: Any) -> Optional[Phrase]:
-        """Update phrase."""
         return self.update(Phrase, phrase_id, **kwargs)
 
     def delete_phrase(self, phrase_id: str) -> bool:
-        """Delete phrase."""
         return self.delete(Phrase, phrase_id)
 
-    # ------------------- LessonProgress CRUD operations -------------------
-
+    # ------------------------------------------------------------------
+    # Lesson Progress CRUD
+    # ------------------------------------------------------------------
     def create_lesson_progress(
         self, user_id: int, lesson_id: str, status: str = "not_started", **kwargs: Any
     ) -> LessonProgress:
-        """Create a new lesson progress."""
-        return self.create(
-            LessonProgress,
-            user_id=user_id,
-            lesson_id=lesson_id,
-            status=status,
-            **kwargs,
-        )
+        return self.create(LessonProgress, user_id=user_id, lesson_id=lesson_id, status=status, **kwargs)
 
     def get_lesson_progress(self, progress_id: int) -> Optional[LessonProgress]:
-        """Get lesson progress by ID."""
         return self.get_by_id(LessonProgress, progress_id)
 
-    def get_user_lesson_progress(
-        self, user_id: int, lesson_id: str
-    ) -> Optional[LessonProgress]:
-        """Get lesson progress for a specific user and lesson."""
+    def get_user_lesson_progress(self, user_id: int, lesson_id: str) -> Optional[LessonProgress]:
         with self.get_session() as session:
             return (
                 session.query(LessonProgress)
-                .filter(
-                    LessonProgress.user_id == user_id,
-                    LessonProgress.lesson_id == lesson_id,
-                )
+                .filter(LessonProgress.user_id == user_id, LessonProgress.lesson_id == lesson_id)
                 .first()
             )
 
     def get_user_progresses(self, user_id: int) -> List[LessonProgress]:
-        """Get all lesson progresses for a user."""
         with self.get_session() as session:
-            return (
-                session.query(LessonProgress)
-                .filter(LessonProgress.user_id == user_id)
-                .all()
-            )
+            return session.query(LessonProgress).filter(LessonProgress.user_id == user_id).all()
 
-    def update_lesson_progress(
-        self, progress_id: int, **kwargs: Any
-    ) -> Optional[LessonProgress]:
-        """Update lesson progress."""
+    def update_lesson_progress(self, progress_id: int, **kwargs: Any) -> Optional[LessonProgress]:
         return self.update(LessonProgress, progress_id, **kwargs)
 
     def delete_lesson_progress(self, progress_id: int) -> bool:
-        """Delete lesson progress."""
         return self.delete(LessonProgress, progress_id)
 
-    # ------------------- Attempt CRUD operations -------------------
-
+    # ------------------------------------------------------------------
+    # Attempt CRUD
+    # ------------------------------------------------------------------
     def create_attempt(
         self,
         user_id: int,
@@ -250,7 +210,6 @@ class Database:
         feedback_type: Optional[str] = None,
         **kwargs: Any,
     ) -> Attempt:
-        """Create a new attempt."""
         return self.create(
             Attempt,
             user_id=user_id,
@@ -262,13 +221,9 @@ class Database:
         )
 
     def get_attempt(self, attempt_id: int) -> Optional[Attempt]:
-        """Get attempt by ID."""
         return self.get_by_id(Attempt, attempt_id)
 
-    def get_user_attempts(
-        self, user_id: int, limit: Optional[int] = None
-    ) -> List[Attempt]:
-        """Get all attempts for a user."""
+    def get_user_attempts(self, user_id: int, limit: Optional[int] = None) -> List[Attempt]:
         with self.get_session() as session:
             query = (
                 session.query(Attempt)
@@ -278,20 +233,13 @@ class Database:
             if limit:
                 query = query.limit(limit)
             attempts = query.all()
-            for attempt in attempts:
-                _ = attempt.id
-                _ = attempt.phrase_id
-                _ = attempt.user_input
-                _ = attempt.score
-                _ = attempt.feedback_type
-                _ = attempt.created_at
-                session.expunge(attempt)
+            for a in attempts:
+                _ = a.id; _ = a.phrase_id; _ = a.user_input; _ = a.score
+                _ = a.feedback_type; _ = a.created_at
+                session.expunge(a)
             return attempts
 
-    def get_phrase_attempts(
-        self, phrase_id: str, limit: Optional[int] = None
-    ) -> List[Attempt]:
-        """Get all attempts for a phrase."""
+    def get_phrase_attempts(self, phrase_id: str, limit: Optional[int] = None) -> List[Attempt]:
         with self.get_session() as session:
             query = (
                 session.query(Attempt)
@@ -301,21 +249,60 @@ class Database:
             if limit:
                 query = query.limit(limit)
             attempts = query.all()
-            for attempt in attempts:
-                _ = attempt.id
-                _ = attempt.user_id
-                _ = attempt.user_input
-                _ = attempt.score
-                _ = attempt.feedback_type
-                _ = attempt.created_at
-                session.expunge(attempt)
+            for a in attempts:
+                _ = a.id; _ = a.user_id; _ = a.user_input; _ = a.score
+                _ = a.feedback_type; _ = a.created_at
+                session.expunge(a)
             return attempts
 
     def update_attempt(self, attempt_id: int, **kwargs: Any) -> Optional[Attempt]:
-        """Update attempt."""
         return self.update(Attempt, attempt_id, **kwargs)
 
     def delete_attempt(self, attempt_id: int) -> bool:
-        """Delete attempt."""
         return self.delete(Attempt, attempt_id)
-        
+
+    # ------------------------------------------------------------------
+    # EXTRA METHODS FOR SETTINGS & SRS (fix for mypy + API routers)
+    # ------------------------------------------------------------------
+    def get_user_settings(self, user_id: int) -> Dict[str, Any]:
+        """Return all settings for a user."""
+        with self.get_session() as session:
+            rows = session.query(Setting).filter(Setting.user_id == user_id).all()
+            return {row.key: row.value for row in rows}
+
+    def get_user_setting(self, user_id: int, key: str) -> Optional[Any]:
+        """Return a single setting for a user."""
+        with self.get_session() as session:
+            setting = (
+                session.query(Setting)
+                .filter(Setting.user_id == user_id, Setting.key == key)
+                .first()
+            )
+            return setting.value if setting else None
+
+    def upsert_setting(self, user_id: int, key: str, value: Any) -> None:
+        """Insert or update a setting for a user."""
+        with self.get_session() as session:
+            existing = (
+                session.query(Setting)
+                .filter(Setting.user_id == user_id, Setting.key == key)
+                .first()
+            )
+            if existing:
+                existing.value = value
+            else:
+                session.add(Setting(user_id=user_id, key=key, value=value))
+            session.flush()
+
+    def get_due_srs_items(self, user_id: int) -> List[Dict[str, Any]]:
+        """Return SRS items due for review."""
+        with self.get_session() as session:
+            items = session.query(SRSMemory).filter(SRSMemory.user_id == user_id).all()
+            return [dict(id=i.id, phrase_id=i.phrase_id, due_at=i.due_at) for i in items]
+
+    def get_user_srs_memories(self, user_id: int) -> List[Dict[str, Any]]:
+        """Return all SRS memories for a user."""
+        with self.get_session() as session:
+            items = session.query(SRSMemory).filter(SRSMemory.user_id == user_id).all()
+            return [dict(id=i.id, phrase_id=i.phrase_id, quality=i.quality) for i in items]
+            
