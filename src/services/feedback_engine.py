@@ -362,3 +362,34 @@ Respond in JSON:
         if user_id in self._conversation_history:
             del self._conversation_history[user_id]
             logger.info(f"Conversation history cleared for user {user_id}")
+
+    # -----------------------------------------------------------------
+    # NEW: method required by unit tests
+    # -----------------------------------------------------------------
+    def evaluate_against_expected(
+        self, user_input: str, expected_phrases: list[str]
+    ) -> dict:
+        """
+        Evaluate how closely user input matches expected phrases.
+
+        Returns:
+            {
+                "best_match": str,
+                "score": float
+            }
+        """
+        if not expected_phrases:
+            return {"best_match": "", "score": 0.0}
+
+        import difflib
+
+        best_phrase = max(
+            expected_phrases,
+            key=lambda phrase: difflib.SequenceMatcher(
+                None, phrase.lower(), user_input.lower()
+            ).ratio(),
+        )
+        score = difflib.SequenceMatcher(
+            None, best_phrase.lower(), user_input.lower()
+        ).ratio()
+        return {"best_match": best_phrase, "score": score}

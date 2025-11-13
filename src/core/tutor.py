@@ -4,7 +4,7 @@ import logging
 import os
 import re
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import Levenshtein
 from openai import OpenAI
@@ -122,7 +122,13 @@ class Tutor:
             suggest_commands=is_confused,
         )
 
-        score = float(feedback.get("score", 0.0))
+        # ✅ mypy-safe float conversion
+        raw_score: Union[str, float, bool, None] = feedback.get("score", 0.0)
+        try:
+            score: float = float(raw_score) if raw_score is not None else 0.0
+        except (ValueError, TypeError):
+            score = 0.0
+
         feedback_type = str(feedback.get("feedback_type", "low"))
 
         if feedback_type == "low":
