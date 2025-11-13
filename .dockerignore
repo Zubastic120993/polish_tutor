@@ -88,7 +88,6 @@ env.template
 
 # Development tools
 Makefile
-scripts/manage_workers.py
 
 # Grafana dashboards (optional)
 grafana-dashboard-*.json

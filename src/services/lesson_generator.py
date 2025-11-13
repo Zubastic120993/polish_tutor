@@ -4,7 +4,7 @@ import json
 import logging
 import os
 import re
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from openai import OpenAI
 
@@ -16,7 +16,7 @@ class LessonGenerator:
 
     def __init__(self):
         """Initialize LessonGenerator with OpenAI client."""
-        self._openai_client = None
+        self._openai_client: Optional[OpenAI] = None
 
         try:
             api_key = os.getenv("OPENAI_API_KEY")
@@ -24,37 +24,29 @@ class LessonGenerator:
                 self._openai_client = OpenAI(api_key=api_key)
                 logger.info("✅ LessonGenerator initialized with AI")
             else:
-                logger.warning("OpenAI API key not found - dynamic lessons unavailable")
+                logger.warning("OpenAI API key not found — dynamic lessons unavailable")
         except Exception as e:
             logger.error(f"Failed to initialize LessonGenerator: {e}")
 
+    # -----------------------------------------------------------------
+    # Public API
+    # -----------------------------------------------------------------
     def generate_lesson(
         self,
         topic: str,
         level: str = "A0",
         num_dialogues: int = 5,
         user_id: Optional[int] = None,
-    ) -> Optional[Dict]:
-        """Generate a custom lesson based on topic.
-
-        Args:
-            topic: Lesson topic (e.g., "restaurant ordering", "shopping", "directions")
-            level: CEFR level (A0, A1, A2, etc.)
-            num_dialogues: Number of dialogue exchanges to generate
-            user_id: User ID for personalization (optional)
-
-        Returns:
-            Lesson dictionary in the same format as JSON lessons
-        """
+    ) -> Optional[Dict[str, Any]]:
+        """Generate a custom lesson based on topic."""
         total_dialogues = max(1, num_dialogues or 1)
 
         if not self._openai_client:
-            logger.info("OpenAI client not available - using offline template lesson")
+            logger.info("OpenAI client not available — using offline template lesson")
             return self._generate_template_lesson(topic, level, total_dialogues)
 
         try:
             prompt = self._build_lesson_prompt(topic, level, total_dialogues)
-
             logger.info(
                 f"🎓 Generating lesson: '{topic}' (Level: {level}, Dialogues: {total_dialogues})"
             )
@@ -64,7 +56,7 @@ class LessonGenerator:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are an expert Polish language teacher creating A0-A1 level lessons.",
+                        "content": "You are an expert Polish language teacher creating A0–A1 lessons.",
                     },
                     {"role": "user", "content": prompt},
                 ],
@@ -74,17 +66,14 @@ class LessonGenerator:
 
             lesson_json = response.choices[0].message.content.strip()
 
-            # Extract JSON from potential markdown code blocks
+            # Extract JSON from code blocks
             if "```json" in lesson_json:
                 lesson_json = lesson_json.split("```json")[1].split("```")[0].strip()
             elif "```" in lesson_json:
                 lesson_json = lesson_json.split("```")[1].split("```")[0].strip()
 
-            # Parse and validate
             lesson_data = json.loads(lesson_json)
-
-            logger.info(f"✅ Generated lesson: {lesson_data.get('title')}")
-
+            logger.info(f"✅ Generated lesson: {lesson_data.get('title', 'Untitled')}")
             return lesson_data
 
         except Exception as e:
@@ -92,6 +81,9 @@ class LessonGenerator:
             logger.info("Falling back to offline template lesson for '%s'", topic)
             return self._generate_template_lesson(topic, level, total_dialogues)
 
+    # -----------------------------------------------------------------
+    # Internal helpers
+    # -----------------------------------------------------------------
     def _build_lesson_prompt(self, topic: str, level: str, num_dialogues: int) -> str:
         """Build prompt for AI lesson generation."""
         return f"""Create a Polish language lesson for {level} level learners.
@@ -99,11 +91,11 @@ class LessonGenerator:
 Topic: {topic}
 
 Requirements:
-1. Create {num_dialogues} realistic dialogue exchanges
-2. Each dialogue should teach practical phrases for {topic}
-3. Include Polish text, English translation, hints, and grammar notes
-4. Use simple vocabulary appropriate for {level} level
-5. Make it conversational and practical
+1. Create {num_dialogues} realistic dialogue exchanges.
+2. Each dialogue should teach practical phrases for {topic}.
+3. Include Polish text, English translation, hints, and grammar notes.
+4. Use simple vocabulary appropriate for {level} level.
+5. Make it conversational and practical.
 
 Return ONLY valid JSON in this exact format:
 {{
@@ -137,22 +129,26 @@ Make it engaging, practical, and beginner-friendly!"""
         """Check if lesson generation is available (AI or offline template)."""
         return True
 
+    # -----------------------------------------------------------------
+    # Offline fallback template
+    # -----------------------------------------------------------------
     def _generate_template_lesson(
         self, topic: str, level: str, num_dialogues: int
-    ) -> Dict:
-        """Create a simple, local lesson template when AI generation is unavailable."""
+    ) -> Dict[str, Any]:
+        """Create a simple local lesson when AI generation is unavailable."""
         safe_topic = (topic or "conversation").strip() or "conversation"
         topic_title = safe_topic.title()
         topic_simple = safe_topic.lower()
-        topic_slug = re.sub(r"[^a-z0-9]+", "_", topic_simple)
-        topic_slug = topic_slug.strip("_") or "conversation"
+        topic_slug = (
+            re.sub(r"[^a-z0-9]+", "_", topic_simple).strip("_") or "conversation"
+        )
 
-        templates = [
+        templates: List[Dict[str, Any]] = [
             {
                 "tutor": "Cześć! Dzisiaj ćwiczymy temat {topic}. Powiedz 'Cześć' i przedstaw się.",
                 "expected": [
-                    "Cześć! Mam na imię Kasia.",
-                    "Dzień dobry! Nazywam się Jan.",
+                    "Cześć! Mam na imię {topic_simple}.",
+                    "Dzień dobry! Nazywam się {topic_simple}.",
                 ],
                 "translation": "Hi! Today we're practicing {topic}. Say 'Cześć' and introduce yourself.",
                 "hint": "Użyj 'Cześć' lub 'Dzień dobry', a potem dodaj swoje imię.",
@@ -180,7 +176,7 @@ Make it engaging, practical, and beginner-friendly!"""
             },
         ]
 
-        dialogues: List[Dict] = []
+        dialogues: List[Dict[str, Any]] = []
         for idx in range(num_dialogues):
             template = templates[min(idx, len(templates) - 1)]
             dialogue_id = f"offline_{topic_slug}_d{idx + 1:02d}"
@@ -190,20 +186,24 @@ Make it engaging, practical, and beginner-friendly!"""
                 else None
             )
 
+            tutor_line = template["tutor"].format(
+                topic=topic_title, topic_simple=topic_simple
+            )
+            expected_lines = [
+                phrase.format(topic=topic_title, topic_simple=topic_simple)
+                for phrase in template.get("expected", [])
+            ]
+            translation_line = template["translation"].format(
+                topic=topic_title, topic_simple=topic_simple
+            )
+
             dialogue = {
                 "id": dialogue_id,
-                "tutor": template["tutor"].format(
-                    topic=topic_title, topic_simple=topic_simple
-                ),
-                "expected": [
-                    phrase.format(topic=topic_title, topic_simple=topic_simple)
-                    for phrase in template["expected"]
-                ],
-                "translation": template["translation"].format(
-                    topic=topic_title, topic_simple=topic_simple
-                ),
-                "hint": template["hint"],
-                "grammar": template["grammar"],
+                "tutor": tutor_line,
+                "expected": expected_lines,
+                "translation": translation_line,
+                "hint": template.get("hint"),
+                "grammar": template.get("grammar"),
                 "options": [],
             }
 
