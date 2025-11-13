@@ -2,9 +2,11 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches:
+      - '**'            # 🔥 Trigger on all branches (including feature/*)
   pull_request:
-    branches: [ main ]
+    branches:
+      - '**'            # Run checks for all PRs
 
 env:
   REGISTRY: ghcr.io
@@ -28,17 +30,14 @@ jobs:
 
     - name: Run linting
       run: |
-        # Stop the build if there are Python syntax errors or undefined names
         flake8 src --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 src --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
     - name: Check formatting with Black
-      run: |
-        black --check --diff src tests
+      run: black --check --diff src tests
 
     - name: Run type checking with mypy
-      run: |
-        mypy src --ignore-missing-imports
+      run: mypy src --ignore-missing-imports
 
   test:
     runs-on: ubuntu-latest
@@ -68,14 +67,12 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run database migrations
-      run: |
-        alembic upgrade head
+      run: alembic upgrade head
       env:
         DATABASE_URL: sqlite:///./test.db
 
     - name: Run tests
-      run: |
-        pytest tests/unit/ tests/integration/ -v --cov=src --cov-report=xml --cov-report=term
+      run: pytest tests/unit/ tests/integration/ -v --cov=src --cov-report=xml --cov-report=term
       env:
         REDIS_URL: redis://localhost:6379
         DATABASE_URL: sqlite:///./test.db
@@ -157,9 +154,8 @@ jobs:
     steps:
     - name: Deploy to staging
       run: |
-        echo "Deploying to staging environment..."
-        # Add your staging deployment commands here
-        # For example: kubectl apply -f k8s/staging/ or docker-compose up -d
+        echo "🚀 Deploying to staging environment..."
+        # Example: kubectl apply -f k8s/staging/
 
   deploy-production:
     runs-on: ubuntu-latest
@@ -169,6 +165,6 @@ jobs:
     steps:
     - name: Deploy to production
       run: |
-        echo "Deploying to production environment..."
-        # Add your production deployment commands here
-        # For example: kubectl apply -f k8s/production/ or docker-compose up -d
+        echo "🚀 Deploying to production environment..."
+        # Example: kubectl apply -f k8s/production/
+        
