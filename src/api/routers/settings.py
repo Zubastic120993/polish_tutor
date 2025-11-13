@@ -118,7 +118,9 @@ async def settings_update(request: SettingsUpdateRequest):
         settings_dict: dict[str, str | int | None] = {"user_id": request.user_id}
 
         # Helper function to get or set setting
-        def get_or_set_setting(key: str, value: str | int | None, default: str | int | None):
+        def get_or_set_setting(
+            key: str, value: str | int | None, default: str | int | None
+        ):
             if value is not None:
                 database.upsert_setting(request.user_id, key, str(value))
                 return value
@@ -127,23 +129,41 @@ async def settings_update(request: SettingsUpdateRequest):
                 return setting.value if setting else default
 
         # Update each setting using upsert
-        settings_dict["voice_mode"] = get_or_set_setting("voice_mode", request.voice_mode, "offline")
-        settings_dict["audio_speed"] = get_or_set_setting("audio_speed", request.audio_speed, "normal")
-        settings_dict["translation"] = get_or_set_setting("translation", request.translation, "smart")
-        settings_dict["mic_mode"] = get_or_set_setting("mic_mode", request.mic_mode, "tap")
-        settings_dict["tutor_mode"] = get_or_set_setting("tutor_mode", request.tutor_mode, "coach")
+        settings_dict["voice_mode"] = get_or_set_setting(
+            "voice_mode", request.voice_mode, "offline"
+        )
+        settings_dict["audio_speed"] = get_or_set_setting(
+            "audio_speed", request.audio_speed, "normal"
+        )
+        settings_dict["translation"] = get_or_set_setting(
+            "translation", request.translation, "smart"
+        )
+        settings_dict["mic_mode"] = get_or_set_setting(
+            "mic_mode", request.mic_mode, "tap"
+        )
+        settings_dict["tutor_mode"] = get_or_set_setting(
+            "tutor_mode", request.tutor_mode, "coach"
+        )
         settings_dict["voice"] = get_or_set_setting("voice", request.voice, "neutral")
-        settings_dict["audio_output"] = get_or_set_setting("audio_output", request.audio_output, "speakers")
+        settings_dict["audio_output"] = get_or_set_setting(
+            "audio_output", request.audio_output, "speakers"
+        )
         settings_dict["theme"] = get_or_set_setting("theme", request.theme, "light")
-        settings_dict["language"] = get_or_set_setting("language", request.language, "en")
+        settings_dict["language"] = get_or_set_setting(
+            "language", request.language, "en"
+        )
 
         raw_conf = get_or_set_setting("confidence_slider", request.confidence_slider, 3)
         try:
-            settings_dict["confidence_slider"] = int(raw_conf) if raw_conf is not None else 3
+            settings_dict["confidence_slider"] = (
+                int(raw_conf) if raw_conf is not None else 3
+            )
         except (TypeError, ValueError):
             settings_dict["confidence_slider"] = 3
 
-        settings_dict["profile_template"] = get_or_set_setting("profile_template", request.profile_template, None)
+        settings_dict["profile_template"] = get_or_set_setting(
+            "profile_template", request.profile_template, None
+        )
 
         return {
             "status": "success",
