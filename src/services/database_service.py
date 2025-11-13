@@ -259,12 +259,6 @@ class Database:
                 query = query.limit(limit)
             attempts = query.all()
             for a in attempts:
-                _ = a.id
-                _ = a.phrase_id
-                _ = a.user_input
-                _ = a.score
-                _ = a.feedback_type
-                _ = a.created_at
                 session.expunge(a)
             return attempts
 
@@ -281,12 +275,6 @@ class Database:
                 query = query.limit(limit)
             attempts = query.all()
             for a in attempts:
-                _ = a.id
-                _ = a.user_id
-                _ = a.user_input
-                _ = a.score
-                _ = a.feedback_type
-                _ = a.created_at
                 session.expunge(a)
             return attempts
 
@@ -297,7 +285,7 @@ class Database:
         return self.delete(Attempt, attempt_id)
 
     # ------------------------------------------------------------------
-    # EXTRA METHODS FOR SETTINGS & SRS (fix for mypy + API routers)
+    # EXTRA METHODS FOR SETTINGS & SRS
     # ------------------------------------------------------------------
     def get_user_settings(self, user_id: int) -> Dict[str, Any]:
         """Return all settings for a user."""
@@ -334,7 +322,8 @@ class Database:
         with self.get_session() as session:
             items = session.query(SRSMemory).filter(SRSMemory.user_id == user_id).all()
             return [
-                dict(id=i.id, phrase_id=i.phrase_id, due_at=i.due_at) for i in items
+                dict(id=i.id, phrase_id=i.phrase_id, due_at=getattr(i, "due_at", None))
+                for i in items
             ]
 
     def get_user_srs_memories(self, user_id: int) -> List[Dict[str, Any]]:
@@ -342,5 +331,34 @@ class Database:
         with self.get_session() as session:
             items = session.query(SRSMemory).filter(SRSMemory.user_id == user_id).all()
             return [
-                dict(id=i.id, phrase_id=i.phrase_id, quality=i.quality) for i in items
+                dict(
+                    id=i.id,
+                    phrase_id=i.phrase_id,
+                    quality=getattr(i, "quality", None),
+                )
+                for i in items
             ]
+
+    def create_srs_memory(
+        self,
+        user_id: int,
+        phrase_id: str,
+        next_review: Any,
+        interval_days: int,
+        review_count: int,
+        strength_level: int,
+    ) -> SRSMemory:
+        """Create and return a new SRS memory entry."""
+        return self.create(
+            SRSMemory,
+            user_id=user_id,
+            phrase_id=phrase_id,
+            next_review=next_review,
+            interval_days=interval_days,
+            review_count=review_count,
+            strength_level=strength_level,
+        )
+
+    def delete_srs_memory(self, srs_id: int) -> bool:
+        """Delete an SRS memory entry by its ID."""
+        return self.delete(SRSMemory, srs_id)
