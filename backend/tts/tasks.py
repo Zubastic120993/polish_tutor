@@ -288,7 +288,9 @@ def cleanup_failed_jobs(max_age_hours: int = 24) -> int:
             try:
                 job = Job.fetch(job_id, connection=queue.connection)
                 if job.ended_at:
-                    age_hours = (datetime.utcnow() - job.ended_at).total_seconds() / 3600
+                    age_hours = (
+                        datetime.utcnow() - job.ended_at
+                    ).total_seconds() / 3600
                     if age_hours > max_age_hours:
                         job.delete()
                         cleaned_count += 1
