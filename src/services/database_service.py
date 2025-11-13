@@ -303,8 +303,8 @@ class Database:
             )
             return setting.value if setting else None
 
-    def upsert_setting(self, user_id: int, key: str, value: Any) -> None:
-        """Insert or update a setting for a user."""
+    def upsert_setting(self, user_id: int, key: str, value: Any):
+        """Insert or update a user-specific setting (unit test–compatible)."""
         with self.get_session() as session:
             existing = (
                 session.query(Setting)
@@ -313,9 +313,29 @@ class Database:
             )
             if existing:
                 existing.value = value
-            else:
-                session.add(Setting(user_id=user_id, key=key, value=value))
+                session.flush()
+                session.refresh(existing)
+                return existing
+            new_setting = Setting(user_id=user_id, key=key, value=value)
+            session.add(new_setting)
             session.flush()
+            session.refresh(new_setting)
+            return new_setting
+
+    def upsert_meta(self, key: str, value: Any):
+        """Insert or update a meta key-value pair (unit test–compatible)."""
+        with self.get_session() as session:
+            existing = session.query(Meta).filter(Meta.key == key).first()
+            if existing:
+                existing.value = value
+                session.flush()
+                session.refresh(existing)
+                return existing
+            new_meta = Meta(key=key, value=value)
+            session.add(new_meta)
+            session.flush()
+            session.refresh(new_meta)
+            return new_meta
 
     def get_due_srs_items(self, user_id: int) -> List[Dict[str, Any]]:
         """Return SRS items due for review."""
