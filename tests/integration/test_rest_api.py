@@ -373,39 +373,55 @@ class TestRestApiIntegration:
     def test_health_endpoint(self):
         """Test health check endpoint."""
         result = self.results["health_check"]
-        assert result["status"] == "passed", f"Health check failed: {result.get('error', 'Unknown error')}"
+        assert (
+            result["status"] == "passed"
+        ), f"Health check failed: {result.get('error', 'Unknown error')}"
         assert result["result"]["status"] == "healthy"
 
     def test_chat_respond_endpoint(self):
         result = self.results["chat_respond"]
-        assert result["status"] == "passed", f"Chat respond failed: {result.get('error', 'Unknown error')}"
+        assert (
+            result["status"] == "passed"
+        ), f"Chat respond failed: {result.get('error', 'Unknown error')}"
         assert result["result"]["status"] == "success"
 
     def test_lesson_get_endpoint(self):
         result = self.results["lesson_get"]
-        assert result["status"] == "passed", f"Lesson get failed: {result.get('error', 'Unknown error')}"
+        assert (
+            result["status"] == "passed"
+        ), f"Lesson get failed: {result.get('error', 'Unknown error')}"
         assert result["result"]["status"] == "success"
 
     def test_settings_get_endpoint(self):
         result = self.results["settings_get"]
-        assert result["status"] == "passed", f"Settings get failed: {result.get('error', 'Unknown error')}"
+        assert (
+            result["status"] == "passed"
+        ), f"Settings get failed: {result.get('error', 'Unknown error')}"
         assert result["result"]["status"] == "success"
 
     def test_settings_update_endpoint(self):
         result = self.results["settings_update"]
-        assert result["status"] == "passed", f"Settings update failed: {result.get('error', 'Unknown error')}"
+        assert (
+            result["status"] == "passed"
+        ), f"Settings update failed: {result.get('error', 'Unknown error')}"
         assert result["result"]["status"] == "success"
 
     def test_user_stats_endpoint(self):
         result = self.results["user_stats"]
-        assert result["status"] == "passed", f"User stats failed: {result.get('error', 'Unknown error')}"
+        assert (
+            result["status"] == "passed"
+        ), f"User stats failed: {result.get('error', 'Unknown error')}"
         assert result["result"]["status"] == "success"
 
     def test_review_endpoints(self):
         get_result = self.results["review_get"]
         update_result = self.results["review_update"]
-        assert get_result["status"] == "passed", f"Review get failed: {get_result.get('error', 'Unknown error')}"
-        assert update_result["status"] == "passed", f"Review update failed: {update_result.get('error', 'Unknown error')}"
+        assert (
+            get_result["status"] == "passed"
+        ), f"Review get failed: {get_result.get('error', 'Unknown error')}"
+        assert (
+            update_result["status"] == "passed"
+        ), f"Review update failed: {update_result.get('error', 'Unknown error')}"
         assert get_result["result"]["status"] == "success"
         assert update_result["result"]["status"] == "success"
 
@@ -413,12 +429,19 @@ class TestRestApiIntegration:
         gen = self.results["audio_generate"]
         engines = self.results["audio_engines"]
         clear = self.results["audio_clear_cache"]
-        for r, name in [(gen, "generate"), (engines, "engines"), (clear, "clear_cache")]:
-            assert r["status"] == "passed", f"Audio {name} failed: {r.get('error', 'Unknown error')}"
+        for r, name in [
+            (gen, "generate"),
+            (engines, "engines"),
+            (clear, "clear_cache"),
+        ]:
+            assert (
+                r["status"] == "passed"
+            ), f"Audio {name} failed: {r.get('error', 'Unknown error')}"
             assert r["result"]["status"] == "success"
 
     def test_websocket_chat_endpoint(self):
         result = self.results["websocket_chat"]
-        assert result["status"] == "passed", f"WebSocket failed: {result.get('error', 'Unknown error')}"
+        assert (
+            result["status"] == "passed"
+        ), f"WebSocket failed: {result.get('error', 'Unknown error')}"
         assert isinstance(result["result"], list)
-        
