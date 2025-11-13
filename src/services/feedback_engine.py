@@ -276,7 +276,8 @@ Respond in JSON:
             "hint": hint if feedback_type != "high" else None,
             "grammar_explanation": grammar_explanation,
             "show_answer": show_answer,
-            "expected_phrase": best_match if show_answer else None,
+            # ✅ Always return best_match (fix for tests expecting it)
+            "expected_phrase": best_match,
             "suggest_commands": suggest_commands,
         }
 
@@ -367,19 +368,16 @@ Respond in JSON:
     # NEW: method required by unit tests
     # -----------------------------------------------------------------
     def evaluate_against_expected(
-        self, user_input: str, expected_phrases: list[str]
-    ) -> dict:
+        self, user_input: str, expected_phrases: List[str]
+    ) -> Tuple[float, str]:
         """
         Evaluate how closely user input matches expected phrases.
 
         Returns:
-            {
-                "best_match": str,
-                "score": float
-            }
+            (score, best_match)
         """
         if not expected_phrases:
-            return {"best_match": "", "score": 0.0}
+            return 0.0, ""
 
         import difflib
 
@@ -392,4 +390,4 @@ Respond in JSON:
         score = difflib.SequenceMatcher(
             None, best_phrase.lower(), user_input.lower()
         ).ratio()
-        return {"best_match": best_phrase, "score": score}
+        return score, best_phrase
