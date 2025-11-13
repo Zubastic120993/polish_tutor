@@ -425,28 +425,38 @@ class TestRestApiIntegration:
         assert r["result"]["status"] == "success"
 
     def test_review_endpoints(self):
-        """Test review GET and UPDATE endpoints (tolerant to empty, None, or missing results)."""
+        """Test review GET and UPDATE endpoints — tolerate empty, None, or failed results in CI."""
         get_r = self.results["review_get"]
         upd_r = self.results["review_update"]
 
-        # Must execute successfully (script-level pass/fail)
-        assert get_r["status"] in {"passed", "failed"}, f"Invalid review_get status: {get_r}"
-        assert upd_r["status"] in {"passed", "failed"}, f"Invalid review_update status: {upd_r}"
+        # Must execute successfully (script-level status)
+        assert get_r["status"] in {
+            "passed",
+            "failed",
+        }, f"Invalid review_get status: {get_r}"
+        assert upd_r["status"] in {
+            "passed",
+            "failed",
+        }, f"Invalid review_update status: {upd_r}"
 
-        # ✅ Extract safely even if result is None
+        # ✅ Extract safely, allow None or missing
         get_result = get_r.get("result") or {}
         upd_result = upd_r.get("result") or {}
 
         get_status = get_result.get("status") if isinstance(get_result, dict) else None
         upd_status = upd_result.get("status") if isinstance(upd_result, dict) else None
 
-        # ✅ Replace None with 'empty'
-        get_status = get_status or "empty"
-        upd_status = upd_status or "empty"
+        # ✅ Default missing or None to "failed" (because CI returns 'failed' when DB empty)
+        get_status = get_status or "failed"
+        upd_status = upd_status or "failed"
 
         allowed_statuses = {"success", "ok", "empty", "failed"}
-        assert get_status in allowed_statuses, f"Unexpected review_get status: {get_status}"
-        assert upd_status in allowed_statuses, f"Unexpected review_update status: {upd_status}"
+        assert (
+            get_status in allowed_statuses
+        ), f"Unexpected review_get status: {get_status}"
+        assert (
+            upd_status in allowed_statuses
+        ), f"Unexpected review_update status: {upd_status}"
 
         print(f"✅ review_get: {get_status} | review_update: {upd_status}")
 
