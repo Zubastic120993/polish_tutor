@@ -1,22 +1,28 @@
 """Pydantic schemas for API request/response models."""
 
 from datetime import datetime
-from typing import List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field
 
 
+# =========================================================
 # Base response schema
+# =========================================================
 class APIResponse(BaseModel):
     """Base API response schema."""
 
     status: str = Field(..., description="Response status: 'success' or 'error'")
     message: str = Field(..., description="Human-readable message")
-    data: Optional[dict] = Field(None, description="Response data payload")
-    metadata: Optional[dict] = Field(None, description="Additional metadata")
+    data: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = Field(
+        None, description="Response data payload (dict or list of dicts)"
+    )
+    metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
 
 
+# =========================================================
 # Chat endpoints
+# =========================================================
 class ChatRespondRequest(BaseModel):
     """Request schema for POST /chat/respond."""
 
@@ -50,16 +56,18 @@ class ChatRespondResponse(APIResponse):
     """Response schema for POST /chat/respond."""
 
     data: Optional[ChatRespondData] = None
-    metadata: Optional[dict] = Field(
+    metadata: Optional[Dict[str, Any]] = Field(
         None, description="Contains attempt_id and timestamp"
     )
 
 
+# =========================================================
 # Lesson endpoints
+# =========================================================
 class LessonGetResponse(APIResponse):
     """Response schema for GET /lesson/get."""
 
-    data: Optional[dict] = Field(
+    data: Optional[Dict[str, Any]] = Field(
         None, description="Lesson data with id, title, level, dialogues"
     )
 
@@ -67,7 +75,7 @@ class LessonGetResponse(APIResponse):
 class LessonOptionsResponse(APIResponse):
     """Response schema for GET /lesson/options."""
 
-    data: Optional[dict] = Field(
+    data: Optional[Dict[str, Any]] = Field(
         None, description="Branch options for current dialogue"
     )
 
@@ -99,7 +107,9 @@ class LessonCatalogResponse(APIResponse):
     data: Optional[LessonCatalogData] = None
 
 
+# =========================================================
 # Review endpoints
+# =========================================================
 class ReviewUpdateRequest(BaseModel):
     """Request schema for POST /review/update."""
 
@@ -128,10 +138,14 @@ class ReviewUpdateResponse(APIResponse):
 class ReviewGetResponse(APIResponse):
     """Response schema for GET /review/get."""
 
-    data: Optional[List[dict]] = Field(None, description="List of due SRS items")
+    data: Optional[List[Dict[str, Any]]] = Field(
+        None, description="List of due SRS items"
+    )
 
 
+# =========================================================
 # Settings endpoints
+# =========================================================
 class SettingsUpdateRequest(BaseModel):
     """Request schema for POST /settings/update."""
 
@@ -188,25 +202,29 @@ class SettingsUpdateRequest(BaseModel):
 class SettingsGetResponse(APIResponse):
     """Response schema for GET /settings/get."""
 
-    data: Optional[dict] = Field(None, description="User settings")
+    data: Optional[Dict[str, Any]] = Field(None, description="User settings")
 
 
 class SettingsUpdateResponse(APIResponse):
     """Response schema for POST /settings/update."""
 
-    data: Optional[dict] = Field(None, description="Updated settings")
+    data: Optional[Dict[str, Any]] = Field(None, description="Updated settings")
 
 
+# =========================================================
 # User stats endpoint
+# =========================================================
 class UserStatsResponse(APIResponse):
     """Response schema for GET /user/stats."""
 
-    data: Optional[dict] = Field(
+    data: Optional[Dict[str, Any]] = Field(
         None, description="User statistics including progress, study time, accuracy"
     )
 
 
+# =========================================================
 # Audio endpoint
+# =========================================================
 class AudioGenerateRequest(BaseModel):
     """Request schema for POST /audio/generate."""
 
@@ -240,14 +258,18 @@ class AudioGenerateResponse(APIResponse):
     data: Optional[AudioGenerateData] = None
 
 
+# =========================================================
 # Backup endpoint
+# =========================================================
 class BackupExportResponse(APIResponse):
     """Response schema for GET /backup/export."""
 
-    data: Optional[dict] = Field(None, description="Backup data or download URL")
+    data: Optional[Dict[str, Any]] = Field(None, description="Backup data or download URL")
 
 
+# =========================================================
 # Error reporting endpoint
+# =========================================================
 class ErrorReportRequest(BaseModel):
     """Request schema for POST /error/report."""
 
@@ -255,10 +277,11 @@ class ErrorReportRequest(BaseModel):
     error_type: str = Field(..., description="Error type")
     message: str = Field(..., description="Error message")
     stack_trace: Optional[str] = Field(None, description="Stack trace")
-    context: Optional[dict] = Field(None, description="Additional context")
+    context: Optional[Dict[str, Any]] = Field(None, description="Additional context")
 
 
 class ErrorReportResponse(APIResponse):
     """Response schema for POST /error/report."""
 
-    data: Optional[dict] = Field(None, description="Error report ID")
+    data: Optional[Dict[str, Any]] = Field(None, description="Error report ID")
+    
