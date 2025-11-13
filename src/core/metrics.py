@@ -1,10 +1,8 @@
 """Prometheus metrics instrumentation for FastAPI and RQ monitoring."""
 
 import time
-from typing import Callable
-
+from typing import Callable, Optional
 from fastapi import Request, Response
-from fastapi.responses import JSONResponse
 from prometheus_client import (
     Counter,
     Histogram,
@@ -14,8 +12,6 @@ from prometheus_client import (
 )
 from starlette.middleware.base import BaseHTTPMiddleware
 
-# Lazy import to avoid circular dependency
-# from backend.tts.queue_manager import get_queue_manager
 from src.core.app_context import app_context
 
 
@@ -112,7 +108,6 @@ class MetricsMiddleware(BaseHTTPMiddleware):
         """Collect metrics for each HTTP request."""
         start_time = time.time()
 
-        # Extract endpoint (simplified path without IDs)
         endpoint = self._get_endpoint_path(request.url.path)
 
         # Record request size
@@ -155,10 +150,8 @@ class MetricsMiddleware(BaseHTTPMiddleware):
 
             return response
 
-        except Exception as exc:
+        except Exception:
             duration = time.time() - start_time
-
-            # Record failed request
             http_requests_total.labels(
                 method=request.method, endpoint=endpoint, status_code="500"
             ).inc()
@@ -166,58 +159,49 @@ class MetricsMiddleware(BaseHTTPMiddleware):
             http_request_duration_seconds.labels(
                 method=request.method, endpoint=endpoint
             ).observe(duration)
-
             raise
 
     def _get_endpoint_path(self, path: str) -> str:
         """Convert actual path to endpoint pattern for metrics."""
-        # Convert /api/tts/status/12345 to /api/tts/status/{job_id}
         parts = path.strip("/").split("/")
 
-        # Simple pattern matching for common API endpoints
         if len(parts) >= 2 and parts[0] == "api":
             if len(parts) == 4 and parts[1] == "tts" and parts[2] == "status":
                 return "/api/tts/status/{job_id}"
             elif len(parts) == 4 and parts[1] == "user":
-                return f"/api/user/{{{parts[3]}}}"  # /api/user/{user_id}
+                return "/api/user/{user_id}"
 
-        # Return original path for other endpoints
         return path
 
 
-def update_queue_metrics():
+def update_queue_metrics() -> None:
     """Update TTS queue metrics from current queue state."""
     try:
-        # Lazy import to avoid circular dependency
-        from backend.tts.queue_manager import get_queue_manager
+        from backend.tts.queue_manager import get_queue_manager  # type: ignore
 
         queue_manager = get_queue_manager()
         stats = queue_manager.get_queue_stats()
 
-        # Update queue length metrics
         for queue_name, queue_stats in stats.get("queues", {}).items():
             tts_queue_length.labels(queue_name=queue_name).set(queue_stats["queued"])
 
-        # Update worker metrics (simplified)
         workers = stats.get("workers", {})
         active_count = workers.get("active_count", 0)
         tts_active_workers.labels(pool_name="all").set(active_count)
 
     except Exception as e:
-        # Log error but don't crash metrics collection
         print(f"Failed to update queue metrics: {e}")
 
 
-def update_cache_metrics():
+def update_cache_metrics() -> None:
     """Update TTS cache metrics."""
     try:
-        from backend.tts.audio_cache import AudioCacheManager
+        from backend.tts.audio_cache import AudioCacheManager  # type: ignore
 
         cache_manager = AudioCacheManager()
         stats = cache_manager.get_cache_stats()
 
         tts_cache_size_bytes.set(stats.get("total_size_bytes", 0))
-        # Note: cache hits/misses would need to be tracked separately
 
     except Exception as e:
         print(f"Failed to update cache metrics: {e}")
@@ -225,50 +209,54 @@ def update_cache_metrics():
 
 async def metrics_endpoint() -> Response:
     """Prometheus metrics endpoint."""
-    # Update dynamic metrics
     update_queue_metrics()
     update_cache_metrics()
-
-    # Generate latest metrics
     output = generate_latest()
     return Response(content=output, media_type=CONTENT_TYPE_LATEST)
 
 
-def record_tts_job_submitted(priority: str = "normal", user_id: str = None):
+# --------------------------------------------------------------------------
+# Metrics recording functions (corrected type hints)
+# --------------------------------------------------------------------------
+
+
+def record_tts_job_submitted(
+    priority: str = "normal", user_id: Optional[str] = None
+) -> None:
     """Record a TTS job submission."""
     tts_jobs_submitted_total.labels(
-        priority=priority, user_id=str(user_id) if user_id else "anonymous"
+        priority=priority, user_id=user_id or "anonymous"
     ).inc()
 
 
-def record_tts_job_completed(duration_seconds: float = None):
+def record_tts_job_completed(duration_seconds: Optional[float] = None) -> None:
     """Record a TTS job completion."""
     tts_jobs_completed_total.inc()
-    if duration_seconds:
+    if duration_seconds is not None:
         tts_job_duration_seconds.observe(duration_seconds)
 
 
-def record_tts_job_failed(error_type: str = "unknown"):
+def record_tts_job_failed(error_type: str = "unknown") -> None:
     """Record a TTS job failure."""
     tts_jobs_failed_total.labels(error_type=error_type).inc()
 
 
-def record_auth_login(success: bool):
+def record_auth_login(success: bool) -> None:
     """Record an authentication attempt."""
     result = "success" if success else "failure"
     auth_logins_total.labels(result=result).inc()
 
 
-def record_auth_token_issued(token_type: str):
+def record_auth_token_issued(token_type: str) -> None:
     """Record JWT token issuance."""
     auth_tokens_issued_total.labels(token_type=token_type).inc()
 
 
-def record_cache_hit():
+def record_cache_hit() -> None:
     """Record a cache hit."""
     tts_cache_hits_total.inc()
 
 
-def record_cache_miss():
+def record_cache_miss() -> None:
     """Record a cache miss."""
     tts_cache_misses_total.inc()
