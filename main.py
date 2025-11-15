@@ -1,5 +1,12 @@
 """Main FastAPI application entry point."""
 
+from dotenv import load_dotenv
+from pathlib import Path
+
+env_path = Path(__file__).resolve().parent / ".env"
+load_dotenv(dotenv_path=env_path)
+
+
 import logging
 from pathlib import Path
 
@@ -22,7 +29,6 @@ from src.api.routers import (
     settings,
     user,
 )
-from backend.api.routers import tts
 from src.core.app_context import app_context
 from src.core.logging_config import setup_structured_logging
 from src.core.middleware import (
@@ -33,6 +39,7 @@ from src.core.middleware import (
 from src.core.metrics import MetricsMiddleware, metrics_endpoint
 
 logger = logging.getLogger(__name__)
+BASE_DIR = Path(__file__).resolve().parent
 
 # Set up structured logging
 config = app_context.config
@@ -75,23 +82,23 @@ app.add_middleware(StructuredLoggingMiddleware)
 app.add_middleware(RequestIDMiddleware)
 
 # Set up static file serving for audio
-static_audio_dir = Path("./static/audio")
+static_audio_dir = BASE_DIR / "static" / "audio"
 static_audio_dir.mkdir(parents=True, exist_ok=True)
 
 # Set up audio cache directory
-audio_cache_dir = Path("./audio_cache")
+audio_cache_dir = BASE_DIR / "audio_cache"
 audio_cache_dir.mkdir(parents=True, exist_ok=True)
 
 # Set up frontend static files
-frontend_static_dir = Path("./frontend/static")
+frontend_static_dir = BASE_DIR / "frontend" / "static"
 frontend_static_dir.mkdir(parents=True, exist_ok=True)
 
 # Set up Jinja2 templates
-templates = Jinja2Templates(directory="frontend/templates")
+templates = Jinja2Templates(directory=str(BASE_DIR / "frontend" / "templates"))
 
 # Mount static files
-app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
-app.mount("/audio_cache", StaticFiles(directory="audio_cache"), name="audio_cache")
+app.mount("/static", StaticFiles(directory=frontend_static_dir), name="static")
+app.mount("/audio_cache", StaticFiles(directory=audio_cache_dir), name="audio_cache")
 
 # Include routers
 app.include_router(auth.router)
@@ -103,7 +110,6 @@ app.include_router(user.router)
 app.include_router(audio.router)
 app.include_router(backup.router)
 app.include_router(error.router)
-app.include_router(tts.router)
 
 
 # WebSocket endpoint
@@ -172,6 +178,12 @@ async def health_check():
 async def root(request: Request):
     """Root endpoint - serve dashboard template."""
     return templates.TemplateResponse("dashboard.html", {"request": request})
+
+
+@app.get("/settings")
+async def settings_page(request: Request):
+    """Serve tutor settings UI."""
+    return templates.TemplateResponse("settings.html", {"request": request})
 
 
 @app.get("/api")

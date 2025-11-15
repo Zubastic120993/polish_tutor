@@ -296,8 +296,43 @@ setInterval(() => {
 // client.disconnect();
 */
 
-// Export for use in modules
+// Export for use in modules (Node.js)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = TutorWebSocketClient;
 }
 
+// Export for use in browser (global) - multiple fallbacks to ensure availability
+try {
+    // Direct global assignment (works in all environments)
+    if (typeof globalThis !== 'undefined') {
+        globalThis.TutorWebSocketClient = TutorWebSocketClient;
+    }
+    
+    // Window object (standard browser)
+    if (typeof window !== 'undefined') {
+        window.TutorWebSocketClient = TutorWebSocketClient;
+    }
+    
+    // Direct global scope (fallback for older browsers)
+    if (typeof self !== 'undefined') {
+        self.TutorWebSocketClient = TutorWebSocketClient;
+    }
+
+    // Verify export succeeded
+    if (typeof TutorWebSocketClient !== 'undefined') {
+        console.log('[WebSocketClient] TutorWebSocketClient class exported successfully');
+    } else {
+        console.warn('[WebSocketClient] Warning: TutorWebSocketClient may not be available globally');
+    }
+
+    // Broadcast readiness so deferred initializers can hook in
+    if (typeof document !== 'undefined' && typeof document.dispatchEvent === 'function') {
+        try {
+            document.dispatchEvent(new CustomEvent('tutor-websocket-ready'));
+        } catch (eventError) {
+            console.warn('[WebSocketClient] Failed to dispatch readiness event:', eventError);
+        }
+    }
+} catch (error) {
+    console.error('[WebSocketClient] Error exporting TutorWebSocketClient:', error);
+}

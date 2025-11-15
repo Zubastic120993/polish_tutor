@@ -3,7 +3,10 @@
  * Centralized error handling with categories, user-friendly messages, recovery actions, and offline queue
  */
 
-class ErrorHandler {
+// Prevent duplicate declaration if script is loaded twice
+// Use window.ErrorHandler check because class declarations are hoisted
+if (typeof window.ErrorHandler === 'undefined') {
+    window.ErrorHandler = class {
     constructor(userId = 1) {
         this.userId = userId;
         this.offlineQueue = [];
@@ -748,16 +751,23 @@ Timestamp: ${lastError.timestamp}
             }, 3000);
         }
     }
-}
+}; // End of window.ErrorHandler class assignment
+} // End of if (typeof window.ErrorHandler === 'undefined')
 
-// Initialize error handler when DOM is ready
-let errorHandler;
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        errorHandler = new ErrorHandler(1); // Default user ID
-        window.errorHandler = errorHandler;
-    });
-} else {
-    errorHandler = new ErrorHandler(1);
-    window.errorHandler = errorHandler;
+// Initialize error handler when DOM is ready (only if not already initialized)
+if (!window.errorHandler && typeof window.ErrorHandler !== 'undefined') {
+    let errorHandler;
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.errorHandler) {
+                errorHandler = new window.ErrorHandler(1); // Default user ID
+                window.errorHandler = errorHandler;
+            }
+        });
+    } else {
+        if (!window.errorHandler) {
+            errorHandler = new window.ErrorHandler(1);
+            window.errorHandler = errorHandler;
+        }
+    }
 }

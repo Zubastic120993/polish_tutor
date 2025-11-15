@@ -66,19 +66,10 @@ tts_job_duration_seconds = Histogram(
     buckets=[10, 30, 60, 120, 300, 600, 1800],
 )
 
-tts_queue_length = Gauge(
-    "tts_queue_length", "Current length of TTS queues", ["queue_name"]
-)
-
-tts_active_workers = Gauge(
-    "tts_active_workers", "Number of active TTS workers", ["pool_name"]
-)
-
 tts_cache_hits_total = Counter("tts_cache_hits_total", "Total number of TTS cache hits")
 tts_cache_misses_total = Counter(
     "tts_cache_misses_total", "Total number of TTS cache misses"
 )
-tts_cache_size_bytes = Gauge("tts_cache_size_bytes", "Total size of TTS cache in bytes")
 
 auth_logins_total = Counter(
     "auth_logins_total", "Total authentication attempts", ["result"]
@@ -162,45 +153,8 @@ class MetricsMiddleware(BaseHTTPMiddleware):
         return path
 
 
-# -------------------------------------------------------------------
-# Dynamic Metrics
-# -------------------------------------------------------------------
-
-
-def update_queue_metrics() -> None:
-    """Update TTS queue metrics."""
-    try:
-        from backend.tts.queue_manager import get_queue_manager
-
-        queue_manager = get_queue_manager()
-        stats = queue_manager.get_queue_stats()
-
-        for qname, qstats in stats.get("queues", {}).items():
-            tts_queue_length.labels(queue_name=qname).set(qstats.get("queued", 0))
-
-        workers = stats.get("workers", {})
-        active = workers.get("active_count", 0)
-        tts_active_workers.labels(pool_name="all").set(active)
-    except Exception as e:
-        print(f"Failed to update queue metrics: {e}")
-
-
-def update_cache_metrics() -> None:
-    """Update TTS cache metrics."""
-    try:
-        from backend.tts.audio_cache import AudioCacheManager
-
-        cache = AudioCacheManager()
-        stats = cache.get_cache_stats()
-        tts_cache_size_bytes.set(stats.get("total_size_bytes", 0))
-    except Exception as e:
-        print(f"Failed to update cache metrics: {e}")
-
-
 async def metrics_endpoint() -> Response:
     """Expose Prometheus metrics."""
-    update_queue_metrics()
-    update_cache_metrics()
     output = generate_latest()
     return Response(content=output, media_type=CONTENT_TYPE_LATEST)
 

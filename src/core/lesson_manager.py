@@ -12,6 +12,9 @@ from src.models import Lesson
 from src.services.database_service import Database
 
 logger = logging.getLogger(__name__)
+BASE_DIR = Path(__file__).resolve().parents[2]
+DEFAULT_LESSON_DIR = BASE_DIR / "data" / "lessons"
+DEFAULT_AUDIO_DIR = BASE_DIR / "static" / "audio" / "native"
 
 # -------------------------------------------------------------------
 # JSON Schema for lesson validation
@@ -79,8 +82,8 @@ class LessonManager:
         database: Optional[Database] = None,
     ):
         """Initialize LessonManager."""
-        self.lessons_dir: Path = Path(lessons_dir or "./data/lessons")
-        self.audio_base_dir: Path = Path(audio_base_dir or "./static/audio/native")
+        self.lessons_dir: Path = Path(lessons_dir or DEFAULT_LESSON_DIR)
+        self.audio_base_dir: Path = Path(audio_base_dir or DEFAULT_AUDIO_DIR)
         self.database: Database = database or Database()
         self._cache: Dict[str, Dict[str, Any]] = {}  # Cached lessons
 

@@ -339,10 +339,33 @@ class Database:
 
     def get_due_srs_items(self, user_id: int) -> List[Dict[str, Any]]:
         """Return SRS items due for review."""
+        from datetime import datetime
+        from sqlalchemy import and_
+
+        now = datetime.utcnow()
         with self.get_session() as session:
-            items = session.query(SRSMemory).filter(SRSMemory.user_id == user_id).all()
+            items = (
+                session.query(SRSMemory)
+                .filter(
+                    and_(
+                        SRSMemory.user_id == user_id,
+                        SRSMemory.next_review <= now,
+                    )
+                )
+                .order_by(SRSMemory.next_review.asc())
+                .all()
+            )
             return [
-                dict(id=i.id, phrase_id=i.phrase_id, due_at=getattr(i, "due_at", None))
+                {
+                    "id": i.id,
+                    "phrase_id": i.phrase_id,
+                    "user_id": i.user_id,
+                    "next_review": i.next_review.isoformat() + "Z" if i.next_review else None,
+                    "efactor": i.efactor,
+                    "interval_days": i.interval_days,
+                    "review_count": i.review_count,
+                    "strength_level": i.strength_level,
+                }
                 for i in items
             ]
 

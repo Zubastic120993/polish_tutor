@@ -6,6 +6,9 @@
 class ChatUI {
     constructor() {
         this.wsClient = null;
+        this.wsInitRetries = 0;
+        this.maxWsInitRetries = 20; // Max 2 seconds of retries (20 * 100ms)
+        this.wsReadyListenerAttached = false;
         this.userId = 1; // Default user ID (will be configurable later)
         this.currentLessonId = null;
         this.currentDialogueId = null;
@@ -32,8 +35,13 @@ class ChatUI {
         this.progressValueEl = document.getElementById('lesson-progress-value');
         this.progressMeter = document.getElementById('lesson-progress-meter');
         this.progressStepEl = document.getElementById('lesson-progress-step');
+        this.progressDetailsEl = document.getElementById('lesson-progress-details');
+        this.segmentsCompletedEl = document.getElementById('segments-completed');
+        this.totalAttemptsEl = document.getElementById('total-attempts');
+        this.lastPracticedEl = document.getElementById('last-practiced');
         this.lessonCatalogPanel = document.getElementById('lesson-catalog-panel');
         this.lessonCatalogSelect = document.getElementById('lesson-catalog-select');
+        this.lessonCatalogList = document.getElementById('lesson-catalog-list'); // For dashboard template
         this.lessonCatalogEmptyState = document.getElementById('lesson-catalog-empty');
         this.lessonCatalogPreview = document.getElementById('lesson-catalog-preview');
         this.lessonCatalogPreviewId = document.getElementById('lesson-preview-id');
@@ -63,6 +71,17 @@ class ChatUI {
             coach: document.getElementById('feedback-coach'),
             retry: document.getElementById('feedback-retry')
         };
+        this.recommendedLessonCard = document.getElementById('recommended-lesson-card');
+        this.recommendedLessonTitle = document.getElementById('recommended-lesson-title');
+        this.recommendedLessonSubtitle = document.getElementById('recommended-lesson-subtitle');
+        this.recommendedLessonLevel = document.getElementById('recommended-lesson-level');
+        this.recommendedLessonDuration = document.getElementById('recommended-lesson-duration');
+        this.recommendedLessonPhrases = document.getElementById('recommended-lesson-phrases');
+        this.recommendedLessonIconEl = document.getElementById('recommended-lesson-icon');
+        this.recommendedLessonButton = document.getElementById('start-first-lesson');
+        this.voiceInstructions = document.getElementById('voice-instructions');
+        this.roadmapSteps = document.querySelectorAll('[data-roadmap-step]');
+        this.roadmapLevelLabel = document.getElementById('roadmap-level-label');
         this.supportButtons = {
             repeat: document.getElementById('support-repeat'),
             hint: document.getElementById('support-hint'),
@@ -84,10 +103,19 @@ class ChatUI {
         this.isSlowMode = false;
         this.hasShownStartReminder = false;
         this.lessonCatalogEntries = [];
+        this.recommendedLessonEntry = null;
         this.selectedLessonEntry = null;
         this.chatPlaceholder = document.getElementById('chat-placeholder');
         this.floatingHintText = document.getElementById('floating-hint-text');
         this.startTooltip = document.getElementById('start-tooltip');
+        this.voiceTranscriptionEl = document.getElementById('voice-transcription');
+        this.voiceTranscriptionTextEl = document.getElementById('voice-transcription-text');
+        this.voiceTranscriptionCloseEl = document.getElementById('voice-transcription-close');
+        this.errorDisplayEl = document.getElementById('error-display');
+        this.errorMessageEl = document.getElementById('error-message');
+        this.errorDetailsEl = document.getElementById('error-details');
+        this.errorRetryEl = document.getElementById('error-retry');
+        this.lastErrorAction = null;
         
         // Load translation setting from localStorage
         const savedSettings = localStorage.getItem('userSettings');
@@ -115,10 +143,14 @@ class ChatUI {
         this.resetLessonProgressIndicator();
         this.setMicIndicatorState(false);
         this.setStartButtonState('select');
+        const initialLevelText = document.getElementById('progress-level')?.textContent || document.getElementById('main-progress-level')?.textContent || 'A0';
+        this.updateRoadmap(initialLevelText);
         this.showPlaceholderMessage();
         
         this.init();
         this.initVoiceInput();
+        this.hideLoadingScreen();
+        this.bindLessonCardEvents();
     }
     
     init() {
@@ -134,6 +166,17 @@ class ChatUI {
         
         // Load lesson catalog so learner can choose a lesson
         this.loadLessonCatalog();
+
+        this.hideLoadingScreen();
+    }
+
+    hideLoadingScreen() {
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+            loadingScreen.classList.add('hidden');
+            loadingScreen.setAttribute('aria-hidden', 'true');
+            loadingScreen.style.display = 'none';
+        }
     }
     
     async initLessonFlow() {
@@ -150,7 +193,9 @@ class ChatUI {
     }
 
     async loadLessonCatalog(force = false) {
-        if (!this.lessonCatalogSelect) {
+        // Support both select dropdown (index.html) and list (dashboard.html) templates
+        if (!this.lessonCatalogSelect && !this.lessonCatalogList) {
+            console.warn('[Chat] No lesson catalog container found');
             return;
         }
 
@@ -159,8 +204,19 @@ class ChatUI {
                 this.lessonCatalogEmptyState.hidden = false;
                 this.lessonCatalogEmptyState.textContent = 'Loading lessons...';
             }
-            this.lessonCatalogSelect.disabled = true;
-            this.lessonCatalogSelect.innerHTML = '<option value="">Loading lessons...</option>';
+            if (this.lessonCatalogSelect) {
+                this.lessonCatalogSelect.disabled = true;
+                this.lessonCatalogSelect.innerHTML = '<option value="">Loading lessons...</option>';
+            }
+            if (this.lessonCatalogList) {
+                this.lessonCatalogList.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-8 text-cafe-mocha">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-cafe-espresso mb-3"></div>
+                        <p class="text-sm">Loading lessons...</p>
+                        <p class="text-xs text-cafe-mocha mt-1">Please wait</p>
+                    </div>
+                `;
+            }
         }
 
         try {
@@ -173,11 +229,29 @@ class ChatUI {
             this.lessonCatalogEntries = entries;
             this.renderLessonCatalog();
             this.populateQuickAccessLessons();
+            
+            // Update navigation manager for dashboard.html
+            if (window.navigationManager && typeof window.navigationManager.buildNavigationTree === 'function') {
+                // Convert catalog entries to navigation format
+                const navLessons = entries.map(entry => ({
+                    id: entry.id,
+                    title: entry.title_pl || entry.title_en || entry.id,
+                    title_pl: entry.title_pl,
+                    title_en: entry.title_en,
+                    level: this.deriveLevelFromLessonId(entry.id) || 'A0',
+                    module: entry.module,
+                    part: entry.part
+                }));
+                window.navigationManager.buildNavigationTree(navLessons);
+            }
         } catch (error) {
             console.error('[Chat] Failed to load lesson catalog:', error);
             if (this.lessonCatalogEmptyState) {
                 this.lessonCatalogEmptyState.hidden = false;
                 this.lessonCatalogEmptyState.textContent = 'Unable to load lessons. Tap refresh to try again.';
+            }
+            if (this.lessonCatalogList) {
+                this.lessonCatalogList.innerHTML = '<div class="text-center py-4 text-cafe-mocha">Unable to load lessons. Please refresh.</div>';
             }
             // Allow fallback to default lesson if available
             if (!this.currentLessonId && this.defaultLessonId) {
@@ -188,6 +262,24 @@ class ChatUI {
     }
 
     renderLessonCatalog() {
+        // Render for select dropdown (index.html template)
+        if (this.lessonCatalogSelect) {
+            this.renderLessonCatalogSelect();
+        }
+        
+        // Render for list (dashboard.html template)
+        if (this.lessonCatalogList) {
+            this.renderLessonCatalogList();
+        }
+        this.renderRecommendedLesson();
+
+        // If neither exists, return early
+        if (!this.lessonCatalogSelect && !this.lessonCatalogList) {
+            return;
+        }
+    }
+    
+    renderLessonCatalogSelect() {
         if (!this.lessonCatalogSelect) {
             return;
         }
@@ -255,6 +347,293 @@ class ChatUI {
             }
         }
     }
+    
+    renderLessonCatalogList() {
+        if (!this.lessonCatalogList) {
+            return;
+        }
+        
+        if (!this.lessonCatalogEntries.length) {
+            if (this.lessonCatalogEmptyState) {
+                this.lessonCatalogEmptyState.hidden = false;
+                this.lessonCatalogEmptyState.textContent = 'No lessons available yet.';
+            }
+            this.lessonCatalogList.innerHTML = '';
+            return;
+        }
+        
+        if (this.lessonCatalogEmptyState) {
+            this.lessonCatalogEmptyState.hidden = true;
+        }
+        
+        // Clear the list
+        this.lessonCatalogList.innerHTML = '';
+        
+        // Group lessons by part and module
+        const groupedLessons = this.groupLessonsByPartAndModule(this.lessonCatalogEntries);
+        
+        // Render lessons as clickable list items with collapsible categories
+        let isFirstLesson = true;
+        const sortedGroups = Object.keys(groupedLessons).sort();
+        
+        sortedGroups.forEach((groupKey, groupIndex) => {
+            const lessons = groupedLessons[groupKey];
+            
+            // Create collapsible group container if there are multiple groups
+            if (sortedGroups.length > 1) {
+                const groupContainer = document.createElement('div');
+                groupContainer.className = 'lesson-group';
+                groupContainer.dataset.groupKey = groupKey;
+                
+                // Group header (clickable to toggle)
+                const groupHeader = document.createElement('button');
+                groupHeader.type = 'button';
+                groupHeader.className = 'lesson-group-header w-full flex items-center justify-between px-3 py-2 mt-4 mb-2 text-xs font-bold text-gray-700 uppercase tracking-wide bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors border-none cursor-pointer';
+                groupHeader.innerHTML = `
+                    <span>${groupKey}</span>
+                    <i data-feather="chevron-down" class="lesson-group-icon w-4 h-4 text-gray-600 transition-transform duration-200"></i>
+                `;
+                
+                // Group content (collapsible)
+                const groupContent = document.createElement('div');
+                groupContent.className = 'lesson-group-content';
+                // Expand first category by default, collapse others
+                const isFirstGroup = groupIndex === 0;
+                groupContent.style.cssText = isFirstGroup ? 'display: block;' : 'display: none;';
+                
+                // Set initial icon rotation for first group
+                const initialIcon = groupHeader.querySelector('.lesson-group-icon');
+                if (initialIcon && !isFirstGroup) {
+                    initialIcon.style.transform = 'rotate(-90deg)';
+                }
+                
+                // Toggle collapse on header click
+                groupHeader.addEventListener('click', () => {
+                    const isCollapsed = groupContent.style.display === 'none';
+                    groupContent.style.display = isCollapsed ? 'block' : 'none';
+                    const icon = groupHeader.querySelector('.lesson-group-icon');
+                    if (icon) {
+                        icon.style.transform = isCollapsed ? 'rotate(0deg)' : 'rotate(-90deg)';
+                    }
+                });
+                
+                // Render lessons inside group
+                lessons.forEach((entry, lessonIndex) => {
+                    const lessonItem = this.createLessonItem(entry, isFirstLesson && groupIndex === 0 && lessonIndex === 0);
+                    groupContent.appendChild(lessonItem);
+                    isFirstLesson = false;
+                });
+                
+                groupContainer.appendChild(groupHeader);
+                groupContainer.appendChild(groupContent);
+                this.lessonCatalogList.appendChild(groupContainer);
+                
+                // Initialize feather icons for the chevron
+                if (typeof feather !== 'undefined') {
+                    feather.replace();
+                }
+            } else {
+                // Single group - no collapse needed, just render lessons
+                lessons.forEach((entry, lessonIndex) => {
+                    const lessonItem = this.createLessonItem(entry, isFirstLesson && lessonIndex === 0);
+                    this.lessonCatalogList.appendChild(lessonItem);
+                    isFirstLesson = false;
+                });
+            }
+        });
+    }
+
+    renderRecommendedLesson() {
+        if (!this.recommendedLessonCard) {
+            return;
+        }
+
+        const recommendation = this.pickRecommendedLesson();
+        if (!recommendation) {
+            this.recommendedLessonCard.classList.add('hidden');
+            this.recommendedLessonEntry = null;
+            return;
+        }
+
+        this.recommendedLessonEntry = recommendation;
+        const title = recommendation.title_pl || recommendation.title_en || recommendation.id;
+        const subtitle = recommendation.title_en && recommendation.title_en !== title ? recommendation.title_en : (recommendation.module || recommendation.part || 'Short lesson to warm up');
+        const level = recommendation.level || this.deriveLevelFromLessonId(recommendation.id);
+        const estimatedMinutes = recommendation.estimated_minutes || recommendation.duration_minutes || 3;
+        const phraseCount = recommendation.phrases?.length || recommendation.dialogues?.length || recommendation.examples?.length || null;
+        const progress = this.loadLessonProgress(recommendation.id);
+        const completion = progress?.completion || 0;
+        const lessonTag = this.getLessonTag(recommendation);
+        const lessonEmoji = this.mapIconToEmoji(lessonTag.icon);
+
+        if (this.recommendedLessonTitle) {
+            this.recommendedLessonTitle.textContent = title;
+        }
+        if (this.recommendedLessonSubtitle) {
+            this.recommendedLessonSubtitle.textContent = subtitle;
+        }
+        if (this.recommendedLessonLevel) {
+            this.recommendedLessonLevel.textContent = `Level ${level}`;
+        }
+        if (this.recommendedLessonDuration) {
+            this.recommendedLessonDuration.textContent = `⏱ ${estimatedMinutes} min`;
+        }
+        if (this.recommendedLessonPhrases) {
+            if (phraseCount) {
+                this.recommendedLessonPhrases.textContent = `💬 ${phraseCount} phrases`;
+                this.recommendedLessonPhrases.classList.remove('hidden');
+            } else {
+                this.recommendedLessonPhrases.classList.add('hidden');
+            }
+        }
+        if (this.recommendedLessonIconEl) {
+            this.recommendedLessonIconEl.textContent = lessonEmoji;
+        }
+        if (this.recommendedLessonButton) {
+            this.recommendedLessonButton.textContent = completion > 0 ? 'Resume lesson' : 'Start lesson';
+        }
+
+        if (this.roadmapLevelLabel) {
+            this.roadmapLevelLabel.textContent = `Level ${level}`;
+        }
+        this.updateRoadmap(level);
+
+        this.recommendedLessonCard.classList.remove('hidden');
+    }
+
+    pickRecommendedLesson() {
+        if (!this.lessonCatalogEntries.length) {
+            return null;
+        }
+
+        const inProgress = this.lessonCatalogEntries.find((entry) => {
+            const progress = this.loadLessonProgress(entry.id);
+            return progress && progress.completion > 0 && progress.completion < 100;
+        });
+        if (inProgress) {
+            return inProgress;
+        }
+
+        const notStarted = this.lessonCatalogEntries.find((entry) => {
+            const progress = this.loadLessonProgress(entry.id);
+            return !progress || progress.completion === 0;
+        });
+        if (notStarted) {
+            return notStarted;
+        }
+
+        return this.lessonCatalogEntries[0];
+    }
+
+    createLessonItem(entry, isFirstLesson = false) {
+        const lessonItem = document.createElement('div');
+        lessonItem.className = 'lesson-card';
+        lessonItem.dataset.lessonId = entry.id;
+        
+        // Load progress for this lesson
+        const progress = this.loadLessonProgress(entry.id);
+        const completion = progress?.completion || 0;
+        const lastPracticed = progress?.lastPracticed ? new Date(progress.lastPracticed) : null;
+        const canResume = completion > 0 && completion < 100;
+        const isSelected = entry.id === this.currentLessonId;
+        
+        const lessonTag = this.getLessonTag(entry);
+        const lessonIcon = this.mapIconToEmoji(lessonTag.icon);
+
+        // Apply CSS classes for modern styling
+        if (isSelected) {
+            lessonItem.classList.add('selected');
+        }
+        
+        const title = entry.title_pl || entry.title_en || entry.id;
+        const subtitle = entry.title_en && entry.title_en !== title ? entry.title_en : '';
+        const duration = entry.estimated_minutes ? `${entry.estimated_minutes} min` : '';
+        const level = entry.level || entry.part || '';
+        
+        // Escape HTML to prevent XSS
+        const escapeHtml = (text) => {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        };
+        
+        // Progress indicator
+        let progressBadgeText = '';
+        let progressBadgeClass = '';
+        if (completion >= 100) {
+            progressBadgeText = '✓ Complete';
+            progressBadgeClass = 'complete';
+        } else if (completion > 0) {
+            progressBadgeText = `${completion}%`;
+        }
+        
+        // Use Tailwind classes for modern card styling with proper hierarchy
+        lessonItem.className = `lesson-card p-5 bg-white rounded-xl border ${isSelected ? 'border-indigo-500 border-l-4 bg-indigo-50 shadow-md' : 'border-gray-200'} shadow-sm hover:shadow-lg hover:border-indigo-300 transition-all mb-4`;
+
+        lessonItem.innerHTML = `
+            <!-- Card Header with Title -->
+            <div class="flex items-start gap-4 mb-4">
+                <div class="lesson-card-icon" aria-hidden="true">${lessonIcon}</div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-bold text-gray-900 mb-1 leading-tight">${escapeHtml(title)}</h3>
+                    ${subtitle ? `<p class="text-sm text-gray-600 mb-2 font-medium">${escapeHtml(subtitle)}</p>` : ''}
+                    <div class="flex items-center gap-2 text-xs text-gray-500">
+                        ${lessonTag.label ? `<span class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 font-semibold">${lessonTag.label}</span>` : ''}
+                        ${level ? `<span>${escapeHtml(level)}</span>` : ''}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card Meta Information -->
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2 text-xs text-gray-500">
+                    ${level ? `<span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-md font-semibold">${escapeHtml(level)}</span>` : ''}
+                    ${duration ? `<span class="text-gray-500">${duration}</span>` : ''}
+                </div>
+                ${progressBadgeText ? `
+                    <span class="px-3 py-1 text-xs font-bold rounded-full ${completion >= 100 ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-indigo-100 text-indigo-700 border border-indigo-200'}">
+                        ${progressBadgeText}
+                    </span>
+                ` : ''}
+            </div>
+            
+            <!-- Progress Bar (if in progress) -->
+            ${completion > 0 && completion < 100 ? `
+                <div class="mb-4">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs font-medium text-gray-600">Progress</span>
+                        <span class="text-xs font-bold text-indigo-600">${completion}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-indigo-500 to-blue-600 rounded-full transition-all duration-300" style="width: ${completion}%;"></div>
+                    </div>
+                </div>
+            ` : ''}
+            
+            <!-- Action Button -->
+            <button class="lesson-start-btn w-full px-5 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold rounded-lg shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-blue-700 transition-all text-sm">
+                ${canResume ? '▶ Resume Lesson' : '▶ Start Lesson'}
+            </button>
+        `;
+        
+        // Button hover effect (handled via CSS, but adding for extra polish)
+        const startBtn = lessonItem.querySelector('.lesson-start-btn');
+        if (startBtn) {
+            startBtn.addEventListener('mouseenter', () => {
+                startBtn.style.transform = 'translateY(-1px)';
+                startBtn.style.boxShadow = '0 6px 12px rgba(79, 70, 229, 0.3)';
+            });
+            startBtn.addEventListener('mouseleave', () => {
+                startBtn.style.transform = 'translateY(0)';
+                startBtn.style.boxShadow = '0 4px 6px rgba(79, 70, 229, 0.2)';
+            });
+        }
+        
+        // Note: Button clicks are handled by global event delegation in dashboard.html
+        // This avoids duplicate handlers and conflicts
+        
+        return lessonItem;
+    }
 
     groupLessonsByPartAndModule(entries) {
         const groups = {};
@@ -285,30 +664,70 @@ class ChatUI {
     }
 
     filterLessons(searchTerm) {
-        const searchLower = searchTerm.toLowerCase().trim();
+        // Apply all filters (search, level, status)
+        this.applyLessonFilters(searchTerm);
+    }
 
-        if (!searchLower) {
-            // Reset to show all lessons and cards
-            this.renderLessonCatalog();
-            this.showAllQuickAccessLessons();
-            return;
-        }
+    applyLessonFilters(searchTerm = null) {
+        const searchValue = searchTerm !== null ? searchTerm : (this.lessonSearchInput?.value || '');
+        const levelFilter = this.lessonFilterLevel?.value || '';
+        const statusFilter = this.lessonFilterStatus?.value || '';
 
-        const filteredEntries = this.lessonCatalogEntries.filter(entry => {
-            const titlePl = (entry.title_pl || '').toLowerCase();
-            const titleEn = (entry.title_en || '').toLowerCase();
-            const module = (entry.module || '').toLowerCase();
-            const part = (entry.part || '').toLowerCase();
+        const searchLower = searchValue.toLowerCase().trim();
 
-            return titlePl.includes(searchLower) ||
-                   titleEn.includes(searchLower) ||
-                   module.includes(searchLower) ||
-                   part.includes(searchLower) ||
-                   entry.id.toLowerCase().includes(searchLower);
+        let filteredEntries = this.lessonCatalogEntries.filter(entry => {
+            // Search filter
+            if (searchLower) {
+                const titlePl = (entry.title_pl || '').toLowerCase();
+                const titleEn = (entry.title_en || '').toLowerCase();
+                const module = (entry.module || '').toLowerCase();
+                const part = (entry.part || '').toLowerCase();
+                
+                const matchesSearch = titlePl.includes(searchLower) ||
+                                    titleEn.includes(searchLower) ||
+                                    module.includes(searchLower) ||
+                                    part.includes(searchLower) ||
+                                    entry.id.toLowerCase().includes(searchLower);
+                
+                if (!matchesSearch) return false;
+            }
+
+            // Level filter
+            if (levelFilter) {
+                const entryLevel = (entry.level || entry.part || '').toUpperCase();
+                if (!entryLevel.includes(levelFilter.toUpperCase())) {
+                    return false;
+                }
+            }
+
+            // Status filter
+            if (statusFilter) {
+                const progress = this.loadLessonProgress(entry.id);
+                const completion = progress?.completion || 0;
+                
+                if (statusFilter === 'completed' && completion < 100) {
+                    return false;
+                } else if (statusFilter === 'in_progress' && (completion === 0 || completion >= 100)) {
+                    return false;
+                } else if (statusFilter === 'not_started' && completion > 0) {
+                    return false;
+                }
+            }
+
+            return true;
         });
 
-        this.renderFilteredCatalog(filteredEntries);
-        this.filterQuickAccessLessons(searchLower);
+        if (searchLower || levelFilter || statusFilter) {
+            this.renderFilteredCatalog(filteredEntries);
+        } else {
+            this.renderLessonCatalog();
+        }
+
+        if (searchLower) {
+            this.filterQuickAccessLessons(searchLower);
+        } else {
+            this.showAllQuickAccessLessons();
+        }
     }
 
     filterQuickAccessLessons(searchTerm) {
@@ -745,6 +1164,52 @@ class ChatUI {
         return { icon: 'bookmark', label: 'General' };
     }
 
+    mapIconToEmoji(iconName) {
+        const emojiMap = {
+            smile: '😊',
+            'user-plus': '🤝',
+            globe: '🌍',
+            heart: '❤️',
+            users: '👥',
+            briefcase: '💼',
+            hash: '🔢',
+            clock: '⏰',
+            'shopping-bag': '🛒',
+            coffee: '☕️',
+            activity: '💪',
+            'life-buoy': '🩺',
+            cloud: '🌦️',
+            layers: '👗',
+            home: '🏠',
+            map: '🗺️',
+            compass: '🧭',
+            navigation: '🚌',
+            star: '⭐️',
+            bookmark: '📘'
+        };
+        return emojiMap[iconName] || '📚';
+    }
+
+    updateRoadmap(levelText = 'A0') {
+        if (!this.roadmapSteps || !this.roadmapSteps.length) {
+            return;
+        }
+        const normalized = levelText.split('→')[0]?.trim() || 'A0';
+        const ordering = ['A0', 'A0.5', 'A1', 'A1.5', 'A2'];
+        const currentIndex = ordering.findIndex((label) => normalized.startsWith(label.replace('.', '')));
+        this.roadmapSteps.forEach((step, index) => {
+            step.classList.toggle('active', currentIndex === -1 ? index === 0 : index === currentIndex);
+            step.classList.toggle('completed', currentIndex !== -1 && index < currentIndex);
+        });
+    }
+
+    scrollToActiveLessonCard() {
+        const card = document.getElementById('active-lesson-card');
+        if (card) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
     handleLessonSelection(entry) {
         if (!entry) {
             return;
@@ -757,9 +1222,16 @@ class ChatUI {
             this.resetActiveLessonSession('Switched to a new lesson. Press Start when ready.');
         }
 
+        // Show active lesson card, hide hero card
+        const heroCard = document.getElementById('hero-card');
+        const activeLessonCard = document.getElementById('active-lesson-card');
+        if (heroCard) heroCard.classList.add('hidden');
+        if (activeLessonCard) activeLessonCard.classList.remove('hidden');
+
         this.previewSelectedLesson(entry);
         this.setStartButtonState('ready');
         this.updateFloatingHint('Great choice! Press Start Lesson to begin.');
+        this.renderRecommendedLesson();
 
         // Emit event for onboarding
         document.dispatchEvent(new CustomEvent('lessonSelected', { detail: entry }));
@@ -778,6 +1250,19 @@ class ChatUI {
             cefr_goal: entry.title_en ? `Practice: ${entry.title_en}` : undefined,
         };
         this.updateLessonOverviewCard(previewLesson);
+        
+        // Update active lesson card title and subtitle
+        const lessonTitleEl = document.getElementById('lesson-title');
+        const lessonSubtitleEl = document.getElementById('lesson-subtitle');
+        if (lessonTitleEl) {
+            lessonTitleEl.textContent = entry.title_pl || entry.title_en || entry.id;
+        }
+        if (lessonSubtitleEl) {
+            lessonSubtitleEl.textContent = entry.title_en && entry.title_en !== (entry.title_pl || entry.id) 
+                ? entry.title_en 
+                : (entry.module || entry.part || '');
+        }
+        
         if (this.lessonFocusEl && entry.title_en) {
             this.lessonFocusEl.textContent = entry.title_en;
         }
@@ -871,6 +1356,9 @@ class ChatUI {
         } catch (error) {
             console.error('[Chat] Failed to start lesson:', error);
             this.isLessonActive = false;
+            // Hide bottom input bar on error
+            const bottomInputBar = document.getElementById('bottom-input-bar');
+            if (bottomInputBar) bottomInputBar.classList.add('hidden');
             this.setStartButtonState('ready');
             this.resetLessonProgressIndicator();
             if (window.errorHandler) {
@@ -894,6 +1382,10 @@ class ChatUI {
         this.hasShownStartReminder = false;
         this.currentLessonId = lessonData.lesson.id;
         this.currentDialogueId = lessonData.dialogue.id;
+        
+        // Show bottom input bar when lesson is active
+        const bottomInputBar = document.getElementById('bottom-input-bar');
+        if (bottomInputBar) bottomInputBar.classList.remove('hidden');
         
         this.enableInteraction();
         this.dismissWelcomeOverlay();
@@ -1081,6 +1573,9 @@ class ChatUI {
 
     handleLessonComplete() {
         this.isLessonActive = false;
+        // Hide bottom input bar when lesson completes
+        const bottomInputBar = document.getElementById('bottom-input-bar');
+        if (bottomInputBar) bottomInputBar.classList.add('hidden');
         this.expandLessonLibrary();
         this.setStartButtonState('ready');
         this.updateFloatingHint('Lesson complete! Choose another lesson to keep practicing.');
@@ -1126,6 +1621,9 @@ class ChatUI {
         }
         this.isLessonActive = false;
         this.currentDialogueId = null;
+        // Hide bottom input bar when lesson is reset
+        const bottomInputBar = document.getElementById('bottom-input-bar');
+        if (bottomInputBar) bottomInputBar.classList.add('hidden');
         this.disableInteraction();
         this.resetLessonProgressIndicator();
         this.resetFeedbackDeck();
@@ -1182,6 +1680,7 @@ class ChatUI {
 
         const total = summary.totalDialogues || 0;
         const completedUnique = summary.uniqueDialogues || 0;
+        const totalAttempts = summary.completedDialogues || completedUnique || 0;
         const percent = total > 0 ? Math.min(100, Math.round((completedUnique / total) * 100)) : 0;
 
         this.progressMeter.style.width = `${percent}%`;
@@ -1200,9 +1699,73 @@ class ChatUI {
                 this.progressStepEl.textContent = 'In progress';
             }
         }
+
+        // Update detailed progress
+        if (this.progressDetailsEl) {
+            this.progressDetailsEl.classList.remove('hidden');
+        }
+        if (this.segmentsCompletedEl) {
+            this.segmentsCompletedEl.textContent = `${completedUnique} / ${total}`;
+        }
+        if (this.totalAttemptsEl) {
+            this.totalAttemptsEl.textContent = String(totalAttempts);
+        }
+        if (this.lastPracticedEl) {
+            const now = new Date();
+            this.lastPracticedEl.textContent = now.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Auto-save progress
+        if (this.currentLessonId) {
+            this.saveLessonProgress(this.currentLessonId, {
+                completion: percent,
+                segmentsCompleted: completedUnique,
+                totalSegments: total,
+                totalAttempts: totalAttempts,
+                lastPracticed: new Date().toISOString()
+            });
+        }
+    }
+
+    saveLessonProgress(lessonId, progress) {
+        try {
+            const progressKey = `lesson_progress_${lessonId}`;
+            const existing = JSON.parse(localStorage.getItem(progressKey) || '{}');
+            const updated = {
+                ...existing,
+                ...progress,
+                updatedAt: new Date().toISOString()
+            };
+            localStorage.setItem(progressKey, JSON.stringify(updated));
+        } catch (e) {
+            console.warn('Failed to save lesson progress:', e);
+        }
+    }
+
+    loadLessonProgress(lessonId) {
+        try {
+            const progressKey = `lesson_progress_${lessonId}`;
+            const progress = localStorage.getItem(progressKey);
+            if (progress) {
+                return JSON.parse(progress);
+            }
+        } catch (e) {
+            console.warn('Failed to load lesson progress:', e);
+        }
+        return null;
     }
 
     setMicIndicatorState(isActive) {
+        if (this.voiceInstructions) {
+            this.voiceInstructions.textContent = isActive
+                ? 'Listening… speak now.'
+                : 'Press the mic to start speaking.';
+        }
         if (!this.micIndicator) {
             return;
         }
@@ -1648,9 +2211,14 @@ class ChatUI {
             };
             
             voiceManager.onTranscriptReady = (transcript) => {
+                // Show transcription display
+                this.showVoiceTranscription(transcript);
+                
                 // Set transcript in input field
-                this.messageInput.value = transcript;
-                this.autoResizeTextarea();
+                if (this.messageInput) {
+                    this.messageInput.value = transcript;
+                    this.autoResizeTextarea();
+                }
                 
                 // Auto-send if in push-to-talk mode, or let user review in tap mode
                 const micMode = voiceManager.getMicMode();
@@ -1663,7 +2231,11 @@ class ChatUI {
             };
             
             voiceManager.onError = (errorMessage) => {
-                this.showErrorMessage(errorMessage);
+                this.showErrorWithRetry(errorMessage, () => {
+                    if (!voiceManager.isCurrentlyListening()) {
+                        voiceManager.startListening(voiceManager.getMicMode());
+                    }
+                });
             };
             
             // Listen for error retry events
@@ -1698,16 +2270,66 @@ class ChatUI {
         feather.replace();
         this.setMicIndicatorState(isListening);
     }
+
+    resolveWebSocketClient() {
+        if (typeof TutorWebSocketClient !== 'undefined') {
+            return TutorWebSocketClient;
+        }
+        if (typeof window !== 'undefined' && window.TutorWebSocketClient) {
+            return window.TutorWebSocketClient;
+        }
+        if (typeof globalThis !== 'undefined' && globalThis.TutorWebSocketClient) {
+            return globalThis.TutorWebSocketClient;
+        }
+        if (typeof self !== 'undefined' && self.TutorWebSocketClient) {
+            return self.TutorWebSocketClient;
+        }
+        return null;
+    }
     
     initWebSocket() {
-        // Import WebSocket client (using the example we created)
-        if (typeof TutorWebSocketClient === 'undefined') {
-            console.error('TutorWebSocketClient not found. Make sure websocket_client_example.js is loaded.');
+        // Wait for TutorWebSocketClient to be available (handles script loading race condition)
+        const TutorWebSocketClientClass = this.resolveWebSocketClient();
+        
+        if (!TutorWebSocketClientClass) {
+            this.wsInitRetries++;
+            if (this.wsInitRetries >= this.maxWsInitRetries) {
+                console.error('[Chat] TutorWebSocketClient not found after multiple retries. Make sure websocket_client_example.js is loaded before chat.js.');
+                console.error('[Chat] Check browser console for script loading errors.');
+                // Check if script tag exists
+                const scripts = Array.from(document.querySelectorAll('script[src]'));
+                const wsScript = scripts.find(s => s.src && s.src.includes('websocket_client_example'));
+                if (!wsScript) {
+                    console.error('[Chat] websocket_client_example.js script tag not found in HTML!');
+                } else {
+                    console.warn('[Chat] Script tag found but class not available. Check for JavaScript errors in websocket_client_example.js');
+                }
+                return;
+            }
+            console.warn(`[Chat] TutorWebSocketClient not found yet, retrying in 100ms... (${this.wsInitRetries}/${this.maxWsInitRetries})`);
+            // Retry after a short delay to allow scripts to finish loading
+            setTimeout(() => this.initWebSocket(), 100);
+
+            // Subscribe to readiness event once so we can short-circuit retries when the script finishes loading
+            if (!this.wsReadyListenerAttached && typeof document !== 'undefined') {
+                this.wsReadyListenerAttached = true;
+                document.addEventListener(
+                    'tutor-websocket-ready',
+                    () => {
+                        this.wsReadyListenerAttached = false;
+                        this.initWebSocket();
+                    },
+                    { once: true }
+                );
+            }
             return;
         }
         
+        // Reset retry counter on success
+        this.wsInitRetries = 0;
+        
         const wsUrl = `ws://${window.location.host}/ws/chat`;
-        this.wsClient = new TutorWebSocketClient(wsUrl);
+        this.wsClient = new TutorWebSocketClientClass(wsUrl);
         
         // Set up callbacks
         this.wsClient.onTyping((message) => {
@@ -1734,11 +2356,11 @@ class ChatUI {
         this.wsClient.connect(
             this.userId,
             () => {
-                this.updateConnectionStatus('connected', 'Connected');
+                this.updateConnectionStatus('connected', 'Ready to learn');
                 console.log('WebSocket connected');
             },
             (event) => {
-                this.updateConnectionStatus('disconnected', 'Disconnected');
+                this.updateConnectionStatus('disconnected', 'Tutor is offline');
                 console.log('WebSocket disconnected', event);
             },
             (error) => {
@@ -1797,6 +2419,27 @@ class ChatUI {
 
         if (this.lessonSearchInput) {
             this.lessonSearchInput.addEventListener('input', (e) => this.filterLessons(e.target.value));
+        }
+
+        if (this.lessonFilterLevel) {
+            this.lessonFilterLevel.addEventListener('change', () => this.applyLessonFilters());
+        }
+
+        if (this.lessonFilterStatus) {
+            this.lessonFilterStatus.addEventListener('change', () => this.applyLessonFilters());
+        }
+
+        if (this.voiceTranscriptionCloseEl) {
+            this.voiceTranscriptionCloseEl.addEventListener('click', () => this.hideVoiceTranscription());
+        }
+
+        if (this.errorRetryEl) {
+            this.errorRetryEl.addEventListener('click', () => {
+                if (this.lastErrorAction) {
+                    this.lastErrorAction();
+                    this.hideError();
+                }
+            });
         }
 
         if (this.recentPrevBtn) {
@@ -2548,8 +3191,6 @@ class ChatUI {
                     },
                     body: JSON.stringify({
                         text: tutorPhrase,
-                        lesson_id: this.currentLessonId,
-                        phrase_id: dialogueId,
                         speed: speed,
                         user_id: this.userId,
                     }),
@@ -2701,6 +3342,62 @@ class ChatUI {
         }
     }
     
+    showVoiceTranscription(transcript) {
+        if (this.voiceTranscriptionEl && this.voiceTranscriptionTextEl) {
+            this.voiceTranscriptionTextEl.textContent = transcript;
+            this.voiceTranscriptionEl.classList.remove('hidden');
+            
+            // Make transcription clickable to edit
+            this.voiceTranscriptionTextEl.style.cursor = 'pointer';
+            const clickHandler = () => {
+                if (this.messageInput) {
+                    this.messageInput.focus();
+                }
+            };
+            // Remove old listener and add new one
+            this.voiceTranscriptionTextEl.removeEventListener('click', clickHandler);
+            this.voiceTranscriptionTextEl.addEventListener('click', clickHandler);
+        }
+    }
+
+    hideVoiceTranscription() {
+        if (this.voiceTranscriptionEl) {
+            this.voiceTranscriptionEl.classList.add('hidden');
+        }
+    }
+
+    showErrorWithRetry(message, retryAction = null, details = '') {
+        // Show in error display if available (for voice/audio errors)
+        if (this.errorDisplayEl && this.errorMessageEl) {
+            this.errorMessageEl.textContent = message;
+            if (this.errorDetailsEl && details) {
+                this.errorDetailsEl.textContent = details;
+                this.errorDetailsEl.classList.remove('hidden');
+            } else if (this.errorDetailsEl) {
+                this.errorDetailsEl.classList.add('hidden');
+            }
+            this.errorDisplayEl.classList.remove('hidden');
+            this.lastErrorAction = retryAction;
+            
+            // Hide error after 10 seconds if no action
+            setTimeout(() => {
+                if (this.errorDisplayEl && !this.errorDisplayEl.classList.contains('hidden')) {
+                    this.hideError();
+                }
+            }, 10000);
+        }
+        
+        // Also show in chat messages for visibility
+        this.showErrorMessage(message);
+    }
+
+    hideError() {
+        if (this.errorDisplayEl) {
+            this.errorDisplayEl.classList.add('hidden');
+        }
+        this.lastErrorAction = null;
+    }
+
     showErrorMessage(message) {
         const { messageDiv, bubbleDiv } = this.buildMessageStructure('info', {
             avatarType: 'error',
@@ -2730,6 +3427,12 @@ class ChatUI {
     }
     
     updateConnectionStatus(status, text) {
+        // Check if elements exist before updating (they may not be in all templates)
+        if (!this.connectionStatus || !this.connectionStatusText) {
+            console.warn('[Chat] Connection status elements not found in DOM, skipping status update');
+            return;
+        }
+        
         this.connectionStatus.className = `connection-status connection-status--${status}`;
         this.connectionStatusText.textContent = text;
         
@@ -2866,8 +3569,6 @@ class ChatUI {
                 },
                 body: JSON.stringify({
                     text: tutorText,
-                    lesson_id: this.currentLessonId,
-                    phrase_id: dialogue.id,
                     speed: speed,
                     user_id: this.userId,
                 }),
@@ -2915,7 +3616,61 @@ class ChatUI {
             this.showErrorMessage('Audio playback not available.');
         }
     }
-    
+
+    bindLessonCardEvents() {
+        if (this.lessonCardClickHandler) {
+            return;
+        }
+
+        this.lessonCardClickHandler = (event) => {
+            const startBtn = event.target.closest('.lesson-start-btn');
+            const lessonCard = event.target.closest('.lesson-card');
+            if (!startBtn && !lessonCard) {
+                return;
+            }
+
+            const targetCard = startBtn ? startBtn.closest('.lesson-card') : lessonCard;
+            const lessonId = targetCard?.dataset.lessonId;
+            if (!lessonId) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (startBtn) {
+                this.startLessonFromCard(lessonId);
+            } else {
+                this.handleLessonSelectionById(lessonId);
+            }
+        };
+
+        document.addEventListener('click', this.lessonCardClickHandler);
+    }
+
+    handleLessonSelectionById(lessonId) {
+        if (!lessonId) {
+            return;
+        }
+        const entry = this.lessonCatalogEntries.find((item) => item.id === lessonId);
+        if (!entry) {
+            console.warn('[Chat] Lesson entry not found for id:', lessonId);
+            return;
+        }
+        this.handleLessonSelection(entry);
+    }
+
+    startLessonFromCard(lessonId) {
+        this.handleLessonSelectionById(lessonId);
+        if (this.startButton && !this.isLessonActive) {
+            try {
+                this.startButton.click();
+            } catch (error) {
+                console.warn('[Chat] Unable to auto-start lesson:', error);
+            }
+        }
+    }
+
     showInfoMessage(message) {
         const infoEl = this.createInfoMessage(message);
         this.chatMessages.appendChild(infoEl);
@@ -2936,7 +3691,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const messages = window.chatUI.chatMessages.querySelectorAll('.message');
                 if (messages.length === 0) {
                     // No messages yet, encourage lesson selection
-                    window.chatUI.showInfoMessage('Browse the lesson library on the left and pick a lesson to begin.');
+                    window.chatUI.showInfoMessage('Select a lesson from the left panel to begin learning. The tutor will guide you step-by-step.');
                 }
             }
         }, 1000);

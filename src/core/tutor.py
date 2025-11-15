@@ -36,9 +36,7 @@ class Tutor:
         self.feedback_engine = feedback_engine or FeedbackEngine()
         self.srs_manager = srs_manager or SRSManager()
         self.speech_engine = speech_engine or SpeechEngine(
-            online_mode=True,
-            openai_api_key=os.getenv("OPENAI_API_KEY"),
-            elevenlabs_api_key=os.getenv("ELEVENLABS_API_KEY"),
+            murf_api_key=os.getenv("MURF_API_KEY")
         )
         self.database = database or Database()
         self.lesson_generator = LessonGenerator()

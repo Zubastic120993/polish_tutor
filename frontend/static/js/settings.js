@@ -11,10 +11,9 @@ class SettingsManager {
     }
     
     init() {
-        this.modal = document.getElementById('settings-modal');
+        this.modal = document.getElementById('settings-panel');
         const settingsButton = document.getElementById('settings-button');
-        const closeButton = document.getElementById('settings-modal-close');
-        const overlay = document.getElementById('settings-modal-overlay');
+        const closeButton = document.getElementById('settings-close');
         
         if (settingsButton) {
             settingsButton.addEventListener('click', () => this.open());
@@ -24,13 +23,18 @@ class SettingsManager {
             closeButton.addEventListener('click', () => this.close());
         }
         
-        if (overlay) {
-            overlay.addEventListener('click', () => this.close());
+        // Close on overlay click (the overlay is the first child of settings-panel)
+        if (this.modal) {
+            this.modal.addEventListener('click', (e) => {
+                if (e.target === this.modal || e.target.classList.contains('bg-black')) {
+                    this.close();
+                }
+            });
         }
         
         // Close on Escape key
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.modal && !this.modal.hasAttribute('aria-hidden')) {
+            if (e.key === 'Escape' && this.modal && !this.modal.classList.contains('hidden')) {
                 this.close();
             }
         });
@@ -68,8 +72,9 @@ class SettingsManager {
         }
         
         if (this.modal) {
+            this.modal.classList.remove('hidden');
+            this.modal.style.display = 'block';
             this.modal.removeAttribute('aria-hidden');
-            this.modal.classList.add('modal--active');
             this.render();
             feather.replace(); // Update icons
         }
@@ -80,8 +85,9 @@ class SettingsManager {
      */
     close() {
         if (this.modal) {
+            this.modal.classList.add('hidden');
+            this.modal.style.display = 'none';
             this.modal.setAttribute('aria-hidden', 'true');
-            this.modal.classList.remove('modal--active');
         }
     }
     

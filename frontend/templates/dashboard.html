@@ -1,237 +1,843 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Patient Polish Tutor – Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/output.css">
+    <link rel="stylesheet" href="/static/css/dashboard-modern.css">
+    <link rel="stylesheet" href="/static/css/modern-ui.css">
+</head>
 
-{% block title %}Dashboard - Patient Polish Tutor{% endblock %}
+<body id="top" class="dashboard-body">
 
-{% block head %}
-<!-- Dashboard-specific head content -->
-{% endblock %}
-
-{% block content %}
-<!-- Main Application Container -->
-<div id="app" class="relative z-10 min-h-screen">
-    <!-- Loading Screen -->
-    <div id="loading-screen" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
-        <div class="text-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-cafe-espresso mx-auto mb-4"></div>
-            <p class="text-cafe-espresso">Loading Patient Polish Tutor...</p>
+<!-- TOAST -->
+<div id="dashboard-toast" class="hidden fixed top-6 right-6 z-50 max-w-sm w-full bg-white shadow-2xl border border-slate-200 rounded-2xl p-4">
+    <div class="flex items-start gap-3">
+        <div id="dashboard-toast-icon" class="mt-1 h-3 w-3 rounded-full bg-blue-500"></div>
+        <div class="flex-1">
+            <p id="dashboard-toast-title" class="font-semibold text-slate-900">Action completed</p>
+            <p id="dashboard-toast-message" class="text-sm text-slate-600 mt-1">Lesson data has been updated.</p>
         </div>
-    </div>
-
-    <!-- Welcome Overlay -->
-    <div id="welcome-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center hidden">
-        <div class="welcome-card bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
-            <div class="text-center mb-6">
-                <h2 class="text-2xl font-bold text-cafe-espresso mb-2">Welcome to Patient Polish Tutor</h2>
-                <p class="text-cafe-mocha">Your AI assistant for learning spoken Polish</p>
-            </div>
-
-            <div class="space-y-4 mb-6">
-                <div class="flex items-start space-x-3">
-                    <div class="flex-shrink-0 w-6 h-6 bg-cafe-latte rounded-full flex items-center justify-center mt-0.5">
-                        <span class="text-cafe-espresso text-sm font-semibold">1</span>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold text-cafe-espresso">Listen & Learn</h3>
-                        <p class="text-sm text-cafe-mocha">Click the play button to hear native Polish pronunciation</p>
-                    </div>
-                </div>
-
-                <div class="flex items-start space-x-3">
-                    <div class="flex-shrink-0 w-6 h-6 bg-cafe-latte rounded-full flex items-center justify-center mt-0.5">
-                        <span class="text-cafe-espresso text-sm font-semibold">2</span>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold text-cafe-espresso">Reply in Polish</h3>
-                        <p class="text-sm text-cafe-mocha">Practice by responding to the tutor's questions</p>
-                    </div>
-                </div>
-
-                <div class="flex items-start space-x-3">
-                    <div class="flex-shrink-0 w-6 h-6 bg-cafe-latte rounded-full flex items-center justify-center mt-0.5">
-                        <span class="text-cafe-espresso text-sm font-semibold">3</span>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold text-cafe-espresso">Get Help</h3>
-                        <p class="text-sm text-cafe-mocha">Type "help" or click the help button for guidance</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex space-x-3">
-                <button id="welcome-dismiss" class="flex-1 px-4 py-2 border border-cafe-mocha text-cafe-mocha rounded-lg hover:bg-cafe-mocha hover:text-white transition-colors">
-                    Skip Tutorial
-                </button>
-                <button id="welcome-start" class="flex-1 px-4 py-2 bg-cafe-espresso text-white rounded-lg hover:bg-cafe-mocha transition-colors">
-                    <span class="welcome-card__start-icon">🎯</span>
-                    <span class="welcome-card__start-text">Start Learning</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-cafe-latte">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <div class="flex items-center space-x-4">
-                    <h1 class="text-2xl font-bold text-cafe-espresso">Patient Polish Tutor</h1>
-                    <span class="text-sm text-cafe-mocha bg-cafe-latte px-2 py-1 rounded">A0 → A1</span>
-                </div>
-
-                <div class="flex items-center space-x-4">
-                    <!-- Settings Button -->
-                    <button id="settings-button" class="p-2 text-cafe-mocha hover:text-cafe-espresso transition-colors" title="Settings">
-                        <i data-feather="settings" class="w-5 h-5"></i>
-                    </button>
-
-                    <!-- User Menu -->
-                    <div class="flex items-center space-x-2">
-                        <div class="w-8 h-8 bg-cafe-latte rounded-full flex items-center justify-center">
-                            <span class="text-cafe-espresso text-sm font-semibold">U</span>
-                        </div>
-                        <span class="text-cafe-espresso text-sm">User</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content Area -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <!-- Sidebar -->
-            <div class="lg:col-span-1">
-                <!-- Current Lesson Card -->
-                <div id="current-lesson-card" class="bg-white rounded-lg shadow-sm border border-cafe-latte p-4 mb-6 hidden">
-                    <h3 class="font-semibold text-cafe-espresso mb-3">Current Lesson</h3>
-                    <div class="current-lesson-meta-card bg-cafe-foam rounded p-3">
-                        <h4 id="lesson-title" class="font-medium text-cafe-espresso mb-1"></h4>
-                        <p id="lesson-level" class="text-sm text-cafe-mocha mb-1"></p>
-                        <p id="lesson-goal" class="text-sm text-cafe-mocha"></p>
-                        <div class="mt-3">
-                            <div class="flex justify-between text-xs text-cafe-mocha mb-1">
-                                <span id="lesson-progress-title">Progress</span>
-                                <span id="lesson-progress-value">0%</span>
-                            </div>
-                            <div class="w-full bg-cafe-latte rounded-full h-2">
-                                <div id="lesson-progress-meter" class="bg-cafe-espresso h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-                            </div>
-                            <p id="lesson-progress-step" class="text-xs text-cafe-mocha mt-1"></p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Lesson Catalog -->
-                <div class="bg-white rounded-lg shadow-sm border border-cafe-latte p-4">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-semibold text-cafe-espresso">Lessons</h3>
-                        <button id="lesson-catalog-refresh" class="p-1 text-cafe-mocha hover:text-cafe-espresso transition-colors" title="Refresh">
-                            <i data-feather="refresh-cw" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-
-                    <!-- Search -->
-                    <div class="mb-4">
-                        <input type="text" id="lesson-search-input" placeholder="Search lessons..." class="w-full px-3 py-2 border border-cafe-latte rounded-lg focus:outline-none focus:ring-2 focus:ring-cafe-espresso">
-                    </div>
-
-                    <!-- Lesson List -->
-                    <div id="lesson-catalog-list" class="space-y-2 max-h-96 overflow-y-auto">
-                        <!-- Lessons will be loaded here -->
-                    </div>
-
-                    <!-- Empty State -->
-                    <div id="lesson-catalog-empty" class="text-center py-8 text-cafe-mocha hidden">
-                        <i data-feather="book-open" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
-                        <p>No lessons found</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Chat Area -->
-            <div class="lg:col-span-3">
-                <!-- Chat Container -->
-                <div id="chat-container" class="bg-white rounded-lg shadow-sm border border-cafe-latte min-h-96 flex flex-col">
-                    <!-- Messages Area -->
-                    <div id="chat-messages" class="flex-1 p-4 space-y-4 overflow-y-auto min-h-0">
-                        <!-- Messages will be loaded here -->
-                    </div>
-
-                    <!-- Input Area -->
-                    <div class="border-t border-cafe-latte p-4">
-                        <div class="flex space-x-2">
-                            <input type="text" id="message-input" placeholder="Type your message in Polish..." class="flex-1 px-4 py-2 border border-cafe-latte rounded-lg focus:outline-none focus:ring-2 focus:ring-cafe-espresso">
-                            <button id="mic-button" class="px-4 py-2 bg-cafe-latte text-cafe-espresso rounded-lg hover:bg-cafe-mocha hover:text-white transition-colors" title="Voice Input">
-                                <i data-feather="mic" class="w-5 h-5"></i>
-                            </button>
-                            <button id="send-button" class="px-6 py-2 bg-cafe-espresso text-white rounded-lg hover:bg-cafe-mocha transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                                <i data-feather="send" class="w-5 h-5"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Quick Actions -->
-                <div class="mt-4 flex flex-wrap gap-2">
-                    <button id="start-lesson-button" class="px-4 py-2 bg-cafe-espresso text-white rounded-lg hover:bg-cafe-mocha transition-colors hidden">
-                        <i data-feather="play" class="w-4 h-4 mr-2"></i>
-                        Start Lesson
-                    </button>
-                    <button id="help-button" class="px-4 py-2 border border-cafe-mocha text-cafe-mocha rounded-lg hover:bg-cafe-mocha hover:text-white transition-colors">
-                        <i data-feather="help-circle" class="w-4 h-4 mr-2"></i>
-                        Help
-                    </button>
-                    <button id="review-button" class="px-4 py-2 border border-cafe-mocha text-cafe-mocha rounded-lg hover:bg-cafe-mocha hover:text-white transition-colors">
-                        <i data-feather="book" class="w-4 h-4 mr-2"></i>
-                        Review
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Settings Panel -->
-    <div id="settings-panel" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden">
-        <div class="absolute right-0 top-0 h-full w-96 bg-white shadow-xl">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-semibold text-cafe-espresso">Settings</h2>
-                    <button id="settings-close" class="p-2 text-cafe-mocha hover:text-cafe-espresso transition-colors">
-                        <i data-feather="x" class="w-5 h-5"></i>
-                    </button>
-                </div>
-
-                <!-- Settings content will be loaded here -->
-                <div id="settings-content">
-                    <!-- Settings will be dynamically loaded -->
-                </div>
-            </div>
-        </div>
+        <button type="button" id="dashboard-toast-close" class="text-slate-400 hover:text-slate-600">&times;</button>
     </div>
 </div>
-{% endblock %}
+{% include "includes/theme-script.html" %}
 
-{% block scripts %}
-<!-- API Client -->
-<script type="module" src="/static/js/api.js"></script>
+<div class="dashboard-wrapper">
+    <header class="dashboard-header">
+        <div class="brand">
+            <span class="brand-mark">🇵🇱</span>
+            <div>
+                <p class="brand-eyebrow">Patient Polish Tutor</p>
+                <h1 class="brand-title">Learning Dashboard</h1>
+            </div>
+        </div>
+        <nav class="dashboard-nav">
+            <a href="#daily-mission">Mission</a>
+            <a href="#recommended">Featured</a>
+            <a href="#continue-learning">Lessons</a>
+            <a href="#lesson-preview">Preview</a>
+            <a href="/settings">Settings</a>
+        </nav>
+    </header>
 
-<!-- Core modules -->
-<script src="/static/js/error_handler.js"></script>
-<script src="/static/js/audio.js"></script>
-<script src="/static/js/lesson.js"></script>
-<script src="/static/js/chat.js"></script>
-<script src="/static/js/settings.js"></script>
-<script src="/static/js/review.js"></script>
-<script src="/static/js/voice.js"></script>
-<script src="/static/js/session.js"></script>
-<script src="/static/js/onboarding.js"></script>
+    <div class="dashboard-columns">
+        <div class="dashboard-main">
+            <!-- DAILY MISSION -->
+            <section class="dashboard-card mission-card" id="daily-mission">
+                <div class="card-heading">
+                    <h2>Daily Mission</h2>
+                    <p>Complete a focused 5-minute drill to keep your streak alive.</p>
+                </div>
+                <div class="mission-content">
+                    <div class="mission-buttons">
+                        <button data-action="start-recommended" class="btn-primary mission-primary">
+                            ▶ Start Recommended Lesson
+                        </button>
+                    </div>
+                    <div class="streak-chip">🔥 3-day streak</div>
+                </div>
+                <div class="progress-row">
+                    <div class="progress-labels">
+                        <span>XP Progress</span>
+                        <span>120 / 500 XP</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+            </section>
 
-<!-- Initialize feather icons -->
+            <!-- FEATURED LESSON -->
+            <section class="dashboard-card featured-card" id="recommended" data-featured-lesson="A1_L01">
+                <div class="card-heading">
+                    <h2>⭐ Featured Lesson</h2>
+                    <p>Hand-picked based on your pace and recent accuracy.</p>
+                </div>
+                <div class="featured-body">
+                    <div>
+                        <p class="featured-meta">Level A1 • 3 min • 3 phrases</p>
+                        <h3>Powitania i pożegnania</h3>
+                        <p class="featured-description">
+                            Perfect your greeting and farewell patterns for both formal and informal settings.
+                        </p>
+                        <ul class="feature-tags">
+                            <li>Speaking drill</li>
+                            <li>3 dialogues</li>
+                            <li>Polite forms</li>
+                        </ul>
+                    </div>
+                    <button data-action="resume-lesson" data-lesson-id="A1_L01" class="btn-outline featured-button">
+                        <span data-resume-label>Resume lesson</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- CONTINUE LEARNING -->
+            <section class="dashboard-card continue-card" id="continue-learning">
+                <div class="card-heading">
+                    <h2>Continue Learning</h2>
+                    <p>Hand-selected drills based on your confidence scores.</p>
+                </div>
+                <div class="lesson-grid">
+                    <article class="lesson-card">
+                        <div class="lesson-card-header">
+                            <span class="lesson-tag">General health</span>
+                            <span class="lesson-time">A1 • 3 min</span>
+                        </div>
+                        <h3>Boli mnie głowa</h3>
+                        <p>Learn to describe symptoms and ask for help politely.</p>
+                        <button data-action="start-lesson" data-lesson-id="A1_L51" class="btn-primary lesson-button">
+                            Start drill
+                        </button>
+                    </article>
+                    <article class="lesson-card">
+                        <div class="lesson-card-header">
+                            <span class="lesson-tag">Weather talk</span>
+                            <span class="lesson-time">A1 • 2 min</span>
+                        </div>
+                        <h3>Deszcz ze śniegiem</h3>
+                        <p>Blend weather phrases for casual conversations.</p>
+                        <button data-action="start-lesson" data-lesson-id="A1_L49" class="btn-primary lesson-button">
+                            Start drill
+                        </button>
+                    </article>
+                    <article class="lesson-card">
+                        <div class="lesson-card-header">
+                            <span class="lesson-tag">Daily life</span>
+                            <span class="lesson-time">A1 • 4 min</span>
+                        </div>
+                        <h3>O której zaczynasz pracę?</h3>
+                        <p>Practice polite questions around schedules.</p>
+                        <button data-action="start-lesson" data-lesson-id="A1_L43" class="btn-primary lesson-button">
+                            Start drill
+                        </button>
+                    </article>
+                </div>
+            </section>
+
+        <!-- PREVIEW -->
+        <section class="dashboard-card preview-card" id="lesson-preview">
+            <div class="card-heading">
+                <h2>Live Preview</h2>
+                <p>Use any button above to load lesson data.</p>
+            </div>
+                <div class="preview-meta">
+                    <div class="preview-cefr">
+                        <span id="lesson-preview-level" class="preview-level">A1</span>
+                        <span class="cefr-short" id="lesson-preview-descriptor">Level A1 — lesson focus</span>
+                        <span class="tooltip" id="lesson-preview-tooltip">i
+                            <span class="tooltip-text" id="lesson-preview-tooltip-text">Descriptor details will appear once a lesson loads.</span>
+                        </span>
+                    </div>
+                </div>
+                <p id="lesson-preview-goal" class="preview-info">Click the info icon for descriptor details.</p>
+                <div id="lesson-preview-empty" class="preview-empty">
+                    <span class="preview-spinner"></span>
+                    <span id="lesson-preview-empty-text">Lesson dialogues will appear here once loaded.</span>
+                </div>
+                <div id="lesson-preview-container" class="preview-content">
+                    <div id="lesson-preview-dialogues" class="dialogue-list hidden">
+                        <!-- Dialogues injected -->
+                    </div>
+                </div>
+        </section>
+
+            <!-- LIBRARY -->
+            <section class="dashboard-card library-card">
+                <div class="card-heading">
+                    <h2>Lesson Library</h2>
+                    <p>Browse lessons saved to your account.</p>
+                </div>
+                <div class="library-actions">
+                    <button data-action="open-library" class="btn-outline">Browse full lesson library</button>
+                </div>
+                <div id="lesson-catalog-empty" class="library-empty-state">
+                    <p>📚 No lessons available yet</p>
+                    <p>Try refreshing or browsing all categories.</p>
+                </div>
+                <div id="lesson-catalog-list" class="library-list hidden">
+                    <!-- Catalog rows -->
+                </div>
+            </section>
+        </div>
+
+        <aside class="dashboard-side">
+            <section class="dashboard-card stats-card">
+                <h3>Your Stats</h3>
+                <div class="stat-item">
+                    <div class="stat-icon">★</div>
+                    <div>
+                        <p>XP Progress</p>
+                        <strong>120 / 500 XP</strong>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">✎</div>
+                    <div>
+                        <p>Phrases mastered</p>
+                        <strong>32 / 40</strong>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🔥</div>
+                    <div>
+                        <p>Current streak</p>
+                        <strong>3 days</strong>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-card level-card">
+                <h3>Current Level</h3>
+                <p class="level-display">A0 → A1</p>
+                <p class="level-meta">+18% this month</p>
+            </section>
+        </aside>
+    </div>
+</div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof feather !== 'undefined') {
-            feather.replace();
+document.addEventListener("DOMContentLoaded", () => {
+    const toast = document.getElementById("dashboard-toast");
+    const toastTitle = document.getElementById("dashboard-toast-title");
+    const toastMessage = document.getElementById("dashboard-toast-message");
+    const toastIcon = document.getElementById("dashboard-toast-icon");
+    const toastClose = document.getElementById("dashboard-toast-close");
+    const previewTitle = document.getElementById("lesson-preview-title");
+    const previewMeta = document.getElementById("lesson-preview-meta");
+    const previewDescriptor = document.getElementById("lesson-preview-descriptor");
+    const previewGoal = document.getElementById("lesson-preview-goal");
+    const previewLevel = document.getElementById("lesson-preview-level");
+    const previewTooltip = document.getElementById("lesson-preview-tooltip");
+    const previewTooltipText = document.getElementById("lesson-preview-tooltip-text");
+    const previewEmpty = document.getElementById("lesson-preview-empty");
+    const previewEmptyText = document.getElementById("lesson-preview-empty-text");
+    const previewDialogues = document.getElementById("lesson-preview-dialogues");
+    const catalogEmpty = document.getElementById("lesson-catalog-empty");
+    const catalogList = document.getElementById("lesson-catalog-list");
+    const resumeButtons = document.querySelectorAll("[data-action='resume-lesson']");
+    const resumeLabels = document.querySelectorAll("[data-resume-label]");
+    const featuredCard = document.querySelector(".featured-card");
+    const featuredLessonId = featuredCard?.dataset.featuredLesson;
+    const lessonEnglishCache = {};
+    const tutorAudioCache = new Map();
+    const userSettings = resolveUserSettings();
+    const currentUserId = resolveCurrentUserId();
+    let toastTimeout;
+    let audioToastTimeout = null;
+    let audioToastFadeTimeout = null;
+    let currentLessonId = null;
+
+    const toastVariants = {
+        success: "bg-emerald-500",
+        error: "bg-rose-500",
+        info: "bg-blue-500"
+    };
+
+    function showToast(title, message, variant = "info") {
+        toastTitle.textContent = title;
+        toastMessage.textContent = message;
+        toast.classList.remove("hidden");
+        toastIcon.className = `mt-1 h-3 w-3 rounded-full ${toastVariants[variant] || toastVariants.info}`;
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => toast.classList.add("hidden"), 4500);
+    }
+
+    toastClose.addEventListener("click", () => toast.classList.add("hidden"));
+
+    function showAudioToast(message = "🔊 Playing audio…") {
+        if (!document?.body) {
+            return;
         }
+        if (audioToastTimeout) {
+            clearTimeout(audioToastTimeout);
+            audioToastTimeout = null;
+        }
+        if (audioToastFadeTimeout) {
+            clearTimeout(audioToastFadeTimeout);
+            audioToastFadeTimeout = null;
+        }
+        const existing = document.getElementById("audio-toast");
+        if (existing) {
+            existing.remove();
+        }
+        const toast = document.createElement("div");
+        toast.id = "audio-toast";
+        toast.textContent = message;
+        Object.assign(toast.style, {
+            position: "fixed",
+            bottom: "24px",
+            right: "24px",
+            background: "var(--color-surface, #ffffff)",
+            color: "var(--color-text, #0f172a)",
+            border: "1px solid rgba(226, 232, 240, 0.8)",
+            padding: "10px 16px",
+            borderRadius: "12px",
+            boxShadow: "var(--shadow-md, 0 18px 30px rgba(15, 23, 42, 0.12))",
+            opacity: "0",
+            transition: "opacity 0.4s ease",
+            zIndex: "9999",
+            pointerEvents: "none",
+        });
+        document.body.appendChild(toast);
+        requestAnimationFrame(() => {
+            toast.style.opacity = "1";
+        });
+        audioToastTimeout = setTimeout(() => {
+            toast.style.opacity = "0";
+            audioToastFadeTimeout = setTimeout(() => toast.remove(), 400);
+        }, 2500);
+    }
+
+    function setPreviewLoading(message) {
+        previewDialogues.innerHTML = "";
+        previewDialogues.classList.add("hidden");
+        previewEmpty.classList.remove("hidden");
+        if (previewEmptyText) {
+            previewEmptyText.textContent = message || "Loading lesson data…";
+        }
+    }
+
+    function resetLessonPreview() {
+        if (previewTitle) previewTitle.textContent = "Pick a lesson to view details";
+        if (previewMeta) previewMeta.textContent = "Use any button above to load lesson data.";
+        if (previewDescriptor) previewDescriptor.textContent = "Level A1 — lesson focus";
+        if (previewGoal) previewGoal.textContent = "Click the info icon for descriptor details.";
+        if (previewTooltipText) previewTooltipText.textContent = "Descriptor details will appear once a lesson loads.";
+        if (previewTooltip) {
+            previewTooltip.setAttribute("aria-label", "Lesson descriptor");
+            previewTooltip.setAttribute("title", "Lesson descriptor");
+        }
+        if (previewLevel) previewLevel.textContent = "A1";
+        setPreviewLoading("Lesson dialogues will appear here once loaded.");
+    }
+
+    function resolveUserSettings() {
+        if (window.userSettings && typeof window.userSettings === "object") {
+            return {
+                ...window.userSettings,
+                audio_speed: window.userSettings.audio_speed || "normal",
+            };
+        }
+        try {
+            const stored = localStorage.getItem("userSettings");
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                if (!parsed.audio_speed) {
+                    parsed.audio_speed = "normal";
+                }
+                return parsed;
+            }
+        } catch (settingsErr) {
+            console.warn("Failed to load user settings:", settingsErr);
+        }
+        return { audio_speed: "normal" };
+    }
+
+    function resolveCurrentUserId() {
+        const candidates = [window.currentUser, window.dashboardUser, window.user, window.USER];
+        for (const candidate of candidates) {
+            if (!candidate) continue;
+            if (typeof candidate === "number" || typeof candidate === "string") {
+                return candidate;
+            }
+            if (typeof candidate === "object") {
+                const id = candidate.id || candidate.user_id || candidate.pk || candidate.uuid;
+                if (id !== undefined && id !== null) {
+                    return id;
+                }
+            }
+        }
+        const fallbackId = document.body?.dataset?.userId;
+        return fallbackId || null;
+    }
+
+    function summarizeDescriptor(text) {
+        if (!text) return "Conversation goal available soon.";
+        return text.length > 70 ? `${text.slice(0, 67)}…` : text;
+    }
+
+    function renderLessonPreview(lesson) {
+        if (!lesson) {
+            resetLessonPreview();
+            return;
+        }
+        console.log("renderLessonPreview called with lesson:", lesson?.id, lesson);
+
+        if (previewTitle) previewTitle.textContent = lesson.title || lesson.id || "Lesson details";
+        const metaParts = [];
+        if (lesson.level) metaParts.push(`Level ${lesson.level}`);
+        if (lesson.module) metaParts.push(lesson.module);
+        if (lesson.tags?.length) metaParts.push(lesson.tags.slice(0, 2).join(", "));
+        if (previewMeta) previewMeta.textContent = metaParts.length ? metaParts.join(" • ") : "Structured lesson from your tutor.";
+        if (previewLevel) previewLevel.textContent = lesson.level || "A1";
+        const descriptor = lesson.cefr_goal || "Conversation goal available soon.";
+        const shortDescriptor = summarizeDescriptor(descriptor);
+        if (previewDescriptor) {
+            const levelLabel = lesson.level ? `${lesson.level} — ` : "";
+            previewDescriptor.textContent = `${levelLabel}${shortDescriptor}`;
+        }
+        if (previewGoal) {
+            previewGoal.textContent = "Click the info icon for the full descriptor.";
+        }
+        if (previewTooltipText) {
+            previewTooltipText.textContent = descriptor;
+        }
+        if (previewTooltip) {
+            previewTooltip.setAttribute("aria-label", descriptor);
+            previewTooltip.setAttribute("title", descriptor);
+        }
+
+        const dialogues = lesson.dialogues || [];
+        console.log("dialogues count:", dialogues.length);
+        previewDialogues.innerHTML = "";
+        if (!dialogues.length) {
+            if (previewEmptyText) previewEmptyText.textContent = "This lesson contains no dialogues yet.";
+            previewDialogues.classList.add("hidden");
+            previewEmpty.classList.remove("hidden");
+            return;
+        }
+
+        previewEmpty.classList.add("hidden");
+        if (previewEmptyText) previewEmptyText.textContent = "";
+        previewDialogues.classList.remove("hidden");
+
+        try {
+            dialogues.forEach((dialogue, idx) => {
+                const entry = document.createElement("div");
+                entry.className = "dialogue-entry";
+
+                const tutorBubble = document.createElement("div");
+                tutorBubble.className = "dialogue-bubble tutor-bubble";
+                const tutorLineRaw = dialogue.tutor ?? dialogue.text ?? "—";
+                const tutorLine = typeof tutorLineRaw === "string" ? tutorLineRaw : String(tutorLineRaw ?? "—");
+                tutorBubble.innerHTML = `<span class="dialogue-number">${idx + 1}</span><div><strong>Tutor:</strong> ${
+                    tutorLine
+                }</div>`;
+                const trimmedLine = tutorLine.trim();
+                const replayBtn = document.createElement("button");
+                replayBtn.type = "button";
+                replayBtn.className = "replay-audio-btn";
+                replayBtn.setAttribute("aria-label", "Replay Tutor Audio");
+                replayBtn.title = "Replay Tutor Audio";
+                replayBtn.innerHTML = "&#9658;";
+                if (trimmedLine) {
+                    replayBtn.addEventListener("click", (event) => {
+                        event.stopPropagation();
+                        playTutorAudio(trimmedLine);
+                    });
+                } else {
+                    replayBtn.disabled = true;
+                }
+                tutorBubble.appendChild(replayBtn);
+
+                const learnerText = (dialogue.expected || []).join(", ") || "—";
+                const learnerBubble = document.createElement("div");
+                learnerBubble.className = "dialogue-bubble learner-bubble";
+                learnerBubble.innerHTML = `<div><em>Your reply:</em> ${learnerText}</div>`;
+
+                entry.append(tutorBubble, learnerBubble);
+                previewDialogues.appendChild(entry);
+            });
+            console.log("dialogue entries rendered:", previewDialogues.childElementCount);
+        } catch (dialogueErr) {
+            console.error("Failed to render dialogues:", dialogueErr);
+        }
+
+        const vocabulary = lesson.vocabulary || lesson.phrases || [];
+        console.log("vocabulary count:", vocabulary.length);
+        if (vocabulary.length) {
+            const vocabContainer = document.createElement("div");
+            vocabContainer.className = "dialogue-entry vocabulary-entry";
+            const heading = document.createElement("p");
+            heading.className = "vocabulary-heading";
+            heading.textContent = "Key phrases";
+            vocabContainer.appendChild(heading);
+
+            const list = document.createElement("ul");
+            list.className = "vocabulary-list";
+            vocabulary.forEach((item) => {
+                const li = document.createElement("li");
+                li.className = "vocabulary-item";
+                const polish = item?.pl || item?.phrase || item?.polish || "";
+                const english = item?.en || item?.translation || item?.english || "";
+                const phraseText = english ? `${polish} — ${english}` : polish;
+
+                const label = document.createElement("span");
+                label.className = "vocabulary-phrase";
+                label.textContent = phraseText;
+                li.appendChild(label);
+
+                const phraseToPlay = polish || phraseText;
+                const playBtn = document.createElement("button");
+                playBtn.type = "button";
+                playBtn.className = "replay-audio-btn vocabulary-play-btn";
+                playBtn.setAttribute("aria-label", `Play audio for ${phraseToPlay}`);
+                playBtn.title = `Play audio for ${phraseToPlay}`;
+                playBtn.innerHTML = "&#9658;";
+                if (phraseToPlay.trim()) {
+                    playBtn.addEventListener("click", (event) => {
+                        event.stopPropagation();
+                        playAudioFor(phraseToPlay);
+                    });
+                } else {
+                    playBtn.disabled = true;
+                }
+                li.appendChild(playBtn);
+                list.appendChild(li);
+            });
+            vocabContainer.appendChild(list);
+            previewDialogues.appendChild(vocabContainer);
+        }
+        console.log("preview container final child count:", previewDialogues.childElementCount);
+    }
+
+    function updateResumeButtons(lessonId, lessonTitle) {
+        const displayTitle = lessonTitle || lessonId || "lesson";
+        resumeButtons.forEach((button) => {
+            button.dataset.lessonId = lessonId;
+        });
+        resumeLabels.forEach((label) => {
+            label.textContent = `Resume ${displayTitle}`;
+        });
+    }
+
+    async function ensureEnglishTitle(entry) {
+        if (entry.title_en) {
+            return entry.title_en;
+        }
+        if (lessonEnglishCache[entry.id]) {
+            return lessonEnglishCache[entry.id];
+        }
+        try {
+            const payload = await apiGet(`/api/lesson/get?lesson_id=${encodeURIComponent(entry.id)}`);
+            const lessonData = payload?.data;
+            const fallback =
+                lessonData?.title_en ||
+                lessonData?.translation ||
+                lessonData?.summary?.title_en ||
+                "";
+            lessonEnglishCache[entry.id] = fallback;
+            return fallback;
+        } catch (error) {
+            return "";
+        }
+    }
+
+    async function enrichCatalogEntries(entries) {
+        const enriched = [];
+        for (const entry of entries) {
+            const englishTitle = await ensureEnglishTitle(entry);
+            enriched.push({
+                ...entry,
+                title_en: englishTitle,
+            });
+        }
+        return enriched;
+    }
+
+    function renderCatalog(entries) {
+        catalogList.innerHTML = "";
+        if (!entries?.length) {
+            catalogList.classList.add("hidden");
+            catalogEmpty.classList.remove("hidden");
+            catalogEmpty.innerHTML = `<p>📚 No lessons available yet</p><p>Try refreshing or browsing all categories.</p>`;
+            return;
+        }
+
+        catalogEmpty.classList.add("hidden");
+        catalogList.classList.remove("hidden");
+
+        entries.forEach((entry) => {
+            const row = document.createElement("div");
+            row.className = "py-4 flex items-center justify-between gap-4";
+
+            const details = document.createElement("div");
+            const polishTitle = entry.title_pl || entry.title_en || entry.id;
+            const englishTitle = entry.title_en || entry.translation || "";
+            const bilingualTitle = englishTitle ? `${polishTitle} — ${englishTitle}` : polishTitle;
+            details.innerHTML = `
+                <p class="font-medium">${bilingualTitle}</p>
+                <p class="text-sm text-white/70">${entry.module || entry.part || "Course module"}</p>
+            `;
+
+            const action = document.createElement("button");
+            action.className = "px-4 py-2 bg-white/10 hover:bg-white/20 text-sm rounded-xl";
+            action.textContent = "Load lesson";
+            action.addEventListener("click", () => startLessonById(entry.id));
+
+            row.appendChild(details);
+            row.appendChild(action);
+            catalogList.appendChild(row);
+        });
+    }
+
+    async function apiGet(url) {
+        const response = await fetch(url);
+        if (!response.ok) {
+            let detail = "";
+            try {
+                const data = await response.json();
+                detail = data.detail || data.message || response.statusText;
+            } catch (err) {
+                detail = response.statusText;
+            }
+            throw new Error(detail);
+        }
+        return response.json();
+    }
+
+    async function apiPost(url, body) {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(body),
+        });
+        if (!response.ok) {
+            let detail = "";
+            try {
+                const data = await response.json();
+                detail = data.detail || data.message || response.statusText;
+            } catch (err) {
+                detail = response.statusText;
+            }
+            throw new Error(detail);
+        }
+        return response.json();
+    }
+
+    async function playTutorAudio(text) {
+        const normalizedText = (text || "").trim();
+        if (!normalizedText) {
+            showToast("Audio unavailable", "No tutor dialogue available to replay.", "error");
+            return;
+        }
+
+        const playAudioUrl = async (audioUrl) => {
+            const audio = new Audio(audioUrl);
+            try {
+                await audio.play();
+                showAudioToast();
+            } catch (playErr) {
+                console.error("Playback failed:", playErr);
+                showToast("Playback failed", "Unable to play tutor audio.", "error");
+            }
+        };
+
+        const cachedUrl = tutorAudioCache.get(normalizedText);
+        if (cachedUrl) {
+            await playAudioUrl(cachedUrl);
+            return;
+        }
+
+        try {
+            const speedMap = {
+                slow: 0.8,
+                normal: 1.0,
+                fast: 1.2,
+            };
+            const configuredSpeed = userSettings?.audio_speed;
+            const parsedSpeed =
+                typeof configuredSpeed === "number"
+                    ? configuredSpeed
+                    : typeof configuredSpeed === "string"
+                    ? parseFloat(configuredSpeed)
+                    : NaN;
+            const numericSpeed =
+                (typeof configuredSpeed === "string" && speedMap[configuredSpeed]) ||
+                (Number.isFinite(parsedSpeed) ? parsedSpeed : null);
+            const speedValue = numericSpeed || 1.0;
+            const payload = {
+                text: normalizedText,
+                speed: speedValue,
+                user_id: currentUserId,
+            };
+            const resp = await apiPost("/api/audio/generate", payload);
+            const audioUrl = resp?.data?.audio_url || resp?.audio_url;
+            if (!audioUrl) {
+                throw new Error("Audio URL missing from response.");
+            }
+            tutorAudioCache.set(normalizedText, audioUrl);
+            await playAudioUrl(audioUrl);
+        } catch (error) {
+            console.error("Failed to replay tutor audio:", error);
+            showToast("Audio unavailable", error.message || "Unable to replay tutor audio.", "error");
+        }
+    }
+
+    async function playAudioFor(text) {
+        const trimmed = (text || "").trim();
+        if (!trimmed) {
+            showToast("Audio unavailable", "No phrase provided for audio playback.", "error");
+            return;
+        }
+        try {
+            const response = await fetch("/api/audio/generate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: JSON.stringify({ text: trimmed }),
+            });
+            if (!response.ok) {
+                throw new Error("Unable to generate audio.");
+            }
+            const contentType = response.headers.get("content-type") || "";
+            let audioBlob;
+            if (contentType.includes("application/json")) {
+                const data = await response.json();
+                const audioUrl = data?.data?.audio_url || data?.audio_url;
+                if (!audioUrl) {
+                    throw new Error("Audio URL missing from response.");
+                }
+                const blobResp = await fetch(audioUrl);
+                if (!blobResp.ok) {
+                    throw new Error("Unable to download generated audio.");
+                }
+                audioBlob = await blobResp.blob();
+            } else {
+                audioBlob = await response.blob();
+            }
+            const objectUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(objectUrl);
+            audio.play();
+        } catch (error) {
+            console.error("Failed to play phrase audio:", error);
+            showToast("Audio unavailable", error.message || "Unable to play phrase audio.", "error");
+        }
+    }
+
+    async function startLessonById(lessonId, options = {}) {
+        const { silent = false } = options;
+        if (!lessonId) {
+            if (!silent) {
+                showToast("Missing data", "Lesson identifier is not available.", "error");
+            }
+            return;
+        }
+        try {
+            const label = silent ? null : `Lesson ${lessonId}`;
+            setPreviewLoading(label ? `Loading ${label}…` : "Loading lesson…");
+            if (!silent) {
+                showToast("Loading lesson…", "Fetching lesson data from the tutor.", "info");
+            }
+            const payload = await apiGet(`/api/lesson/get?lesson_id=${encodeURIComponent(lessonId)}`);
+            console.log("Lesson payload received for", lessonId, payload);
+            const lessonData = payload?.data;
+            const resolvedLessonId = lessonData?.id || lessonId;
+            const title = lessonData?.title || resolvedLessonId;
+            renderLessonPreview(lessonData);
+            updateResumeButtons(resolvedLessonId, title);
+            currentLessonId = resolvedLessonId;
+            if (featuredCard && featuredLessonId) {
+                featuredCard.classList.toggle("is-active", resolvedLessonId === featuredLessonId);
+            }
+            if (!silent) {
+                showToast("Lesson ready", `Lesson "${title}" loaded successfully.`, "success");
+            }
+        } catch (error) {
+            if (!silent) {
+                showToast("Lesson unavailable", error.message || "Unable to load lesson.", "error");
+            }
+            renderLessonPreview(null);
+        }
+    }
+
+    async function startRecommendedLesson() {
+        try {
+            showToast("Preparing recommendation…", "Looking at your lesson catalog.", "info");
+            const catalog = await apiGet("/api/lesson/catalog");
+            const entries = catalog?.data?.entries || [];
+            if (!entries.length) {
+                throw new Error("No lessons available in catalog.");
+            }
+            const nextLesson = entries[0];
+            await startLessonById(nextLesson.id || nextLesson.slug || nextLesson.title);
+        } catch (error) {
+            showToast("No recommendation", error.message || "Unable to find a recommended lesson.", "error");
+        }
+    }
+
+    async function openLessonLibrary() {
+        try {
+            showToast("Loading catalog…", "Fetching the full lesson list.", "info");
+            const catalog = await apiGet("/api/lesson/catalog");
+            const entries = catalog?.data?.entries || [];
+            if (!entries.length) {
+                showToast("No lessons found", "Lesson catalog is empty.", "error");
+                return;
+            }
+            const enrichedEntries = await enrichCatalogEntries(entries);
+            const sample = enrichedEntries
+                .slice(0, 3)
+                .map((entry) => entry.title_pl || entry.title_en || entry.id)
+                .join(", ");
+            renderCatalog(enrichedEntries);
+            showToast("Catalog ready", `Recent lessons: ${sample}`, "success");
+        } catch (error) {
+            showToast("Catalog unavailable", error.message || "Unable to load lessons.", "error");
+        }
+    }
+
+    document.querySelectorAll("[data-action='start-lesson']").forEach(btn => {
+        btn.addEventListener("click", (event) => {
+            const lessonId = event.currentTarget.dataset.lessonId;
+            startLessonById(lessonId);
+        });
     });
+
+    resumeButtons.forEach(button => {
+        button.addEventListener("click", (event) => {
+            const lessonId = event.currentTarget.dataset.lessonId;
+            startLessonById(lessonId);
+        });
+    });
+
+    const recommendedButton = document.querySelector("[data-action='start-recommended']");
+    if (recommendedButton) {
+        recommendedButton.addEventListener("click", startRecommendedLesson);
+    }
+
+    const libraryButton = document.querySelector("[data-action='open-library']");
+    if (libraryButton) {
+        libraryButton.addEventListener("click", openLessonLibrary);
+    }
+
+    resetLessonPreview();
+
+    const initialLessonId = resumeButtons[0]?.dataset.lessonId;
+    if (initialLessonId) {
+        startLessonById(initialLessonId, { silent: true });
+    }
+});
 </script>
-{% endblock %}
+</body>
+</html>

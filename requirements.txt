@@ -17,20 +17,9 @@ python-jose[cryptography]>=3.3.0
 passlib[bcrypt]>=1.7.4
 
 # Speech & Audio
-# Online TTS (Premium Quality)
-openai>=1.0.0  # GPT-4-TTS
-elevenlabs>=0.2.0  # ElevenLabs TTS
-
-# Offline TTS
-coqui-tts>=0.21.0  # Coqui-TTS (offline, high quality)
-pyttsx3>=2.90  # Emergency fallback
-
-# Legacy online TTS (will be deprecated)
-gTTS>=2.4.0
-
-# Audio Processing
-pydub>=0.25.1
-mutagen>=1.47.0
+openai>=1.0.0  # Conversational AI features
+httpx>=0.25.0  # HTTP client for Murf API
+requests>=2.31.0
 
 # Text Processing & Similarity
 python-Levenshtein>=0.23.0
@@ -51,10 +40,8 @@ pytest>=7.4.0
 pytest-asyncio>=0.21.0
 pytest-cov>=4.1.0
 pytest-playwright>=0.4.4
-httpx>=0.25.0
-redis>=4.5.0
-rq>=1.15.0
 black>=23.11.0
 flake8>=6.1.0
 mypy>=1.7.0
 playwright>=1.49.0
+python-dotenv==1.0.1

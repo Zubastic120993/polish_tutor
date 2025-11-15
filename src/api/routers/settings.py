@@ -1,6 +1,8 @@
 """Settings API endpoints."""
 
 import logging
+from typing import Any, Dict, Iterable, Optional
+
 from fastapi import APIRouter, HTTPException, Query
 
 from src.api.schemas import (
@@ -22,9 +24,10 @@ async def settings_get(user_id: int = Query(..., description="User ID", gt=0)):
         database = app_context.database
 
         # get_user_settings() → Dict[str, Any]
-        user_settings = database.get_user_settings(user_id)
+        raw_settings = database.get_user_settings(user_id)
+        normalized_settings = _normalize_settings(raw_settings)
 
-        if not user_settings:
+        if not normalized_settings:
             # Default fallback
             return {
                 "status": "success",
@@ -46,9 +49,8 @@ async def settings_get(user_id: int = Query(..., description="User ID", gt=0)):
             }
 
         # Convert dict to response object
-        settings_dict: dict[str, str | int | None] = {"user_id": user_id}
-        for key, value in user_settings.items():
-            settings_dict[key] = value
+        settings_dict: Dict[str, Any] = {"user_id": user_id}
+        settings_dict.update(normalized_settings)
 
         # Convert legacy numeric audio speed → named values
         if "audio_speed" in settings_dict:
@@ -99,7 +101,7 @@ async def settings_update(request: SettingsUpdateRequest):
     try:
         database = app_context.database
 
-        settings_dict: dict[str, str | int | None] = {"user_id": request.user_id}
+        settings_dict: Dict[str, Any] = {"user_id": request.user_id}
 
         # Helper for inserting or reading values
         def get_or_set_setting(
@@ -109,7 +111,8 @@ async def settings_update(request: SettingsUpdateRequest):
                 database.upsert_setting(request.user_id, key, str(value))
                 return value
             existing_value = database.get_user_setting(request.user_id, key)
-            return existing_value if existing_value is not None else default
+            extracted = _extract_setting_value(existing_value)
+            return extracted if extracted is not None else default
 
         # Apply all settings
         settings_dict["voice_mode"] = get_or_set_setting(
@@ -157,3 +160,49 @@ async def settings_update(request: SettingsUpdateRequest):
     except Exception as e:
         logger.error(f"Error in settings_update: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+
+def _normalize_settings(settings: Any) -> Dict[str, Any]:
+    """Normalize storage-specific settings into a primitive dict."""
+    result: Dict[str, Any] = {}
+    if not settings:
+        return result
+
+    if isinstance(settings, dict):
+        for key, value in settings.items():
+            result[key] = _extract_setting_value(value)
+        return result
+
+    for item in _as_iterable(settings):
+        key = getattr(item, "key", None)
+        if key is None and isinstance(item, dict):
+            key = item.get("key")
+        if not key:
+            continue
+        if isinstance(item, dict):
+            value = item.get("value")
+        else:
+            value = getattr(item, "value", None)
+        result[key] = _extract_setting_value(value)
+    return result
+
+
+def _extract_setting_value(value: Any) -> Any:
+    """Extract primitive value from ORM/list/dict entries."""
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    if isinstance(value, dict):
+        if "value" in value:
+            return value.get("value")
+        return {k: _extract_setting_value(v) for k, v in value.items()}
+    if hasattr(value, "value"):
+        return getattr(value, "value")
+    return value
+
+
+def _as_iterable(value: Any) -> Iterable[Any]:
+    if value is None:
+        return []
+    if isinstance(value, (list, tuple, set)):
+        return value
+    return [value]

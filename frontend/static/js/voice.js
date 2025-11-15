@@ -295,7 +295,7 @@ class VoiceInputManager {
     createLiveCaptionElement() {
         // Find input bar container
         const inputBar = document.querySelector('.input-bar');
-        if (!inputBar) {
+        if (!inputBar || !inputBar.parentNode) {
             console.error('Input bar not found');
             return;
         }
@@ -308,8 +308,12 @@ class VoiceInputManager {
         caption.setAttribute('aria-live', 'polite');
         caption.style.display = 'none';
         
-        // Insert before input bar
-        inputBar.parentNode.insertBefore(caption, inputBar);
+        // Insert before input bar or append if no sibling context
+        if (inputBar.parentNode.firstChild === inputBar) {
+            inputBar.parentNode.insertBefore(caption, inputBar);
+        } else {
+            inputBar.parentNode.insertBefore(caption, inputBar);
+        }
         
         this.liveCaptionElement = caption;
     }
@@ -505,4 +509,3 @@ class VoiceInputManager {
 
 // Global voice input manager instance
 window.voiceInputManager = new VoiceInputManager();
-

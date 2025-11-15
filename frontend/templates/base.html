@@ -23,7 +23,7 @@
     <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/layout.css">
     <link rel="stylesheet" href="/static/css/components.css">
-    <link rel="stylesheet" href="/static/css/tailwind.generated.css">
+    <link rel="stylesheet" href="/static/css/output.css">
 
     <!-- Theme-specific styles -->
     <style>
@@ -49,13 +49,12 @@
 
     {% block head %}{% endblock %}
 </head>
-<body class="font-sans text-cafe-espresso bg-cafe-foam relative min-h-screen overflow-x-hidden">
+<body class="font-sans text-app-text bg-app-bg relative min-h-screen overflow-x-hidden" style="background: var(--color-bg); color: var(--color-text);">
     <!-- Skip link for accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <!-- Background gradients -->
-    <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.85),_rgba(247,233,217,0.6))]"></div>
-    <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_bottom,_rgba(235,197,165,0.2),_rgba(255,255,255,0))]"></div>
+    <!-- Modern background gradients -->
+    <div class="absolute inset-0 pointer-events-none opacity-40" style="background: radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.04) 0%, transparent 50%), radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.04) 0%, transparent 50%);"></div>
 
     <!-- Main content area -->
     <main id="main-content">

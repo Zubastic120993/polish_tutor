@@ -234,9 +234,7 @@ class AudioGenerateRequest(BaseModel):
     speed: Optional[float] = Field(
         1.0, description="Audio playback speed (0.75, 1.0, or 1.25)", ge=0.75, le=1.25
     )
-    user_id: Optional[int] = Field(
-        None, description="User ID for checking voice_mode setting", gt=0
-    )
+    user_id: Optional[int] = Field(None, description="(Reserved) User ID context", gt=0)
 
 
 class AudioGenerateData(BaseModel):
@@ -244,11 +242,9 @@ class AudioGenerateData(BaseModel):
 
     audio_url: str = Field(..., description="URL to audio file")
     cached: bool = Field(..., description="Whether audio was retrieved from cache")
-    engine: str = Field(
-        ..., description="TTS engine used (gpt4, elevenlabs, coqui, gtts, pyttsx3)"
-    )
+    engine: str = Field(..., description="TTS engine used (murf)")
     source: str = Field(
-        ..., description="Full source info (e.g., 'cached_gpt4', 'generated_coqui')"
+        ..., description="Full source info (e.g., 'cached_murf', 'generated_murf')"
     )
 
 
