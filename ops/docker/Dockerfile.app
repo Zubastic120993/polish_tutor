@@ -28,9 +28,6 @@ COPY . .
 # Create necessary directories
 RUN mkdir -p logs audio_cache static/audio sessions data frontend/static frontend/templates
 
-# Make scripts executable
-RUN chmod +x scripts/manage_workers.py
-
 # Expose port
 EXPOSE 8000
 
