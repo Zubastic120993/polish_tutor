@@ -33,13 +33,12 @@ class AudioRequest(BaseModel):
 
 
 async def _generate_polish_tts(api_key: str, text: str, speed: float) -> bytes:
-    payload: Dict[str, Any] = {
-        "voiceId": _DEFAULT_VOICE_ID,
-        "text": text,
-        "format": "mp3",
-        "encoding": "mp3",
-        "style": _DEFAULT_VOICE_STYLE,
-    }
+    payload: Dict[str, Any] = {}
+    payload["voiceId"] = _DEFAULT_VOICE_ID
+    payload["text"] = text
+    payload["format"] = "mp3"
+    payload["encoding"] = "mp3"
+    payload["style"] = _DEFAULT_VOICE_STYLE
     if speed and abs(speed - 1.0) > 1e-3:
         payload["speakingRate"] = speed
 

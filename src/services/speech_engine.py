@@ -183,12 +183,11 @@ class SpeechEngine:
             "Accept": "application/json",
         }
 
-        payload: Dict[str, Any] = {
-            "voiceId": voice_id,
-            "text": text,
-            "format": "mp3",
-            "encoding": "mp3",
-        }
+        payload: Dict[str, Any] = {}
+        payload["voiceId"] = voice_id
+        payload["text"] = text
+        payload["format"] = "mp3"
+        payload["encoding"] = "mp3"
         if self.voice_style:
             payload["style"] = self.voice_style
         if self.language:
