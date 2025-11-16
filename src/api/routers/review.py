@@ -73,7 +73,11 @@ async def review_get_due(user_id: int = Query(..., description="User ID", gt=0))
             audio = None
 
             # Try to get phrase from database first
-            phrase = database.get_phrase(phrase_id) if hasattr(database, "get_phrase") else None
+            phrase = (
+                database.get_phrase(phrase_id)
+                if hasattr(database, "get_phrase")
+                else None
+            )
             if phrase:
                 lesson_id = getattr(phrase, "lesson_id", None)
                 phrase_text = getattr(phrase, "text", None)

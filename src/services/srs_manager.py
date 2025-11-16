@@ -169,7 +169,7 @@ class SRSManager:
                 .order_by(SRSMemory.next_review.asc())
                 .all()
             )
-            
+
             # Expunge all objects from session so they can be used after session closes
             for item in due_items:
                 session.expunge(item)
