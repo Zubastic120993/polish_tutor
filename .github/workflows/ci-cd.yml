@@ -117,13 +117,13 @@ jobs:
       matrix:
         image:
           - name: app
-            file: ./Dockerfile.app
+            file: ./ops/docker/Dockerfile.app
             suffix: ''
           - name: worker
-            file: ./Dockerfile.worker
+            file: ./ops/docker/Dockerfile.worker
             suffix: '-worker'
           - name: frontend
-            file: ./Dockerfile.frontend
+            file: ./ops/docker/Dockerfile.frontend
             suffix: '-frontend'
 
     steps:
