@@ -360,7 +360,9 @@ class Database:
                     "id": i.id,
                     "phrase_id": i.phrase_id,
                     "user_id": i.user_id,
-                    "next_review": i.next_review.isoformat() + "Z" if i.next_review else None,
+                    "next_review": (
+                        i.next_review.isoformat() + "Z" if i.next_review else None
+                    ),
                     "efactor": i.efactor,
                     "interval_days": i.interval_days,
                     "review_count": i.review_count,

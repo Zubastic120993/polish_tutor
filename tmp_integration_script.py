@@ -1,4 +1,3 @@
-
 import json
 import os
 import sys
@@ -10,7 +9,9 @@ from pathlib import Path
 # Environment setup
 # ----------------------------------------------------------
 project_root_env = os.environ.get("POLISH_TUTOR_PROJECT_ROOT")
-project_root = Path(project_root_env) if project_root_env else Path(__file__).resolve().parent
+project_root = (
+    Path(project_root_env) if project_root_env else Path(__file__).resolve().parent
+)
 mpl_dir = project_root / ".mplconfig"
 mpl_dir.mkdir(exist_ok=True)
 os.environ.setdefault("MPLCONFIGDIR", str(mpl_dir))
@@ -18,6 +19,7 @@ os.environ.setdefault("FONTCONFIG_PATH", str(mpl_dir))
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "src"))
 os.environ.setdefault("DATABASE_URL", "sqlite:///./data/polish_tutor.db")
+
 
 # ----------------------------------------------------------
 # Dummy Speech Engine Stub (skip real audio generation)
@@ -28,8 +30,13 @@ class DummySpeechEngine:
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
     def get_audio_path(
-        self, text, lesson_id=None, phrase_id=None,
-        audio_filename=None, speed=1.0, voice_id="default"
+        self,
+        text,
+        lesson_id=None,
+        phrase_id=None,
+        audio_filename=None,
+        speed=1.0,
+        voice_id="default",
     ):
         dummy_file = self.cache_dir / "integration_dummy.mp3"
         dummy_file.write_bytes(b"fake-audio")
@@ -40,6 +47,7 @@ class DummySpeechEngine:
             "gpt4": {"available": True, "quality": "high"},
             "offline": {"available": True, "quality": "medium"},
         }
+
 
 dummy_module = types.ModuleType("src.services.speech_engine")
 dummy_module.SpeechEngine = DummySpeechEngine
@@ -67,13 +75,17 @@ from src.core.app_context import app_context
 
 try:
     from src.core.init_db import init_database
+
     init_database()
     print("✅ Database schema initialized successfully.")
 except Exception as e:
     print(f"⚠️ WARNING: Database initialization skipped: {e}")
 
 client = TestClient(app)
-TEST_PHRASE_ID = f"integration_phrase_{int(datetime.now(timezone.utc).timestamp() * 1000)}"
+TEST_PHRASE_ID = (
+    f"integration_phrase_{int(datetime.now(timezone.utc).timestamp() * 1000)}"
+)
+
 
 # ----------------------------------------------------------
 # Helper to prepare review/test data
@@ -128,7 +140,9 @@ def ensure_review_data():
     except Exception as e:
         print(f"⚠️ Could not create SRS memory: {e}")
 
+
 ensure_review_data()
+
 
 # ----------------------------------------------------------
 # Utility to run each test
@@ -139,12 +153,14 @@ def run_test(test_name, test_func):
         return {"test": test_name, "status": "passed", "result": result}
     except Exception as e:
         import traceback
+
         return {
             "test": test_name,
             "status": "failed",
             "error": str(e),
             "traceback": traceback.format_exc(),
         }
+
 
 # ----------------------------------------------------------
 # Actual endpoint tests
@@ -155,6 +171,7 @@ def test_health_check():
     data = response.json()
     assert data["status"] == "healthy"
     return data
+
 
 def test_chat_respond_basic():
     payload = {
@@ -169,12 +186,14 @@ def test_chat_respond_basic():
     assert data["status"] == "success"
     return data
 
+
 def test_lesson_get():
     response = client.get("/api/lesson/get", params={"lesson_id": "coffee_001"})
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
     return data
+
 
 def test_lesson_options():
     response = client.get(
@@ -186,6 +205,7 @@ def test_lesson_options():
     assert data["status"] == "success"
     return data
 
+
 def test_lesson_catalog():
     response = client.get("/api/lesson/catalog")
     assert response.status_code == 200
@@ -193,12 +213,14 @@ def test_lesson_catalog():
     assert data["status"] == "success"
     return data
 
+
 def test_settings_get():
     response = client.get("/api/settings/get", params={"user_id": 1})
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
     return data
+
 
 def test_settings_update():
     payload = {"user_id": 1, "voice_mode": "online", "theme": "dark"}
@@ -208,12 +230,14 @@ def test_settings_update():
     assert data["status"] == "success"
     return data
 
+
 def test_user_stats():
     response = client.get("/api/user/stats", params={"user_id": 1})
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
     return data
+
 
 def test_review_get():
     response = client.get("/api/review/get", params={"user_id": 1})
@@ -223,6 +247,7 @@ def test_review_get():
     if data.get("status") not in {"success", "empty"}:
         raise AssertionError(f"Unexpected review_get status: {data}")
     return data
+
 
 def test_review_update():
     payload = {
@@ -239,12 +264,14 @@ def test_review_update():
         raise AssertionError(f"Unexpected review_update status: {data}")
     return data
 
+
 def test_backup_export():
     response = client.get("/api/backup/export", params={"user_id": 1, "format": "json"})
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
     return data
+
 
 def test_audio_generate():
     payload = {
@@ -258,12 +285,14 @@ def test_audio_generate():
     assert data["status"] == "success"
     return data
 
+
 def test_audio_engines():
     response = client.get("/api/audio/engines")
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
     return data
+
 
 def test_audio_clear_cache():
     response = client.post("/api/audio/clear-cache")
@@ -272,29 +301,39 @@ def test_audio_clear_cache():
     assert data["status"] == "success"
     return data
 
+
 def test_error_report():
-    payload = {"user_id": 1, "error_type": "test", "message": "Test error", "context": {}}
+    payload = {
+        "user_id": 1,
+        "error_type": "test",
+        "message": "Test error",
+        "context": {},
+    }
     response = client.post("/api/error/report", json=payload)
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
     return data
 
+
 def test_websocket_chat():
     messages = []
     with client.websocket_connect("/ws/chat") as websocket:
         websocket.send_json({"type": "connect", "user_id": 1})
         messages.append(websocket.receive_json())
-        websocket.send_json({
-            "type": "message",
-            "text": "Poproszę kawę",
-            "lesson_id": "coffee_001",
-            "dialogue_id": "coffee_001_d1",
-            "speed": 1.0,
-        })
+        websocket.send_json(
+            {
+                "type": "message",
+                "text": "Poproszę kawę",
+                "lesson_id": "coffee_001",
+                "dialogue_id": "coffee_001_d1",
+                "speed": 1.0,
+            }
+        )
         messages.append(websocket.receive_json())  # typing
         messages.append(websocket.receive_json())  # response
     return messages
+
 
 # ----------------------------------------------------------
 # Run all tests

@@ -210,7 +210,9 @@ class SpeechEngine:
                 )
 
             data = response.json()
-            audio_file_url = data.get("audioFile") or data.get("data", {}).get("audioFile")
+            audio_file_url = data.get("audioFile") or data.get("data", {}).get(
+                "audioFile"
+            )
             if not audio_file_url:
                 raise RuntimeError("Murf TTS response missing audio URL")
 

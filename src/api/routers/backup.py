@@ -33,8 +33,16 @@ async def backup_export(
             return {
                 "status": "success",
                 "message": "CSV export not yet implemented — please request JSON instead.",
-                "data": {"user_id": user_id, "exported_at": timestamp, "download_url": None},
-                "metadata": {"format": "csv", "timestamp": timestamp, "status": "pending"},
+                "data": {
+                    "user_id": user_id,
+                    "exported_at": timestamp,
+                    "download_url": None,
+                },
+                "metadata": {
+                    "format": "csv",
+                    "timestamp": timestamp,
+                    "status": "pending",
+                },
             }
 
         # Get user data
@@ -58,8 +66,12 @@ async def backup_export(
                     "interval_days": _get_field(memory, "interval_days"),
                     "review_count": _get_field(memory, "review_count"),
                     "strength_level": _get_field(memory, "strength_level"),
-                    "next_review": _serialize_datetime(_get_field(memory, "next_review")),
-                    "last_review": _serialize_datetime(_get_field(memory, "last_review")),
+                    "next_review": _serialize_datetime(
+                        _get_field(memory, "next_review")
+                    ),
+                    "last_review": _serialize_datetime(
+                        _get_field(memory, "last_review")
+                    ),
                 }
             )
 
@@ -68,7 +80,9 @@ async def backup_export(
             if key:
                 settings_data[key] = value
 
-        attempts = [_serialize_attempt(attempt) for attempt in _as_iterable(raw_attempts)]
+        attempts = [
+            _serialize_attempt(attempt) for attempt in _as_iterable(raw_attempts)
+        ]
         progresses = [
             _serialize_progress(progress) for progress in _as_iterable(raw_progress)
         ]
@@ -173,7 +187,9 @@ def _serialize_datetime(value: Any) -> Any:
     return value
 
 
-def _iter_settings(raw_settings: Union[Dict[str, Any], Iterable[Any], None]) -> Iterable[Tuple[str, Any]]:
+def _iter_settings(
+    raw_settings: Union[Dict[str, Any], Iterable[Any], None]
+) -> Iterable[Tuple[str, Any]]:
     """Yield (key, value) pairs from potential storage formats."""
     if not raw_settings:
         return []
