@@ -7,7 +7,7 @@ import logging
 import os
 import time
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import httpx
 
@@ -183,7 +183,7 @@ class SpeechEngine:
             "Accept": "application/json",
         }
 
-        payload = {
+        payload: Dict[str, Any] = {
             "voiceId": voice_id,
             "text": text,
             "format": "mp3",
