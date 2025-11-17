@@ -1,96 +1,92 @@
 # Patient Polish Tutor — GAP Analysis (v2 Roadmap Alignment)
+*Last updated: 2025-11-16*
 
-*Last updated: 2025-11-14*
-
-This document compares the existing repository against the v2 UI Redesign Roadmap and enumerates the required changes for frontend, backend, database, and conversation logic.
+This document evaluates the current repository against the v2 UI Redesign Roadmap, documenting which Phase A items are complete and what gaps remain for Phases B–D.
 
 ---
 
-## 1. Frontend Gap Summary
+## 1. Frontend Gap Summary (Phase A Complete)
 
-| Planned Component / Feature | Current State | Gap |
+| Planned Component / Feature | Current State | Gap (Future Phases) |
 | --- | --- | --- |
-| Chat-based Lesson UI (`LessonChatPage`) | Legacy Jinja preview renders full lesson statically | Rebuild as React SPA |
-| Tutor / User message bubbles | Not implemented | Build `TutorMessage`, `UserMessage`, `FeedbackMessage` |
-| Phrase-by-phrase flow | Entire lesson shown at once | Implement state machine with `currentPhraseIndex` |
-| Mic recording + playback controls | Limited button stubs, no recording pipeline | Introduce `MicButton`, connect to STT endpoint (Phase B) |
-| Typing indicator, auto-scroll | Not present | Add `TypingIndicator`, chat container auto-scroll |
-| Scoring & feedback overlays | Not present | Add `ScoreBadge`, star pulses, success/fail states |
-| Key phrase drill upgrades | Static list with play buttons | Extend with mic, scoring, expand/collapse, history |
-| End-of-lesson summary | Not present | Build `LessonSummaryPage` with stats and next-step buttons |
+| Chat-based Lesson UI (`LessonChatPage`) | **Implemented** — React SPA, routing, layout, state machine | Add backend integration (Phase B) |
+| Tutor/User/Feedback messages | **Implemented** — all bubble components in place | Add animations & CEFR visual cues (Phase D) |
+| Phrase-by-phrase flow | **Implemented** — mock provider + lesson machine | Connect to `/lesson/{id}/next` API (Phase B) |
+| Mic recording + playback | **Mock implemented** — mock mic + mock evaluator | Connect real STT + evaluation (Phase B) |
+| Typing indicator & auto-scroll | **Implemented** | Add micro-animations (Phase D) |
+| Scoring overlays | **Basic UI implemented** | Add star ratings + animations (Phase D) |
+| Key phrase drills | **Implemented** | Add scoring history & mic scoring (Phase D) |
+| End-of-lesson summary | **Implemented** | Add CEFR badges + XP (Phase D) |
 
-**Action:** Begin Phase A — React component implementation (see roadmap).
+**Summary:**  
+**Phase A frontend is 100% complete.**  
+All remaining frontend gaps belong to Phases B–D.
 
 ---
 
-## 2. Backend Gap Summary
+## 2. Backend Gap Summary (Phase B Next)
 
 | Planned Endpoint | Current State | Gap |
 | --- | --- | --- |
-| `POST /speech/recognize` | Missing | Add Whisper STT endpoint |
-| `POST /evaluate` | Missing | Add pronunciation + semantic scoring route |
-| `GET /lesson/{id}/next` | Missing | Add phrase-by-phrase fetch |
-| Evaluation pipeline | None | Implement scoring engine (phonetic, semantic, hints) |
-| Adaptive progression | None | Add state machine + lesson context |
+| `POST /api/v2/speech/recognize` | Missing | Implement Whisper STT service |
+| `POST /api/v2/evaluate` | Missing | Implement evaluator (phonetic + semantic scoring) |
+| `GET /api/v2/lesson/{id}/next` | Missing | Backend phrase progression engine |
+| Evaluation pipeline | None | Build phonetic distance + semantic accuracy pipeline |
+| Adaptive progression | None | Add lesson context + difficulty tracking |
 
-**Action:** Phase B — build STT/evaluation endpoints after UI requirements are solid.
+**Summary:**  
+UI is ready. Backend must now implement Phase B endpoints.
 
 ---
 
-## 3. Database Gap Summary
+## 3. Database Gap Summary (Phase C)
 
 | Planned Table | Current State | Gap |
 | --- | --- | --- |
-| `phrase_attempts` | Missing | Track per-phrase attempts & scores |
-| `user_progress` | Missing | Store lesson completion, CEFR level |
-| `user_stats` | Partially covered via SRS | Extend with speaking metrics |
-| `daily_reviews` | Missing | Support spaced repetition scheduling |
-| `cached_audio` metadata | Missing | Persist generated audio references |
+| `phrase_attempts` | Missing | Track per-phrase attempts & scoring |
+| `user_progress` | Missing | Store lesson completion + CEFR level |
+| `user_stats` | Partial SRS logic present | Extend with speaking metrics |
+| `daily_reviews` | Missing | Add spaced repetition scheduler |
+| `cached_audio` | Missing | Track Murf/Whisper audio references |
 
-**Field Guidelines (from roadmap)**  
-`score` (float 0–1), `phonetic_distance`, `semantic_accuracy`, `response_time` (ms), `timestamp`, `audio_ref`.
-
-**Action:** Phase C — add models + Alembic migrations.
+**Action:**  
+Implement SQLAlchemy models + Alembic migrations in Phase C.
 
 ---
 
 ## 4. Conversation / State Machine Gaps
 
-Current app has no conversation engine. Planned state machine:
+Phase A includes a working **mock-only** state machine. Missing features for later phases:
 
-```
-TUTOR_SPEAKING → WAITING_FOR_USER → RECORDING → EVALUATING → FEEDBACK → NEXT_PHRASE → …
-```
-
-Missing pieces:
-
-* Tutor typing delay + audio playback triggers
-* User recording lifecycle
-* Evaluation feedback loops (retry vs advance)
-* Adaptive hints & difficulty progression
-* CEFR tracking logic
+- Real STT → evaluation → scoring loop  
+- Retry/advance logic driven by backend  
+- Persistent attempt history  
+- CEFR/XP progression  
+- Advanced feedback animations (pulse, shake)
 
 **Action:**  
-* Phase A — implement UI state machine + mock data provider  
-* Phase B — connect to real scoring endpoints  
-* Phase C — persist progress metrics
+Phase B and Phase C will replace mocks with real logic.
 
 ---
 
 ## 5. Migration & Coexistence Notes
 
-* Maintain current Jinja dashboard for preview-only use during Phase A.
-* Serve React SPA under `/app/*` via new `frontend-react` bundle.
-* Plan controlled switchover once React chat UI reaches feature parity.
+- Jinja UI remains temporarily for preview.  
+- React SPA lives under `frontend-react/` and is served via `/app/*`.  
+- No legacy templates were modified in Phase A.  
+- Full switchover occurs after Phase B–D are complete.
 
 ---
 
 ## 6. Recommended Next Steps
 
-1. Create `frontend-react/` using **Vite + React + TypeScript + TailwindCSS**.
-2. Implement Phase A components + state machine using mock lesson provider.
-3. Add backend STT/evaluation endpoints (Phase B) aligned with roadmap API contracts.
-4. Introduce database tables via Alembic migrations (Phase C).
-5. Layer advanced UI enhancements (Phase D) once scoring data is available.
+1. **Begin Phase B** — Implement `/speech/recognize`, `/evaluate`, and `/lesson/{id}/next` under `/api/v2`.  
+2. Connect React UI to new endpoints (replace mocks without UI redesign).  
+3. **Phase C** — Add SQL models + migrations.  
+4. **Phase D** — Add advanced UI/UX (animations, CEFR dashboard, scoring stars, adaptive hints).
 
-This GAP analysis should be updated after each phase to track progress against the roadmap.
+---
+
+This GAP Analysis is now aligned with the v2.0.1 roadmap and the completed Phase A implementation.
+
+### END OF FILE

@@ -25,6 +25,74 @@ This document defines **exactly** what Cursor may generate and where.
 
 ---
 
+# ✅ Phase A Completion Summary
+
+The `frontend-react/` workspace now contains a fully operational Phase A implementation:
+
+* **Vite + React + TypeScript + Tailwind** configured (`package.json`, `vite.config.ts`, `tailwind.config.js`, `postcss.config.js`, `src/index.css`).
+* **Routing** for `/lesson/:id` and `/summary` defined in `App.tsx`, with `/` redirecting to `lesson_mock_001`.
+* **All required components** created under `src/components/**`.
+* **Chat UI** wired via `ChatContainer`, `TutorMessage`, `UserMessage`, `FeedbackMessage`, `TypingIndicator`.
+* **Mock lesson flow** implemented using `useLessonState`, `lessonMachine`, and `useAudioQueue`.
+* **Controls:** `ProgressIndicator`, `ScoreBadge`, `MicRecordButton`, `PlayButton`.
+* **Key phrase UI:** `KeyPhrasesPanel`, `KeyPhraseCard`, `KeyPhraseRow`.
+* **LessonSummaryPage** with mock stats and navigation.
+* **Auto-scroll** behavior functioning inside `ChatContainer`.
+* **Static mock audio** support from `public/mock_audio/*.mp3`.
+* **No backend or legacy Jinja templates modified.**
+
+Phase A is complete and ready for backend integration.
+
+---
+
+# 🚧 Phase B – Functional Requirements
+
+Backend integration tasks (frontend stays unchanged unless noted):
+
+1. Implement `/api/audio/generate` using Murf TTS (primary voice engine).
+2. Implement `/speech/recognize` using Whisper (local `tiny` or OpenAI Whisper).
+3. Build evaluation service: STT transcription → phonetic similarity → semantic LLM scoring.
+4. Replace mock playback in `PlayButton` with the backend TTS endpoint.
+5. Replace mock behavior in `MicRecordButton` with real recording + POST to `/speech/recognize`.
+6. Store phrase attempts (phonetic score, semantic score, timestamps) in SQLAlchemy models.
+7. Add lesson navigation endpoints (`GET /lesson/{id}/next`, `POST /lesson/{id}/answer`).
+8. Keep the React UI/state machine unchanged unless integration demands small adjustments.
+9. Ensure compatibility with the existing Phase A flow.
+
+---
+
+# 📂 Phase B Directory Map
+
+Expected backend files to create/update:
+
+* `backend/api/routers/audio.py`
+* `backend/api/routers/speech.py`
+* `backend/api/routers/lesson.py`
+* `backend/services/murf_tts.py`
+* `backend/services/whisper_stt.py`
+* `backend/services/evaluator.py`
+* `backend/schemas/lesson.py`
+* `backend/schemas/evaluation.py`
+* `backend/models/attempt.py`
+* `backend/models/lesson.py`
+* `backend/db/session.py`
+
+---
+
+# 🛠 Phase B Execution Order
+
+1. Implement Murf TTS backend endpoint.
+2. Implement Whisper STT endpoint.
+3. Implement evaluation service (phonetic + semantic scoring).
+4. Add database models and migrations (phrase attempts, lessons).
+5. Implement lesson navigation endpoints.
+6. Connect frontend `PlayButton` to hit `/api/audio/generate`.
+7. Connect frontend `MicRecordButton` to send audio to `/speech/recognize`.
+8. Replace mock scoring with backend evaluation responses.
+9. Switch lesson data source from mocks to the database.
+
+---
+
 # 🏛 PROJECT ROOT STRUCTURE (STRICT)
 
 Cursor must assume the root folder has:
