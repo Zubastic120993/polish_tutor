@@ -6,7 +6,7 @@ COPY frontend/static /usr/share/nginx/html/static
 COPY frontend/templates /usr/share/nginx/html/templates
 
 # Copy nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY ops/docker/nginx.conf /etc/nginx/nginx.conf
 
 # Create audio cache directory
 RUN mkdir -p /usr/share/nginx/html/audio_cache

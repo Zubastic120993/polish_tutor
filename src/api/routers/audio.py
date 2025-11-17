@@ -6,7 +6,7 @@ import logging
 import os
 import uuid
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any, Dict, Optional, Union
 
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
@@ -33,7 +33,7 @@ class AudioRequest(BaseModel):
 
 
 async def _generate_polish_tts(api_key: str, text: str, speed: float) -> bytes:
-    payload = {
+    payload: Dict[str, Any] = {
         "voiceId": _DEFAULT_VOICE_ID,
         "text": text,
         "format": "mp3",
