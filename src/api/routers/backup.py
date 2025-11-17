@@ -188,7 +188,7 @@ def _serialize_datetime(value: Any) -> Any:
 
 
 def _iter_settings(
-    raw_settings: Union[Dict[str, Any], Iterable[Any], None]
+    raw_settings: Union[Dict[str, Any], Iterable[Any], None],
 ) -> Iterable[Tuple[str, Any]]:
     """Yield (key, value) pairs from potential storage formats."""
     if not raw_settings:
