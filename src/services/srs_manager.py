@@ -170,6 +170,10 @@ class SRSManager:
                 .all()
             )
 
+            # Expunge all objects from session so they can be used after session closes
+            for item in due_items:
+                session.expunge(item)
+
         logger.info(f"Found {len(due_items)} items due for review for user {user_id}")
         return due_items
 
@@ -237,7 +241,8 @@ class SRSManager:
 
                 session.commit()
                 session.refresh(existing)
-                session.expunge(existing)
+                if hasattr(session, "expunge"):
+                    session.expunge(existing)
 
                 logger.info(
                     f"Updated SRS memory for user {user_id}, phrase {phrase_id}: "
@@ -266,7 +271,8 @@ class SRSManager:
                 session.add(new_memory)
                 session.commit()
                 session.refresh(new_memory)
-                session.expunge(new_memory)
+                if hasattr(session, "expunge"):
+                    session.expunge(new_memory)
 
                 logger.info(
                     f"Created SRS memory for user {user_id}, phrase {phrase_id}: "

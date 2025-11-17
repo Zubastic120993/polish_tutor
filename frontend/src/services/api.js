@@ -286,7 +286,7 @@ export class ReviewApiService {
      * @returns {Promise<Object>} SRS review data
      */
     async getReviews(userId) {
-        return this.api.get('/api/review/get', { user_id: userId });
+        return this.api.get('/api/review/due', { user_id: userId });
     }
 
     /**

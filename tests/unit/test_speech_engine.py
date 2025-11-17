@@ -1,5 +1,6 @@
+import os
+import time
 from pathlib import Path
-from unittest.mock import patch, MagicMock
 
 from src.services.speech_engine import SpeechEngine
 
@@ -8,14 +9,10 @@ def test_generate_cache_key_is_deterministic():
     engine = SpeechEngine(
         native_audio_dir="/tmp/nonexistent",
         cache_dir="/tmp/audio_cache",
-        online_mode=False,
+        murf_api_key="test-key",
     )
-    first = engine.generate_cache_key(
-        "tekst", voice_id="default", speed=1.0, engine="pyttsx3"
-    )
-    second = engine.generate_cache_key(
-        "tekst", voice_id="default", speed=1.0, engine="pyttsx3"
-    )
+    first = engine.generate_cache_key("tekst", "default", 1.0)
+    second = engine.generate_cache_key("tekst", "default", 1.0)
     assert first == second
 
 
@@ -31,201 +28,75 @@ def test_get_audio_path_prefers_pre_recorded(tmp_path):
     engine = SpeechEngine(
         native_audio_dir=str(native_dir),
         cache_dir=str(tmp_path / "cache"),
-        online_mode=False,
+        murf_api_key="test-key",
     )
 
     audio_path, source = engine.get_audio_path(
-        text="Tekst",
-        lesson_id="lesson1",
-        phrase_id="phrase_001",
-        speed=0.75,
+        text="Tekst", lesson_id="lesson1", phrase_id="phrase_001", speed=0.8
     )
 
     assert Path(audio_path) == slow_path
     assert source == "pre_recorded"
 
 
-def test_get_audio_path_returns_cached_file(tmp_path, monkeypatch):
-    native_dir = tmp_path / "native"
-    cache_dir = tmp_path / "cache"
+def test_get_audio_path_returns_cached_file(tmp_path):
     engine = SpeechEngine(
-        native_audio_dir=str(native_dir),
-        cache_dir=str(cache_dir),
-        online_mode=False,
+        native_audio_dir=str(tmp_path / "native"),
+        cache_dir=str(tmp_path / "cache"),
+        murf_api_key="test-key",
     )
 
-    cache_key = engine.generate_cache_key("Tekst", engine="gpt4")
-    cached_file = cache_dir / f"{cache_key}.mp3"
+    cache_key = engine.generate_cache_key("Tekst", engine.default_voice_id, 1.0)
+    cached_file = engine._cache_file_path(cache_key)
+    cached_file.parent.mkdir(parents=True, exist_ok=True)
     cached_file.write_bytes(b"cached")
-
-    # Prevent fallback generation from running
-    monkeypatch.setattr(
-        engine, "_generate_audio", lambda *args, **kwargs: (None, "none")
-    )
 
     audio_path, source = engine.get_audio_path(text="Tekst", speed=1.0)
     assert Path(audio_path) == cached_file
-    assert source == "cached_gpt4"
+    assert source == "cached_murf"
 
 
-def test_get_available_engines():
-    """Test get_available_engines returns correct engine availability."""
+def test_get_audio_path_generates_when_cache_miss(tmp_path, monkeypatch):
     engine = SpeechEngine(
-        native_audio_dir="/tmp", cache_dir="/tmp/cache", online_mode=False
-    )
-    available = engine.get_available_engines()
-
-    assert "mode" in available
-    assert "online" in available
-    assert "offline" in available
-    assert available["mode"] == "offline"
-
-
-def test_get_available_engines_online_mode():
-    """Test get_available_engines in online mode."""
-    engine = SpeechEngine(
-        native_audio_dir="/tmp", cache_dir="/tmp/cache", online_mode=True
-    )
-    available = engine.get_available_engines()
-
-    assert available["mode"] == "online"
-
-
-def test_generate_with_pyttsx3_success(tmp_path):
-    """Test pyttsx3 audio generation."""
-    engine = SpeechEngine(
-        native_audio_dir="/tmp", cache_dir=str(tmp_path), online_mode=False
+        native_audio_dir=str(tmp_path / "native"),
+        cache_dir=str(tmp_path / "cache"),
+        murf_api_key="test-key",
     )
 
-    # Mock the pyttsx3 module and its init function
-    with patch("src.services.speech_engine.pyttsx3") as mock_pyttsx3:
-        mock_engine = MagicMock()
-        mock_pyttsx3.init.return_value = mock_engine
+    def _fake_synthesize(text, voice_id, speed, output_path):
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_bytes(b"generated")
+        return output_path
 
-        # Initialize the engine
-        engine._pyttsx3_engine = mock_engine
+    monkeypatch.setattr(engine, "_synthesize_with_murf", _fake_synthesize)
 
-        # Mock the file operations to avoid actual file creation
-        with patch("builtins.open", create=True) as mock_open:
-            mock_file = MagicMock()
-            mock_open.return_value.__enter__.return_value = mock_file
-
-            result = engine._generate_with_pyttsx3("Test text", 1.0, "default")
-
-            # Just check that the method was called and didn't crash
-            mock_engine.save_to_file.assert_called_once()
-            mock_engine.runAndWait.assert_called_once()
+    path, source = engine.get_audio_path(text="Tekst", speed=1.0)
+    assert source == "generated_murf"
+    assert Path(path).exists()
 
 
-def test_generate_with_pyttsx3_failure(tmp_path):
-    """Test pyttsx3 audio generation failure."""
-    engine = SpeechEngine(
-        native_audio_dir="/tmp", cache_dir=str(tmp_path), online_mode=False
-    )
+def test_get_available_engines_reports_api_key(monkeypatch):
+    monkeypatch.delenv("MURF_API_KEY", raising=False)
+    engine = SpeechEngine(murf_api_key=None)
+    info = engine.get_available_engines()
+    assert info["online"]["murf"] is False
 
-    # Mock the pyttsx3 module and its init function
-    with patch("src.services.speech_engine.pyttsx3") as mock_pyttsx3:
-        mock_engine = MagicMock()
-        mock_engine.save_to_file.side_effect = Exception("TTS error")
-        mock_pyttsx3.init.return_value = mock_engine
-
-        # Force re-initialization of the engine to use our mock
-        engine._pyttsx3_engine = mock_engine
-
-        result = engine._generate_with_pyttsx3("Test text", 1.0, "default")
-
-        assert result is None
+    engine_with_key = SpeechEngine(murf_api_key="abc123")
+    info_with_key = engine_with_key.get_available_engines()
+    assert info_with_key["online"]["murf"] is True
 
 
-def test_adjust_speed_with_pydub(tmp_path):
-    """Test audio speed adjustment."""
-    engine = SpeechEngine(
-        native_audio_dir="/tmp", cache_dir=str(tmp_path), online_mode=False
-    )
-
-    # Create a dummy input file
-    input_path = tmp_path / "input.mp3"
-    input_path.write_bytes(b"dummy audio data")
-
-    output_path = tmp_path / "output.mp3"
-
-    # Mock the entire pydub chain
-    with patch("src.services.speech_engine.AudioSegment") as mock_audio_segment_class:
-        mock_audio = MagicMock()
-        mock_audio_segment_class.from_file.return_value = mock_audio
-        mock_audio._spawn.return_value = mock_audio
-        mock_audio.set_frame_rate.return_value = mock_audio
-
-        engine._adjust_speed(input_path, output_path, 0.75)
-
-        mock_audio._spawn.assert_called_once()
-        mock_audio.set_frame_rate.assert_called_once()
-        mock_audio.export.assert_called_once_with(
-            str(output_path), format="mp3", bitrate="128k"
-        )
-
-
-def test_cleanup_cache_method_exists(tmp_path):
-    """Test that cleanup_cache method can be called."""
+def test_cleanup_cache_removes_old_files(tmp_path):
     cache_dir = tmp_path / "cache"
-    cache_dir.mkdir()
+    engine = SpeechEngine(cache_dir=str(cache_dir), murf_api_key="test")
 
-    engine = SpeechEngine(
-        native_audio_dir="/tmp", cache_dir=str(cache_dir), online_mode=False
-    )
+    old_file = engine._cache_file_path("deadbeefdeadbeefdeadbeefdeadbeef")
+    old_file.parent.mkdir(parents=True, exist_ok=True)
+    old_file.write_bytes(b"old")
 
-    # Just test that the method can be called without errors
-    removed_count = engine.cleanup_cache(max_age_days=30)
+    old_mtime = time.time() - (60 * 60 * 24 * 40)
+    os.utime(old_file, (old_mtime, old_mtime))
 
-    # Should return an integer (could be 0 if no old files)
-    assert isinstance(removed_count, int)
-    assert removed_count >= 0
-
-
-def test_generate_audio_fallback_chain(tmp_path):
-    """Test _generate_audio tries fallback engines in correct order."""
-    engine = SpeechEngine(
-        native_audio_dir="/tmp", cache_dir=str(tmp_path), online_mode=False
-    )
-
-    # Mock all generation methods to fail except the last one
-    with patch.object(
-        engine, "_generate_with_gpt4_tts", return_value=None
-    ), patch.object(
-        engine, "_generate_with_elevenlabs", return_value=None
-    ), patch.object(
-        engine, "_generate_with_coqui", return_value=None
-    ), patch.object(
-        engine, "_generate_with_gtts", return_value=None
-    ), patch.object(
-        engine, "_generate_with_pyttsx3", return_value=tmp_path / "test.mp3"
-    ) as mock_pyttsx3:
-
-        result = engine._generate_audio("Test text", 1.0, "default")
-
-        assert result == (tmp_path / "test.mp3", "pyttsx3")
-        mock_pyttsx3.assert_called_once()
-
-
-def test_generate_audio_all_fail(tmp_path):
-    """Test _generate_audio when all engines fail."""
-    engine = SpeechEngine(
-        native_audio_dir="/tmp", cache_dir=str(tmp_path), online_mode=False
-    )
-
-    # Mock all generation methods to fail
-    with patch.object(
-        engine, "_generate_with_gpt4_tts", return_value=None
-    ), patch.object(
-        engine, "_generate_with_elevenlabs", return_value=None
-    ), patch.object(
-        engine, "_generate_with_coqui", return_value=None
-    ), patch.object(
-        engine, "_generate_with_gtts", return_value=None
-    ), patch.object(
-        engine, "_generate_with_pyttsx3", return_value=None
-    ):
-
-        result = engine._generate_audio("Test text", 1.0, "default")
-
-        assert result == (None, "none")
+    removed = engine.cleanup_cache(max_age_days=30)
+    assert removed >= 1
+    assert not old_file.exists()

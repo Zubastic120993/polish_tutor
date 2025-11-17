@@ -2,20 +2,25 @@
 
 import json
 import logging
-import os
 from pathlib import Path
-from typing import Dict, List, Optional, Set, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, Set
 
 import jsonschema
 from jsonschema import ValidationError
 
-from src.models import Lesson, Phrase
+from src.models import Lesson
 from src.services.database_service import Database
 
 logger = logging.getLogger(__name__)
+BASE_DIR = Path(__file__).resolve().parents[2]
+DEFAULT_LESSON_DIR = BASE_DIR / "data" / "lessons"
+DEFAULT_AUDIO_DIR = BASE_DIR / "static" / "audio" / "native"
 
+# -------------------------------------------------------------------
 # JSON Schema for lesson validation
-LESSON_SCHEMA = {
+# -------------------------------------------------------------------
+
+LESSON_SCHEMA: Dict[str, Any] = {
     "type": "object",
     "required": ["id", "title", "level", "dialogues"],
     "properties": {
@@ -23,10 +28,7 @@ LESSON_SCHEMA = {
         "title": {"type": "string"},
         "level": {"type": "string"},
         "cefr_goal": {"type": "string"},
-        "tags": {
-            "type": "array",
-            "items": {"type": "string"},
-        },
+        "tags": {"type": "array", "items": {"type": "string"}},
         "dialogues": {
             "type": "array",
             "minItems": 1,
@@ -65,6 +67,10 @@ LESSON_SCHEMA = {
     },
 }
 
+# -------------------------------------------------------------------
+# LessonManager
+# -------------------------------------------------------------------
+
 
 class LessonManager:
     """Manages lesson loading, validation, and caching."""
@@ -73,107 +79,73 @@ class LessonManager:
         self,
         lessons_dir: Optional[str] = None,
         audio_base_dir: Optional[str] = None,
-        database: Optional["Database"] = None,
+        database: Optional[Database] = None,
     ):
-        """Initialize LessonManager.
+        """Initialize LessonManager."""
+        self.lessons_dir: Path = Path(lessons_dir or DEFAULT_LESSON_DIR)
+        self.audio_base_dir: Path = Path(audio_base_dir or DEFAULT_AUDIO_DIR)
+        self.database: Database = database or Database()
+        self._cache: Dict[str, Dict[str, Any]] = {}  # Cached lessons
 
-        Args:
-            lessons_dir: Directory containing lesson JSON files (default: ./data/lessons)
-            audio_base_dir: Base directory for audio files (default: ./static/audio/native)
-            database: Database service instance (optional, for persistence)
-        """
-        self.lessons_dir = Path(lessons_dir or "./data/lessons")
-        self.audio_base_dir = Path(audio_base_dir or "./static/audio/native")
-        self.database = database or Database()
-        self._cache: Dict[str, Dict] = {}  # Cache for loaded lessons
+    # -------------------------------------------------------------------
+    # Lesson loading
+    # -------------------------------------------------------------------
 
-    def load_lesson(self, lesson_id: str, validate: bool = True) -> Dict:
-        """Load a lesson from JSON file.
-
-        Args:
-            lesson_id: Lesson identifier (e.g., "coffee_001")
-            validate: Whether to validate schema and branches (default: True)
-
-        Returns:
-            Dictionary containing lesson data
-
-        Raises:
-            FileNotFoundError: If lesson file doesn't exist
-            ValidationError: If JSON schema validation fails
-            ValueError: If branch validation fails or audio files missing
-        """
-        # Check cache first
+    def load_lesson(self, lesson_id: str, validate: bool = True) -> Dict[str, Any]:
+        """Load a lesson JSON file."""
         if lesson_id in self._cache:
-            logger.debug(f"Loading lesson {lesson_id} from cache")
+            logger.debug(f"Lesson {lesson_id} loaded from cache")
             return self._cache[lesson_id]
 
-        # Load JSON file
         lesson_file = self.lessons_dir / f"{lesson_id}.json"
         if not lesson_file.exists():
             raise FileNotFoundError(f"Lesson file not found: {lesson_file}")
 
-        logger.info(f"Loading lesson from {lesson_file}")
         with open(lesson_file, "r", encoding="utf-8") as f:
             lesson_data = json.load(f)
 
-        # Validate schema
         if validate:
             self._validate_schema(lesson_data)
             self._validate_branches(lesson_data)
             self._validate_audio_files(lesson_data)
 
-        # Cache the lesson
         self._cache[lesson_id] = lesson_data
-
         return lesson_data
 
-    def load_all_lessons(self, validate: bool = True) -> Dict[str, Dict]:
-        """Load all lesson JSON files from the lessons directory.
-
-        Args:
-            validate: Whether to validate each lesson (default: True)
-
-        Returns:
-            Dictionary mapping lesson_id to lesson data
-        """
-        lessons = {}
+    def load_all_lessons(self, validate: bool = True) -> Dict[str, Dict[str, Any]]:
+        """Load all lessons from directory."""
+        lessons: Dict[str, Dict[str, Any]] = {}
         if not self.lessons_dir.exists():
-            logger.warning(f"Lessons directory does not exist: {self.lessons_dir}")
+            logger.warning(f"Lessons directory not found: {self.lessons_dir}")
             return lessons
 
         for json_file in self.lessons_dir.glob("*.json"):
             lesson_id = json_file.stem
             try:
-                lessons[lesson_id] = self.load_lesson(lesson_id, validate=validate)
+                lessons[lesson_id] = self.load_lesson(lesson_id, validate)
             except Exception as e:
                 logger.error(f"Failed to load lesson {lesson_id}: {e}")
-                continue
-
         logger.info(f"Loaded {len(lessons)} lessons")
         return lessons
 
-    def load_lesson_catalog(self) -> List[Dict]:
-        """Load and flatten lesson catalog metadata.
-
-        Returns:
-            List of catalog entries with ids, titles, module, part, and status
-        """
+    def load_lesson_catalog(self) -> List[Dict[str, Any]]:
+        """Load catalog.json (flattened)."""
         catalog_file = self.lessons_dir / "catalog.json"
         if not catalog_file.exists():
-            logger.debug(f"Lesson catalog not found: {catalog_file}")
             return []
+
         try:
             with open(catalog_file, "r", encoding="utf-8") as f:
                 catalog_data = json.load(f)
         except Exception as exc:
-            logger.warning(f"Failed to read lesson catalog: {exc}")
+            logger.warning(f"Cannot read catalog: {exc}")
             return []
 
-        entries: List[Dict] = []
+        entries: List[Dict[str, Any]] = []
         seen: Set[str] = set()
 
         def push_entry(
-            entry: Dict,
+            entry: Dict[str, Any],
             part_title: Optional[str] = None,
             module_title: Optional[str] = None,
         ) -> None:
@@ -200,28 +172,21 @@ class LessonManager:
                 module_title = module.get("title_pl") or module.get("title_en")
                 for lesson in module.get("lessons", []):
                     push_entry(lesson, part_title=part_title, module_title=module_title)
-
         return entries
 
+    # -------------------------------------------------------------------
+    # Database integration
+    # -------------------------------------------------------------------
+
     def save_lesson_to_db(self, lesson_id: str) -> Optional[Lesson]:
-        """Load lesson from JSON and save to database.
-
-        Args:
-            lesson_id: Lesson identifier
-
-        Returns:
-            Lesson model instance if successful, None otherwise
-        """
+        """Load and save a lesson into DB."""
         try:
             lesson_data = self.load_lesson(lesson_id, validate=True)
+            existing = self.database.get_lesson(lesson_id)
+            if existing:
+                logger.info(f"Lesson {lesson_id} already exists.")
+                return existing
 
-            # Check if lesson already exists
-            existing_lesson = self.database.get_lesson(lesson_id)
-            if existing_lesson:
-                logger.info(f"Lesson {lesson_id} already exists in database, skipping")
-                return existing_lesson
-
-            # Create lesson
             tags_json = json.dumps(lesson_data.get("tags", []))
             lesson = self.database.create_lesson(
                 lesson_id=lesson_data["id"],
@@ -231,165 +196,86 @@ class LessonManager:
                 cefr_goal=lesson_data.get("cefr_goal"),
             )
 
-            # Create phrases for each dialogue
-            for dialogue in lesson_data.get("dialogues", []):
-                dialogue_id = dialogue["id"]
-                expected_text = ", ".join(dialogue.get("expected", []))
+            for dlg in lesson_data.get("dialogues", []):
+                dlg_id = dlg["id"]
+                expected_text = ", ".join(dlg.get("expected", []))
+                audio_path = f"{lesson_id}/{dlg['audio']}" if dlg.get("audio") else None
 
-                # Determine audio path
-                audio_path = None
-                if "audio" in dialogue and dialogue["audio"]:
-                    audio_path = f"{lesson_id}/{dialogue['audio']}"
-
-                phrase = self.database.create_phrase(
-                    phrase_id=dialogue_id,
+                self.database.create_phrase(
+                    phrase_id=dlg_id,
                     lesson_id=lesson_id,
                     text=expected_text,
-                    grammar=dialogue.get("grammar"),
+                    grammar=dlg.get("grammar"),
                     audio_path=audio_path,
                 )
-                logger.debug(f"Created phrase {dialogue_id} for lesson {lesson_id}")
-
-            logger.info(f"Saved lesson {lesson_id} to database")
             return lesson
-
         except Exception as e:
-            logger.error(f"Failed to save lesson {lesson_id} to database: {e}")
+            logger.error(f"Failed to save lesson {lesson_id}: {e}")
             return None
 
-    def get_lesson(self, lesson_id: str) -> Optional[Dict]:
-        """Get lesson from cache or load it.
+    # -------------------------------------------------------------------
+    # Cache and helpers
+    # -------------------------------------------------------------------
 
-        Args:
-            lesson_id: Lesson identifier
-
-        Returns:
-            Lesson data dictionary or None if not found
-        """
+    def get_lesson(self, lesson_id: str) -> Optional[Dict[str, Any]]:
         if lesson_id in self._cache:
             return self._cache[lesson_id]
-
         try:
             return self.load_lesson(lesson_id, validate=False)
         except FileNotFoundError:
             return None
 
     def clear_cache(self) -> None:
-        """Clear the lesson cache."""
         self._cache.clear()
         logger.info("Lesson cache cleared")
 
-    def cache_lesson(self, lesson_id: str, lesson_data: Dict) -> None:
-        """Cache a lesson (e.g., from AI generation) without saving to file.
-
-        Args:
-            lesson_id: Lesson identifier
-            lesson_data: Lesson data dictionary
-        """
+    def cache_lesson(self, lesson_id: str, lesson_data: Dict[str, Any]) -> None:
         self._cache[lesson_id] = lesson_data
         logger.info(f"Lesson {lesson_id} cached in memory")
 
-    def _validate_schema(self, lesson_data: Dict) -> None:
-        """Validate lesson JSON against schema.
+    # -------------------------------------------------------------------
+    # Validation helpers
+    # -------------------------------------------------------------------
 
-        Args:
-            lesson_data: Lesson data dictionary
-
-        Raises:
-            ValidationError: If schema validation fails
-        """
+    def _validate_schema(self, lesson_data: Dict[str, Any]) -> None:
         try:
             jsonschema.validate(instance=lesson_data, schema=LESSON_SCHEMA)
-            logger.debug(f"Schema validation passed for lesson {lesson_data.get('id')}")
         except ValidationError as e:
-            logger.error(f"Schema validation failed: {e.message}")
             raise ValueError(f"Invalid lesson schema: {e.message}") from e
 
-    def _validate_branches(self, lesson_data: Dict) -> None:
-        """Validate that all branch 'next' IDs exist in the lesson.
-
-        Args:
-            lesson_data: Lesson data dictionary
-
-        Raises:
-            ValueError: If branch validation fails
-        """
+    def _validate_branches(self, lesson_data: Dict[str, Any]) -> None:
         lesson_id = lesson_data["id"]
-        dialogues = lesson_data.get("dialogues", [])
+        dialogues: List[Dict[str, Any]] = lesson_data.get("dialogues", [])
+        dialogue_ids: Set[str] = {dlg["id"] for dlg in dialogues}
 
-        # Collect all dialogue IDs in this lesson
-        dialogue_ids: Set[str] = {dialogue["id"] for dialogue in dialogues}
+        missing: List[str] = []
+        for dlg in dialogues:
+            for opt in dlg.get("options", []):
+                nxt = opt.get("next")
+                if nxt and nxt not in dialogue_ids and not nxt.startswith(lesson_id):
+                    missing.append(nxt)
 
-        # Check all branch targets
-        missing_ids = []
-        for dialogue in dialogues:
-            options = dialogue.get("options", [])
-            for option in options:
-                next_id = option.get("next")
-                if next_id and next_id not in dialogue_ids:
-                    # Check if it's a lesson_id (format: lesson_id_dialogue_id)
-                    # For now, we only validate within the same lesson
-                    # Cross-lesson references would need all lessons loaded
-                    if not next_id.startswith(lesson_id):
-                        missing_ids.append((dialogue["id"], next_id))
+        if missing:
+            raise ValueError(f"Lesson {lesson_id} references missing IDs: {missing}")
 
-        if missing_ids:
-            error_msg = f"Branch validation failed for lesson {lesson_id}: "
-            error_msg += ", ".join(
-                [
-                    f"dialogue {d_id} references missing ID '{next_id}'"
-                    for d_id, next_id in missing_ids
-                ]
-            )
-            logger.error(error_msg)
-            raise ValueError(error_msg)
-
-        # Validate exactly one default option per dialogue with options
-        for dialogue in dialogues:
-            options = dialogue.get("options", [])
+        for dlg in dialogues:
+            options = dlg.get("options", [])
             if options:
-                default_count = sum(1 for opt in options if opt.get("default", False))
+                default_count = sum(1 for o in options if o.get("default", False))
                 if default_count != 1:
                     raise ValueError(
-                        f"Dialogue {dialogue['id']} must have exactly one default option, found {default_count}"
+                        f"Dialogue {dlg['id']} must have exactly one default option (found {default_count})"
                     )
 
-        logger.debug(f"Branch validation passed for lesson {lesson_id}")
-
-    def _validate_audio_files(self, lesson_data: Dict) -> None:
-        """Validate that referenced audio files exist.
-
-        Args:
-            lesson_data: Lesson data dictionary
-
-        Raises:
-            ValueError: If audio file validation fails
-        """
+    def _validate_audio_files(self, lesson_data: Dict[str, Any]) -> None:
         lesson_id = lesson_data["id"]
-        dialogues = lesson_data.get("dialogues", [])
-        missing_audio = []
-
-        for dialogue in dialogues:
-            # Check main audio file
-            if "audio" in dialogue and dialogue["audio"]:
-                audio_path = self.audio_base_dir / lesson_id / dialogue["audio"]
-                if not audio_path.exists():
-                    missing_audio.append(str(audio_path))
-
-            # Check slow audio file
-            if "audio_slow" in dialogue and dialogue["audio_slow"]:
-                audio_slow_path = (
-                    self.audio_base_dir / lesson_id / dialogue["audio_slow"]
-                )
-                if not audio_slow_path.exists():
-                    missing_audio.append(str(audio_slow_path))
-
-        if missing_audio:
-            error_msg = f"Audio file validation failed for lesson {lesson_id}: "
-            error_msg += "Missing files: " + ", ".join(missing_audio)
-            logger.warning(error_msg)
-            # Note: We warn but don't fail, as audio files might be generated later
-            # Uncomment the raise below if you want strict validation
-            # raise ValueError(error_msg)
-
-        logger.debug(f"Audio file validation passed for lesson {lesson_id}")
+        missing: List[str] = []
+        for dlg in lesson_data.get("dialogues", []):
+            for key in ("audio", "audio_slow"):
+                fname = dlg.get(key)
+                if fname:
+                    fpath = self.audio_base_dir / lesson_id / fname
+                    if not fpath.exists():
+                        missing.append(str(fpath))
+        if missing:
+            logger.warning(f"Audio files missing for {lesson_id}: {missing}")

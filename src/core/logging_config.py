@@ -77,6 +77,25 @@ class StructuredJSONFormatter(logging.Formatter):
         return json.dumps(log_entry, default=str, separators=(",", ":"))
 
 
+class RequiredContextFilter(logging.Filter):
+    """Ensure log records always expose expected context fields."""
+
+    def __init__(self, required_fields: Optional[tuple[str, ...]] = None):
+        super().__init__()
+        self.required_fields = required_fields or (
+            "correlation_id",
+            "request_id",
+            "user_id",
+            "job_id",
+        )
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        for field in self.required_fields:
+            if not hasattr(record, field):
+                setattr(record, field, None)
+        return True
+
+
 class ContextAdapter(logging.LoggerAdapter):
     """Logger adapter that adds context information to log records."""
 
@@ -141,6 +160,7 @@ def setup_structured_logging(
     logger = logging.getLogger()
     logger.setLevel(getattr(logging, log_level.upper(), logging.INFO))
     logger.handlers.clear()
+    context_filter = RequiredContextFilter()
 
     file_handler_configured = False
     if not disable_file_logs:
@@ -161,6 +181,7 @@ def setup_structured_logging(
                         datefmt="%Y-%m-%d %H:%M:%S",
                     )
                 )
+            file_handler.addFilter(context_filter)
             logger.addHandler(file_handler)
             file_handler_configured = True
         except PermissionError:
@@ -183,6 +204,7 @@ def setup_structured_logging(
                     datefmt="%Y-%m-%d %H:%M:%S",
                 )
             )
+        console_handler.addFilter(context_filter)
         logger.addHandler(console_handler)
 
     # ✅ FIXED SECTION — safe info log (no invalid `extra` keys)

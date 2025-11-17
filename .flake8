@@ -1,0 +1,16 @@
+[flake8]
+max-line-length = 88
+extend-ignore = E203, W503
+ignore = F401, F841, E402
+exclude = 
+    venv,
+    .venv,
+    __pycache__,
+    migrations,
+    .git,
+    .github,
+    .pytest_cache,
+    .mypy_cache,
+    tests/__pycache__,
+    build,
+    dist

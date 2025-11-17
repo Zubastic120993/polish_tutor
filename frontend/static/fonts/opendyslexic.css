@@ -1,0 +1,11 @@
+/* TailwindCSS v4 */
+@import "tailwindcss";
+
+/* Placeholder for OpenDyslexic; expects the font to be available locally or via CDN */
+@font-face {
+  font-family: 'OpenDyslexic';
+  font-style: normal;
+  font-weight: 400;
+  src: local('OpenDyslexic-Regular'), local('OpenDyslexic'),
+       url('https://fonts.cdnfonts.com/s/14842/OpenDyslexic-Regular.woff') format('woff');
+}
