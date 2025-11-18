@@ -17,6 +17,7 @@ load_dotenv()
 # Import Base and all models
 from src.core.database import Base
 from src.models import *  # noqa: F401, F403
+from src.models.v2 import *  # noqa: F401, F403
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

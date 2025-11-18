@@ -1,17 +1,28 @@
-"""Placeholder PhraseAttempt model for upcoming persistence work."""
+"""SQLAlchemy model for storing phrase evaluation attempts."""
 
-from typing import Optional
+from uuid import uuid4
 
-from pydantic import BaseModel
+from sqlalchemy import Column, DateTime, Float, Integer, String, Text, func
+
+from src.core.database import Base
+from src.models.v2._types import UUID
 
 
-class PhraseAttempt(BaseModel):
-    """Represents a single user attempt at speaking a phrase."""
+class PhraseAttempt(Base):
+    """Stores every user evaluation attempt with scoring details."""
 
-    phrase_id: str
-    user_id: str
-    transcript: str
-    audio_url: Optional[str] = None
-    score: float
-    passed: bool
-    feedback: Optional[str] = None
+    __tablename__ = "phrase_attempts"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    user_id = Column(UUID(as_uuid=True), index=True, nullable=False)
+    phrase_id = Column(String, index=True, nullable=False)
+    transcript = Column(Text, nullable=False)
+
+    score = Column(Float, nullable=False)
+    phonetic_distance = Column(Float, nullable=False)
+    semantic_accuracy = Column(Float, nullable=False)
+
+    response_time_ms = Column(Integer, nullable=True)
+    audio_ref = Column(String, nullable=True)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)

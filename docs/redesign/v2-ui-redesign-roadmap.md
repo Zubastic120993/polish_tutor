@@ -1,5 +1,5 @@
 # Patient Polish Tutor — UI Redesign Roadmap (v2.0.0 → v2.3.0)
-_Last updated: 2025-11-16_
+_Last updated: 2025-11-18_
 
 ## Phase A Completion Summary (v2.0.1)
 Phase A (React SPA foundation) is now **fully implemented** inside `frontend-react/`.
@@ -43,9 +43,9 @@ This version is tagged internally as `v2.0.1-alpha-stable`.
 
 ## Phase Options (Execute in Order)
 1. **A — React Component Implementation** (v2.0.x) — _DONE_  
-2. **B — Backend STT + Evaluation Endpoints** (v2.1.x) — NEXT  
-3. **C — Database Schema & Migrations** (v2.2.x)  
-4. **D — v2 UI Enhancements** (v2.3.x)  
+2. **B — Backend STT + Evaluation Endpoints** (v2.1.x) — IN PROGRESS  
+3. **C — Database Schema & Migrations** (v2.2.x) — _DONE (13479edb7ec9)_  
+4. **D — v2 UI Enhancements** (v2.3.x) — NEXT  
 
 > **Workflow rule:** Never break the order A → B → C → D.  
 > Frontend → Backend → DB → Enhanced UI.
@@ -60,8 +60,8 @@ This version is tagged internally as `v2.0.1-alpha-stable`.
 | Backend TTS (Murf) | ✅ | `/api/audio/generate` stable and cached |
 | Murf engine + caching | ✅ | Production-ready |
 | **A — React Chat UI** | **✅ DONE** | Entire Phase A delivered under `frontend-react/` |
-| **B — STT + Evaluation** | ❌ | Must implement Whisper STT + evaluator |
-| **C — Database (v2)** | ❌ | Need phrase_attempts, user_progress, CEFR metrics |
+| **B — STT + Evaluation** | 🔄 | Whisper STT + evaluator work progressing |
+| **C — Database (v2)** | ✅ | Migration `13479edb7ec9` adds all Phase C tables |
 | **D — UI Enhancements** | ❌ | Stars, CEFR badges, micro-animations |
 
 ---
@@ -187,15 +187,25 @@ Mock evaluator will be replaced by real STT → scoring pipeline.
 
 ---
 
-# Phase C — Database Schema (v2.2.x)
-Tables:
-- phrase_attempts  
-- user_progress  
-- user_stats  
-- daily_reviews  
-- cached_audio (optional)
+# Phase C — Database Schema (v2.2.x) ✅
 
-With full Alembic migrations.
+Migration `13479edb7ec9` introduces the complete v2 backend storage layer:
+
+- `phrase_attempts`: per-attempt scoring (phonetic + semantic + timing)
+- `user_progress`: lesson index, totals, CEFR level
+- `user_stats`: XP, streak, total attempts vs passes
+- `daily_reviews`: spaced-repetition scheduling metadata
+- `cached_audio`: deduplicated text → audio references
+
+**Storage strategy**
+- UUID primary keys with timezone-aware timestamps across all tables
+- SQLite continues as default dev DB, but schema uses SQLAlchemy UUID + indexes compatible with Postgres deployments
+- Evaluator + lesson services will persist attempts and update progress/stats in upcoming Phase D tasks
+
+**Next for Phase D**
+1. Wire `EvaluationService` + lesson flow to insert into `phrase_attempts`, update `user_progress`, and recompute `user_stats`
+2. Surface XP/streak + review queue counts in the React UI
+3. Use `daily_reviews` to schedule recap prompts and CEFR badge unlocks
 
 ---
 

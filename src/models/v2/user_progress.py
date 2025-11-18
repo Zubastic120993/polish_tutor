@@ -1,15 +1,23 @@
-"""Placeholder UserProgress model for upcoming persistence work."""
+"""SQLAlchemy model for per-lesson learner progress."""
 
-from typing import Optional
+from uuid import uuid4
 
-from pydantic import BaseModel
+from sqlalchemy import Column, DateTime, Integer, String, func
+
+from src.core.database import Base
+from src.models.v2._types import UUID
 
 
-class UserProgress(BaseModel):
-    """Tracks lightweight learner progress across phrases."""
+class UserProgress(Base):
+    """Tracks lesson progress and CEFR metadata for a user."""
 
-    user_id: str
-    current_phrase_id: Optional[str] = None
-    completed_phrases: int = 0
-    streak: int = 0
-    last_score: Optional[float] = None
+    __tablename__ = "user_progress"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    user_id = Column(UUID(as_uuid=True), index=True, nullable=False)
+    lesson_id = Column(String, index=True, nullable=False)
+    current_index = Column(Integer, default=0)
+    total = Column(Integer, default=0)
+
+    cefr_level = Column(String, default="A0")
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)

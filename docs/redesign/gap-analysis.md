@@ -1,5 +1,5 @@
 # Patient Polish Tutor — GAP Analysis (v2 Roadmap Alignment)
-*Last updated: 2025-11-16*
+*Last updated: 2025-11-18*
 
 This document evaluates the current repository against the v2 UI Redesign Roadmap, documenting which Phase A items are complete and what gaps remain for Phases B–D.
 
@@ -39,18 +39,20 @@ UI is ready. Backend must now implement Phase B endpoints.
 
 ---
 
-## 3. Database Gap Summary (Phase C)
+## 3. Database Summary (Phase C ✅)
 
-| Planned Table | Current State | Gap |
+Migration `13479edb7ec9` adds the entire v2 storage layer:
+
+| Table | Status | Notes |
 | --- | --- | --- |
-| `phrase_attempts` | Missing | Track per-phrase attempts & scoring |
-| `user_progress` | Missing | Store lesson completion + CEFR level |
-| `user_stats` | Partial SRS logic present | Extend with speaking metrics |
-| `daily_reviews` | Missing | Add spaced repetition scheduler |
-| `cached_audio` | Missing | Track Murf/Whisper audio references |
+| `phrase_attempts` | ✅ Added | Stores pronunciation + semantic scoring for every attempt |
+| `user_progress` | ✅ Added | Tracks lesson index, totals, and CEFR level |
+| `user_stats` | ✅ Added | Aggregated XP, streak, attempts, passes |
+| `daily_reviews` | ✅ Added | SM-2 style spaced repetition schedule |
+| `cached_audio` | ✅ Added | Hash + ref metadata for reusing generated audio |
 
-**Action:**  
-Implement SQLAlchemy models + Alembic migrations in Phase C.
+**Storage strategy:**  
+Models use timezone-aware timestamps and UUID PKs. SQLite remains default via `DATABASE_URL`, but the schema is Postgres-ready (UUID columns + indexes). Phase D will wire services to persist evaluator output, progress, and review queues, plus surface CEFR/XP metrics in the UI.
 
 ---
 
