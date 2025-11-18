@@ -21,6 +21,7 @@ class WhisperSTTService:
     """Wrapper around the official OpenAI GPT-4o STT endpoint."""
 
     def __init__(self, engine: str | None = None):
+        self.client: OpenAI | None = None
         # Correct default STT model
         self.engine = engine or os.getenv("STT_ENGINE", "gpt-4o-transcribe")
 
@@ -29,7 +30,7 @@ class WhisperSTTService:
             logger.warning(
                 "OPENAI_API_KEY is not configured. STT requests will fail at runtime."
             )
-            self.client = OpenAI()
+            self.client = None
         else:
             self.client = OpenAI(api_key=api_key)
 
@@ -37,6 +38,11 @@ class WhisperSTTService:
 
     def transcribe_base64(self, audio_base64: str) -> SpeechRecognitionResponse:
         """Decode Base64 audio and submit it to OpenAI for transcription."""
+        if self.client is None:
+            raise RuntimeError(
+                "OpenAI API key is not configured. Set OPENAI_API_KEY environment variable."
+            )
+
         temp_path: Path | None = None
 
         try:
