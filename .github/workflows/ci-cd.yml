@@ -97,12 +97,16 @@ jobs:
           DATABASE_URL: sqlite:///./test.db
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        if: always() && hashFiles('coverage.xml') != ''
+        uses: codecov/codecov-action@v5
+        continue-on-error: true
         with:
           file: ./coverage.xml
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: false
 
   # 🐳 3️⃣ Build & Push Docker Images
   build-and-push:
