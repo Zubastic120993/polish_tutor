@@ -1,5 +1,7 @@
 """Pydantic models for speech recognition endpoints."""
 
+from typing import List
+
 from pydantic import BaseModel
 
 
@@ -21,4 +23,4 @@ class SpeechRecognitionResponse(BaseModel):
     """Response containing the transcript and per-word timing."""
 
     transcript: str
-    words: list[WordTiming]
+    words: List[WordTiming]

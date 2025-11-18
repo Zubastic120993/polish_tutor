@@ -1,22 +1,32 @@
-"""Phase B: Evaluation endpoint (stub)."""
+"""Evaluation endpoint wiring real scoring pipeline."""
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+
 from src.schemas.v2.evaluate import EvaluateRequest, EvaluateResponse
+from src.services.evaluator import EvaluationService
 
-# IMPORTANT:
-# prefix="", and route path="" instead of "/"
-# gives final endpoint:  /api/v2/evaluate
 router = APIRouter(prefix="/evaluate")
-print("DEBUG: Evaluate router loaded with prefix:", router.prefix)
+
+TARGET_PHRASES = {
+    "p1": "cześć",
+    "p2": "jak się masz?",
+    "p3": "miłego dnia!",
+}
+
+_evaluation_service = EvaluationService()
 
 
 @router.post("", response_model=EvaluateResponse)
-async def evaluate(payload: EvaluateRequest):
-    """Stub evaluation endpoint — returns mock scoring."""
-    return EvaluateResponse(
-        score=0.88,
-        feedback="Mock feedback",
-        hint="Mock hint",
-        passed=True,
-        next_action="advance",
-    )
+async def evaluate(payload: EvaluateRequest) -> EvaluateResponse:
+    """Evaluate a user transcript for a specific phrase."""
+    if not payload.phrase_id.strip():
+        raise HTTPException(status_code=400, detail="phrase_id is required")
+    if not payload.user_transcript.strip():
+        raise HTTPException(status_code=400, detail="user_transcript is required")
+
+    target_phrase = TARGET_PHRASES.get(payload.phrase_id)
+    if not target_phrase:
+        raise HTTPException(status_code=404, detail="Unknown phrase_id")
+
+    result = _evaluation_service.evaluate(target_phrase, payload.user_transcript)
+    return EvaluateResponse(**result)

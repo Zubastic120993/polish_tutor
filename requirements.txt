@@ -18,7 +18,7 @@ python-jose[cryptography]>=3.3.0
 passlib[bcrypt]>=1.7.4
 
 # Speech & Audio
-openai>=1.0.0  # Conversational AI features
+openai>=1.50.0  # Conversational AI features
 httpx>=0.25.0  # HTTP client for Murf API
 requests>=2.31.0
 

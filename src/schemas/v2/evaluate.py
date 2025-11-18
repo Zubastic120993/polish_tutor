@@ -1,6 +1,6 @@
 """Pydantic models for pronunciation and semantic evaluation."""
 
-from typing import Literal
+from typing import Literal, Optional
 
 from pydantic import BaseModel
 
@@ -10,7 +10,7 @@ class EvaluateRequest(BaseModel):
 
     phrase_id: str
     user_transcript: str
-    audio_url: str
+    audio_url: Optional[str] = None
 
 
 class EvaluateResponse(BaseModel):
