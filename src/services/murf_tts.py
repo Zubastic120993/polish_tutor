@@ -1,5 +1,6 @@
 """Phase B: Murf TTS wrapper stub."""
 
+
 class MurfTTS:
     """
     Placeholder wrapper for Murf TTS in Phase B.

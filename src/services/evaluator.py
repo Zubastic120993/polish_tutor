@@ -1,5 +1,6 @@
 """Phase B: Evaluation stub service."""
 
+
 class EvaluatorService:
     """
     Stub for pronunciation + semantic evaluation.
@@ -16,5 +17,5 @@ class EvaluatorService:
             "feedback": "Stub feedback",
             "hint": "Stub hint",
             "passed": False,
-            "next_action": "retry"
+            "next_action": "retry",
         }
