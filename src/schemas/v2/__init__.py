@@ -1,1 +1,14 @@
-# Phase B module
+"""Public exports for v2 schema models."""
+
+from .speech import SpeechRecognitionRequest, SpeechRecognitionResponse, WordTiming
+from .evaluate import EvaluateRequest, EvaluateResponse
+from .lessons import LessonNextResponse
+
+__all__ = (
+    "SpeechRecognitionRequest",
+    "SpeechRecognitionResponse",
+    "WordTiming",
+    "EvaluateRequest",
+    "EvaluateResponse",
+    "LessonNextResponse",
+)

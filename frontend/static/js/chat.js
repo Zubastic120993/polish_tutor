@@ -14,7 +14,7 @@ class ChatUI {
         this.currentDialogueId = null;
         this.messageInput = document.getElementById('message-input');
         this.sendButton = document.getElementById('send-button');
-        this.micButton = document.getElementById('mic-button');
+        this.micButton = document.getElementById('micBtn') || document.getElementById('mic-button');
         this.startButton = document.getElementById('start-lesson-button');
         this.lessonOverlay = document.getElementById('welcome-overlay');
         this.welcomeDismiss = document.getElementById('welcome-dismiss');
@@ -84,7 +84,7 @@ class ChatUI {
         this.roadmapLevelLabel = document.getElementById('roadmap-level-label');
         this.supportButtons = {
             repeat: document.getElementById('support-repeat'),
-            hint: document.getElementById('support-hint'),
+            hint: document.getElementById('show-hints-button') || document.getElementById('support-hint'),
             slow: document.getElementById('support-slow'),
             topic: document.getElementById('support-topic'),
             culture: document.getElementById('support-culture')

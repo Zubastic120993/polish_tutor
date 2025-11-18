@@ -257,7 +257,7 @@ if (typeof window.ErrorHandler === 'undefined') {
                         this.showMessage('Microphone permission granted! You can now use voice input.', 'success');
                         errorEl.remove();
                         // Show mic button again if it was hidden
-                        const micButton = document.getElementById('mic-button');
+                        const micButton = document.getElementById('micBtn') || document.getElementById('mic-button');
                         if (micButton) {
                             micButton.style.display = '';
                             micButton.removeAttribute('aria-hidden');
@@ -395,7 +395,7 @@ if (typeof window.ErrorHandler === 'undefined') {
      * Enable text input mode (hide mic button, focus text input)
      */
     enableTextInputMode() {
-        const micButton = document.getElementById('mic-button');
+        const micButton = document.getElementById('micBtn') || document.getElementById('mic-button');
         const messageInput = document.getElementById('message-input');
         
         if (micButton) {

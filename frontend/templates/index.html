@@ -81,6 +81,17 @@
             </div>
         </div>
 
+        <div class="px-6 lg:px-10 pb-4 flex flex-wrap gap-3" id="quick-actions">
+            <button type="button" id="start-recommended-lesson" class="inline-flex items-center gap-2 rounded-full bg-cafe-mocha text-white px-5 py-2 text-sm font-semibold shadow-md">
+                <i data-feather="play-circle" aria-hidden="true"></i>
+                <span>Start Recommended Lesson</span>
+            </button>
+            <button type="button" id="browse-lessons" class="inline-flex items-center gap-2 rounded-full border border-cafe-hazelnut/50 bg-white px-5 py-2 text-sm font-semibold text-cafe-espresso shadow-sm">
+                <i data-feather="book" aria-hidden="true"></i>
+                <span>Browse Lessons</span>
+            </button>
+        </div>
+
         <main class="flex-1 px-6 lg:px-10 pb-6" id="main-content">
             <div class="layout-grid">
                 <aside class="flex flex-col gap-4 h-full">
@@ -168,6 +179,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <div id="lesson-catalog-list" class="lesson-library__legacy-list hidden" aria-live="polite"></div>
                         </div>
                     </section>
 
@@ -194,7 +206,7 @@
                                 <i data-feather="rotate-cw" class="control-button__icon" aria-hidden="true"></i>
                                 <span class="control-button__text">Repeat</span>
                             </button>
-                            <button class="control-button text-xs justify-center" type="button" data-action="hint" id="support-hint" title="Show an English hint">
+                            <button class="control-button text-xs justify-center" type="button" data-action="hint" id="show-hints-button" title="Show an English hint">
                                 <i data-feather="help-circle" class="control-button__icon" aria-hidden="true"></i>
                                 <span class="control-button__text">Hint</span>
                             </button>
@@ -295,8 +307,8 @@
                         </div>
                     </div>
 
-                    <div class="input-bar input-bar--conversation flex items-center gap-3 surface-card" role="region" aria-label="Reply to tutor" data-onboarding-target="input-area">
-                        <button class="input-bar__button input-bar__button--secondary rounded-2xl border border-cafe-hazelnut/50 bg-white/80 hover:bg-white transition" id="mic-button" aria-label="Start voice input" title="Click to speak – I will transcribe it" type="button" disabled>
+                    <div class="input-bar input-bar--conversation flex items-center gap-3 surface-card" role="region" aria-label="Reply to tutor" data-onboarding-target="input-area" id="bottom-input-bar">
+                        <button class="input-bar__button input-bar__button--secondary rounded-2xl border border-cafe-hazelnut/50 bg-white/80 hover:bg-white transition" id="micBtn" aria-label="Start voice input" title="Click to speak – I will transcribe it" type="button" disabled>
                             <i data-feather="mic" class="input-bar__button-icon"></i>
                         </button>
                         <textarea class="input-bar__input flex-1 bg-transparent text-sm placeholder:text-cafe-espresso/50 resize-none" id="message-input" placeholder="Type or dictate your reply…" rows="1" aria-label="Message input" aria-describedby="input-help" disabled></textarea>
@@ -310,12 +322,12 @@
         </main>
     </div>
 
-    <div class="modal" id="settings-modal" role="dialog" aria-labelledby="settings-modal-title" aria-hidden="true">
-        <div class="modal__overlay" id="settings-modal-overlay"></div>
+    <div class="modal hidden" id="settings-panel" role="dialog" aria-labelledby="settings-panel-title" aria-hidden="true">
+        <div class="modal__overlay" id="settings-panel-overlay"></div>
         <div class="modal__content modal__content--large">
             <div class="modal__header">
-                <h2 class="modal__title" id="settings-modal-title">Settings</h2>
-                <button class="modal__close" id="settings-modal-close" aria-label="Close settings">
+                <h2 class="modal__title" id="settings-panel-title">Settings</h2>
+                <button class="modal__close" id="settings-close" aria-label="Close settings">
                     <i data-feather="x"></i>
                 </button>
             </div>

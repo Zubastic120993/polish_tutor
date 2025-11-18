@@ -19,6 +19,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from src.api.routers import (
+    api_v2_router,
     audio,
     auth,
     backup,
@@ -110,6 +111,7 @@ app.include_router(user.router)
 app.include_router(audio.router)
 app.include_router(backup.router)
 app.include_router(error.router)
+app.include_router(api_v2_router)
 
 
 # WebSocket endpoint
@@ -176,8 +178,8 @@ async def health_check():
 
 @app.get("/")
 async def root(request: Request):
-    """Root endpoint - serve dashboard template."""
-    return templates.TemplateResponse("dashboard.html", {"request": request})
+    """Root endpoint - serve interactive tutor shell."""
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
 @app.get("/settings")
