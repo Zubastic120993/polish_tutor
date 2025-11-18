@@ -10,7 +10,9 @@ _lesson_flow_service = LessonFlowService()
 
 
 @router.get("/{lesson_id}/next", response_model=LessonNextResponse)
-async def get_next_phrase(lesson_id: str, index: int = Query(0, ge=0)) -> LessonNextResponse:
+async def get_next_phrase(
+    lesson_id: str, index: int = Query(0, ge=0)
+) -> LessonNextResponse:
     """Return the tutor phrase at the requested index."""
     try:
         result = _lesson_flow_service.get_next_phrase(lesson_id, index)

@@ -13,7 +13,9 @@ stt_service = WhisperSTTService()
 
 
 @router.post("/recognize", response_model=SpeechRecognitionResponse)
-async def recognize_speech(payload: SpeechRecognitionRequest) -> SpeechRecognitionResponse:
+async def recognize_speech(
+    payload: SpeechRecognitionRequest,
+) -> SpeechRecognitionResponse:
     """Transcribe learner audio using OpenAI's STT service."""
     try:
         return stt_service.transcribe_base64(payload.audio_base64)

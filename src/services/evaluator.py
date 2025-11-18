@@ -57,7 +57,10 @@ class EvaluationService:
     def _fallback_feedback(self, score: float) -> Tuple[str, str]:
         """Provide human-friendly feedback without LLM support."""
         if score >= 0.85:
-            return "Świetna wymowa i dobry sens zdania!", "Kontynuuj naukę kolejnych fraz."
+            return (
+                "Świetna wymowa i dobry sens zdania!",
+                "Kontynuuj naukę kolejnych fraz.",
+            )
         if score >= 0.6:
             return (
                 "Niezły wynik, ale warto dopracować wymowę i słownictwo.",
@@ -79,7 +82,9 @@ class EvaluationService:
                             return json.loads(text)
             output_text = getattr(response, "output_text", None)
             if output_text:
-                return json.loads(output_text[0] if isinstance(output_text, list) else output_text)
+                return json.loads(
+                    output_text[0] if isinstance(output_text, list) else output_text
+                )
         except Exception as exc:
             logger.warning("Failed to parse semantic response: %s", exc)
         return None
@@ -120,7 +125,9 @@ class EvaluationService:
             )
             payload = self._extract_semantic_payload(response)
             if payload:
-                score = self._clamp_score(payload.get("semantic_accuracy", fallback_score))
+                score = self._clamp_score(
+                    payload.get("semantic_accuracy", fallback_score)
+                )
                 feedback = payload.get("feedback") or ""
                 hint = payload.get("hint") or ""
                 return score, feedback, hint
