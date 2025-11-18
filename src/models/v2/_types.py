@@ -16,7 +16,7 @@ if _PGUUID is not None:
     UUID = _PGUUID  # type: ignore
 else:
 
-    class UUID(TypeDecorator):
+    class _UUIDFallback(TypeDecorator):
         """Fallback UUID type that stores stringified UUIDs."""
 
         impl = CHAR
@@ -42,3 +42,5 @@ else:
             if isinstance(value, uuid.UUID):
                 return value
             return uuid.UUID(str(value))
+
+    UUID = _UUIDFallback  # type: ignore[assignment]
