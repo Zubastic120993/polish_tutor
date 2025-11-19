@@ -1,7 +1,7 @@
 import { memo } from 'react'
 import { CefrBadge } from '../CefrBadge'
 import { ProgressBarXP } from './ProgressBarXP'
-import { StreakFlame } from './StreakFlame'
+import { StreakFlame } from '../StreakFlame'
 import { CefrProgressRing } from './CefrProgressRing'
 
 interface Props {
@@ -29,7 +29,6 @@ export const HeaderLayout = memo(function HeaderLayout({
   cefrProgress,
   isLoading,
 }: Props) {
-  const streakPulseId = streakPulseKey ? String(streakPulseKey) : null
   const xpDelta = !isLoading && xpFloatDelta > 0 ? xpFloatDelta : null
 
   return (
@@ -57,7 +56,7 @@ export const HeaderLayout = memo(function HeaderLayout({
             delta={xpDelta}
             isLoading={isLoading}
           />
-          <StreakFlame streak={streak} pulseKey={streakPulseId} isLoading={isLoading} />
+          <StreakFlame streak={streak} pulseKey={streakPulseKey} isLoading={isLoading} />
         </div>
       </div>
     </header>

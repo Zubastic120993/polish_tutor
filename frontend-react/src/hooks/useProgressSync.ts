@@ -9,7 +9,6 @@ const GC_INTERVAL = REFRESH_INTERVAL * 3
 const DEFAULT_CEFR = 'A0'
 const DEFAULT_XP = 0
 const DEFAULT_STREAK = 0
-const GLOBAL_MAX_XP = 5000
 
 const CEFR_THRESHOLDS = [
   { level: 'A0', min: 0, max: 600 },

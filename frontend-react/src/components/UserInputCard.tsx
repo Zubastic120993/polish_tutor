@@ -1,4 +1,4 @@
-import { FormEventHandler } from 'react'
+import type { FormEventHandler } from 'react'
 import { MicRecordButton } from './controls/MicRecordButton'
 
 interface Props {

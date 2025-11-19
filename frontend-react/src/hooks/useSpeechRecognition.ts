@@ -198,13 +198,14 @@ export function useSpeechRecognition() {
 
       const tick = () => {
         if (!analyserRef.current || !dataArrayRef.current) return
-        analyserRef.current.getFloatTimeDomainData(dataArrayRef.current)
+        const buffer = dataArrayRef.current
+        analyserRef.current.getFloatTimeDomainData(buffer as Float32Array<ArrayBuffer>)
         let sumSquares = 0
-        for (let i = 0; i < dataArrayRef.current.length; i += 1) {
-          const value = dataArrayRef.current[i]
+        for (let i = 0; i < buffer.length; i += 1) {
+          const value = buffer[i]
           sumSquares += value * value
         }
-        const rms = Math.sqrt(sumSquares / dataArrayRef.current.length)
+        const rms = Math.sqrt(sumSquares / buffer.length)
         const normalized = Math.min(1, rms * 3)
         setAmplitude(normalized)
         animationFrameRef.current = requestAnimationFrame(tick)
