@@ -1,5 +1,5 @@
 # Patient Polish Tutor — UI Redesign Roadmap (v2.0.0 → v2.3.0)
-_Last updated: 2025-11-18_
+_Last updated: 2026-03-20_
 
 ## Phase A Completion Summary (v2.0.1)
 Phase A (React SPA foundation) is now **fully implemented** inside `frontend-react/`.
@@ -42,10 +42,10 @@ This version is tagged internally as `v2.0.1-alpha-stable`.
 ---
 
 ## Phase Options (Execute in Order)
-1. **A — React Component Implementation** (v2.0.x) — _DONE_  
-2. **B — Backend STT + Evaluation Endpoints** (v2.1.x) — IN PROGRESS  
-3. **C — Database Schema & Migrations** (v2.2.x) — _DONE (13479edb7ec9)_  
-4. **D — v2 UI Enhancements** (v2.3.x) — NEXT  
+1. **A — React Component Implementation** (v2.0.x) — ✅ DONE  
+2. **B — Backend STT + Evaluation Endpoints** (v2.1.x) — ✅ DONE  
+3. **C — Database Schema & Migrations** (v2.2.x) — ✅ DONE (`13479edb7ec9`)  
+4. **D — v2 UI Enhancements** (v2.3.x) — ⏭ NEXT  
 
 > **Workflow rule:** Never break the order A → B → C → D.  
 > Frontend → Backend → DB → Enhanced UI.
@@ -60,9 +60,9 @@ This version is tagged internally as `v2.0.1-alpha-stable`.
 | Backend TTS (Murf) | ✅ | `/api/audio/generate` stable and cached |
 | Murf engine + caching | ✅ | Production-ready |
 | **A — React Chat UI** | **✅ DONE** | Entire Phase A delivered under `frontend-react/` |
-| **B — STT + Evaluation** | 🔄 | Whisper STT + evaluator work progressing |
+| **B — STT + Evaluation** | ✅ | `/api/v2/speech/recognize`, `/evaluate`, `/lesson/{id}` live with Whisper + LLM + persistence |
 | **C — Database (v2)** | ✅ | Migration `13479edb7ec9` adds all Phase C tables |
-| **D — UI Enhancements** | ❌ | Stars, CEFR badges, micro-animations |
+| **D — UI Enhancements** | 🚧 | Stars, CEFR badges, micro-animations (not started) |
 
 ---
 
@@ -149,41 +149,17 @@ Everything implemented as originally designed.
 
 ---
 
-# Phase B Preparation Notes (Important)
-Phase B introduces real audio processing:
+# Phase B Summary (v2.1.x — ✅)
+Phase B delivered the production backend stack:
 
-You must create:
-`src/api/v2/speech.py`  
-`src/api/v2/evaluate.py`  
-`src/api/v2/lesson.py`  
-`src/services/whisper_stt.py`  
-`src/services/murf_tts.py`  
-`src/services/evaluator.py`
+- `src/api/routers/v2/speech.py` → Base64 STT endpoint backed by `WhisperSTTService` (OpenAI gpt-4o-transcribe) returning transcript + per-word timings.
+- `src/api/routers/v2/evaluate.py` → Evaluation pipeline tying `LessonFlowService`, `EvaluationService`, `ProgressTracker`, and `StatsManager`. Results persist to `phrase_attempts`, `user_progress`, `user_stats`, and `daily_reviews`.
+- `src/api/routers/v2/lessons.py` → Lesson manifest + next-phrase endpoints that manage Murf audio via `SpeechEngine` and cache under `static/audio_cache_v2`.
+- Services: `whisper_stt.py`, `evaluator.py`, `speech_engine.py`, `progress_tracker.py`, `stats_manager.py` — all wired with env-based config and fault logging.
 
-Mock evaluator will be replaced by real STT → scoring pipeline.
-
----
-
-# Phase B — Backend STT + Evaluation (v2.1.x)
-## Endpoints
-
-### POST /api/v2/speech/recognize
-→ Whisper STT  
-→ Return transcript + word timings
-
-### POST /api/v2/evaluate
-→ Compare transcript to expected phrase  
-→ LLM semantic scoring + pronunciation scoring  
-→ Return score, feedback, hint, passed/failed  
-
-### GET /api/v2/lesson/{id}/next
-→ Backend progression (not React-side mock)
-
-## Order of Work
-1. Whisper STT  
-2. Evaluator (phonetic + semantic)  
-3. Lesson navigation  
-4. Mock-mode fallback  
+**Remaining work for Phase B frontend integration:**
+- Replace mock mic/evaluator in the React SPA with calls to the live endpoints.
+- Handle loading/error states and retries based on backend responses.
 
 ---
 
@@ -226,12 +202,11 @@ Features:
 | Phase | Version | Status |
 |-------|---------|--------|
 | A | v2.0.x | ✅ Done |
-| B | v2.1.x | 🚧 Next |
-| C | v2.2.x | Pending |
-| D | v2.3.x | Pending |
+| B | v2.1.x | ✅ Done (backend + persistence) |
+| C | v2.2.x | ✅ Done (migration `13479edb7ec9`) |
+| D | v2.3.x | 🚧 Upcoming |
 
 ---
 
 # Next Action
-Proceed to **Phase B**: implement STT + evaluator endpoints.  
-React UI remains unchanged until B → C → D are complete.
+Connect the React lesson flow to the live `/api/v2` endpoints, then begin Phase D UX upgrades (CEFR badges, adaptive hints, richer animations) once telemetry is stable.

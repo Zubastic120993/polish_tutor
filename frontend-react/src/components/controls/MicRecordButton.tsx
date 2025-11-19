@@ -7,6 +7,7 @@ interface Props {
   onToggle: () => void
   amplitude?: number
   elapsedSeconds?: number
+  className?: string
 }
 
 const formatTime = (seconds = 0) => {
@@ -23,6 +24,7 @@ export function MicRecordButton({
   onToggle,
   amplitude = 0,
   elapsedSeconds = 0,
+  className = '',
 }: Props) {
   const showWaveform = isRecording || isTranscribing
   const label = isRecording ? 'Recording…' : isTranscribing ? 'Processing…' : 'Tap to speak'
@@ -45,7 +47,7 @@ export function MicRecordButton({
       type="button"
       onClick={onToggle}
       disabled={disabled || isTranscribing}
-      className={`${baseClasses} ${toneClasses}`}
+      className={`${baseClasses} ${toneClasses} ${className}`.trim()}
     >
       <div className="flex items-center gap-3">
         <div className="relative flex h-12 w-12 items-center justify-center rounded-full">

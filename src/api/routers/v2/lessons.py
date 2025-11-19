@@ -13,7 +13,9 @@ from src.services.speech_engine import SpeechEngine
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter()
+# ADD PREFIX HERE
+router = APIRouter(prefix="/api/v2/lesson", tags=["lesson-v2"])
+
 _lesson_flow_service = LessonFlowService()
 
 PROJECT_ROOT = Path(__file__).resolve().parents[4]

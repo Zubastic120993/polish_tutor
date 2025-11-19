@@ -1,5 +1,5 @@
 # Patient Polish Tutor — GAP Analysis (v2 Roadmap Alignment)
-*Last updated: 2025-11-18*
+*Last updated: 2026-03-20*
 
 This document evaluates the current repository against the v2 UI Redesign Roadmap, documenting which Phase A items are complete and what gaps remain for Phases B–D.
 
@@ -24,15 +24,15 @@ All remaining frontend gaps belong to Phases B–D.
 
 ---
 
-## 2. Backend Gap Summary (Phase B Next)
+## 2. Backend Gap Summary (Phase B Complete)
 
 | Planned Endpoint | Current State | Gap |
 | --- | --- | --- |
-| `POST /api/v2/speech/recognize` | Missing | Implement Whisper STT service |
-| `POST /api/v2/evaluate` | Missing | Implement evaluator (phonetic + semantic scoring) |
-| `GET /api/v2/lesson/{id}/next` | Missing | Backend phrase progression engine |
-| Evaluation pipeline | None | Build phonetic distance + semantic accuracy pipeline |
-| Adaptive progression | None | Add lesson context + difficulty tracking |
+| `POST /api/v2/speech/recognize` | **Implemented** — OpenAI Whisper (gpt-4o-transcribe) with Base64 payload + per-word timings | Add load/error telemetry + rate limiting (Phase D) |
+| `POST /api/v2/evaluate` | **Implemented** — LLM semantic scoring + persistence through `ProgressTracker` | Expand phonetic metrics + multi-phrase attempts (Phase D) |
+| `GET /api/v2/lesson/{id}/next` | **Implemented** — LessonFlow mock + Murf audio caching | Swap mock lessons for DB-backed catalog in Phase C/D |
+| Evaluation pipeline | **Active** — `EvaluationService`, `SpeechEngine`, `StatsManager` | Tune thresholds, connect adaptive difficulty |
+| Adaptive progression | **Partially stubbed** — lesson lookup + stats updates | Real difficulty engine + CEFR gating (Phase D) |
 
 **Summary:**  
 UI is ready. Backend must now implement Phase B endpoints.
@@ -82,10 +82,10 @@ Phase B and Phase C will replace mocks with real logic.
 
 ## 6. Recommended Next Steps
 
-1. **Begin Phase B** — Implement `/speech/recognize`, `/evaluate`, and `/lesson/{id}/next` under `/api/v2`.  
-2. Connect React UI to new endpoints (replace mocks without UI redesign).  
-3. **Phase C** — Add SQL models + migrations.  
-4. **Phase D** — Add advanced UI/UX (animations, CEFR dashboard, scoring stars, adaptive hints).
+1. **Frontend Integration** — Connect the React chat flow to the existing `/speech/recognize`, `/evaluate`, and `/lesson/{id}/next` endpoints (Phase B frontend work).  
+2. **Lesson Data Source** — Replace the in-memory `LessonFlowService` map with DB-backed lessons (Phase C follow-up).  
+3. **Adaptive + CEFR UX** — Surface stats, XP, CEFR badges, and richer animations once backend telemetry is stable (Phase D).  
+4. **Observability** — Add monitoring around Whisper/Murf usage and DB persistence to catch failures early.
 
 ---
 

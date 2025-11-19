@@ -7,7 +7,13 @@ LESSONS: Dict[str, List[Dict[str, str]]] = {
         {"id": "p1", "pl": "Cześć!", "en": "Hi!"},
         {"id": "p2", "pl": "Jak się masz?", "en": "How are you?"},
         {"id": "p3", "pl": "Miłego dnia!", "en": "Have a good day!"},
-    ]
+    ],
+    "p1": [
+        {"id": "p1_1", "pl": "Cześć!", "en": "Hi!"},
+        {"id": "p1_2", "pl": "Jak się masz?", "en": "How are you?"},
+        {"id": "p1_3", "pl": "Dobrze, dziękuję!", "en": "Good, thank you!"},
+        {"id": "p1_4", "pl": "Miło cię poznać.", "en": "Nice to meet you."},
+    ],
 }
 
 

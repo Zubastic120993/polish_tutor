@@ -29,6 +29,10 @@ class EvaluationResult:
     next_action: str
     phonetic_similarity: float
     semantic_accuracy: float
+    difficulty: str
+    error_type: Optional[str]
+    recommendation: str
+    focus_word: Optional[str]
 
     @property
     def phonetic_distance(self) -> float:
@@ -41,6 +45,10 @@ class EvaluationResult:
             "hint": self.hint,
             "passed": self.passed,
             "next_action": self.next_action,
+            "difficulty": self.difficulty,
+            "error_type": self.error_type,
+            "recommendation": self.recommendation,
+            "focus_word": self.focus_word,
         }
 
 
@@ -89,6 +97,55 @@ class EvaluationService:
     @staticmethod
     def _clamp(value: float) -> float:
         return max(0.0, min(1.0, float(value)))
+
+    @staticmethod
+    def _extract_focus_word(text: str) -> Optional[str]:
+        """Attempt to pull a focus word from evaluator reason text."""
+        if not text:
+            return None
+        # Prefer quoted fragments such as "słowo"
+        quote_match = re.search(r"[\"“”'‘’](.+?)[\"“”'‘’]", text)
+        if quote_match:
+            focus = quote_match.group(1).strip()
+            if focus and " " not in focus:
+                return focus
+        # fallback: pick last single word mentioned after keywords
+        for keyword in ("word", "słowo", "wyraz"):
+            idx = text.lower().find(keyword)
+            if idx != -1:
+                fragment = text[idx + len(keyword) :].strip()
+                candidate = fragment.split()[0] if fragment else ""
+                candidate = re.sub(r"[^A-Za-zĄąĆćĘęŁłŃńÓóŚśŹźŻż-]", "", candidate)
+                if candidate:
+                    return candidate
+        return None
+
+    @classmethod
+    def _infer_midrange_metadata(cls, reason: str):
+        """Return (error_type, recommendation, focus_word) for mid scores."""
+        reason_lower = (reason or "").lower()
+        focus_word = None
+
+        if any(
+            keyword in reason_lower for keyword in ("pronunciation", "accent", "akcent")
+        ):
+            return "pronunciation", "slow_down", None
+
+        if any(
+            keyword in reason_lower
+            for keyword in ("wrong word", "word choice", "słowo", "wyraz")
+        ):
+            focus_word = cls._extract_focus_word(reason)
+            return "word_choice", "repeat_focus_word", focus_word
+
+        if any(keyword in reason_lower for keyword in ("missing", "brakuje")):
+            return "missing_word", "repeat_core", None
+
+        if "order" in reason_lower or "kolejność" in reason_lower:
+            return "order", "repeat_core", None
+
+        # Default mid-range guidance
+        return "missing_word", "repeat_core", None
 
     # =====================================================================
     # Synchronous LLM scoring (run in thread pool)
@@ -188,6 +245,26 @@ class EvaluationService:
         else:
             hint = "Powtórz zdanie powoli, akcentując polskie znaki."
 
+        if score >= 0.85:
+            difficulty = "easy"
+            recommendation = "proceed"
+            error_type = None
+            focus_word = None
+        elif score >= 0.6:
+            difficulty = "medium"
+            error_type, recommendation, focus_word = self._infer_midrange_metadata(
+                reason
+            )
+        else:
+            difficulty = "hard"
+            recommendation = "full_retry"
+            reason_lower = (reason or "").lower()
+            if "order" in reason_lower or "kolejność" in reason_lower:
+                error_type = "order"
+            else:
+                error_type = "missing_word"
+            focus_word = None
+
         return EvaluationResult(
             score=round(score, 2),
             feedback=feedback,
@@ -196,4 +273,8 @@ class EvaluationService:
             next_action="advance" if passed else "retry",
             phonetic_similarity=score,
             semantic_accuracy=score,
+            difficulty=difficulty,
+            error_type=error_type,
+            recommendation=recommendation,
+            focus_word=focus_word,
         )
