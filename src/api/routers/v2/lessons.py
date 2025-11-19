@@ -90,7 +90,10 @@ async def get_next_phrase(
     except IndexError:
         raise HTTPException(status_code=400, detail="index out of range") from None
 
-    phrase_id = cast(str, result.pop("phrase_id", f"{lesson_id}_{cast(int, result['current_index'])}"))
+    phrase_id = cast(
+        str,
+        result.pop("phrase_id", f"{lesson_id}_{cast(int, result['current_index'])}"),
+    )
     audio_url = result.get("audio_url")
     if audio_url:
         filename = Path(cast(str, audio_url)).name
