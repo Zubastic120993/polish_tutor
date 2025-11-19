@@ -58,7 +58,8 @@ class WhisperSTTService:
                 transcription = self.client.audio.transcriptions.create(
                     file=audio_file,
                     model=self.engine,
-                    response_format="json",  # FIXED: must be json
+                    response_format="json",
+                    language="pl",
                     timestamp_granularities=["word"],
                 )
 

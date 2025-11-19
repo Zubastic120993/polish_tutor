@@ -1,43 +1,49 @@
 export type LessonState =
-  | 'TUTOR_SPEAKING'
-  | 'WAITING_FOR_USER'
+  | 'IDLE'
+  | 'TUTOR_PROMPT'
   | 'RECORDING'
+  | 'STT'
   | 'EVALUATING'
   | 'FEEDBACK'
-  | 'NEXT_PHRASE'
-  | 'FINISHED'
+  | 'NEXT'
+  | 'COMPLETE'
 
 export type LessonEvent =
-  | 'SHOW_TUTOR'
-  | 'AWAIT_USER'
-  | 'BEGIN_RECORDING'
-  | 'EVALUATE'
+  | 'PROMPT_READY'
+  | 'ENABLE_RECORDING'
+  | 'BEGIN_STT'
+  | 'TRANSCRIPT_READY'
+  | 'REQUEST_EVAL'
   | 'SHOW_FEEDBACK'
+  | 'RETRY'
   | 'ADVANCE'
-  | 'COMPLETE'
+  | 'FINISH'
 
 export function nextState(current: LessonState, event: LessonEvent): LessonState {
   switch (current) {
-    case 'TUTOR_SPEAKING':
-      return event === 'AWAIT_USER' ? 'WAITING_FOR_USER' : current
-    case 'WAITING_FOR_USER':
-      if (event === 'BEGIN_RECORDING') return 'RECORDING'
-      return current
+    case 'IDLE':
+      return event === 'PROMPT_READY' ? 'TUTOR_PROMPT' : current
+    case 'TUTOR_PROMPT':
+      return event === 'ENABLE_RECORDING' ? 'RECORDING' : current
     case 'RECORDING':
-      if (event === 'EVALUATE') return 'EVALUATING'
+      if (event === 'BEGIN_STT') return 'STT'
+      if (event === 'REQUEST_EVAL') return 'EVALUATING'
       return current
+    case 'STT':
+      return event === 'TRANSCRIPT_READY' ? 'EVALUATING' : current
     case 'EVALUATING':
-      if (event === 'SHOW_FEEDBACK') return 'FEEDBACK'
-      return current
+      return event === 'SHOW_FEEDBACK' ? 'FEEDBACK' : current
     case 'FEEDBACK':
-      if (event === 'ADVANCE') return 'NEXT_PHRASE'
+      if (event === 'ADVANCE') return 'NEXT'
+      if (event === 'RETRY') return 'RECORDING'
+      if (event === 'FINISH') return 'COMPLETE'
       return current
-    case 'NEXT_PHRASE':
-      if (event === 'SHOW_TUTOR') return 'TUTOR_SPEAKING'
-      if (event === 'COMPLETE') return 'FINISHED'
+    case 'NEXT':
+      if (event === 'PROMPT_READY') return 'TUTOR_PROMPT'
+      if (event === 'FINISH') return 'COMPLETE'
       return current
-    case 'FINISHED':
+    case 'COMPLETE':
     default:
-      return 'FINISHED'
+      return 'COMPLETE'
   }
 }

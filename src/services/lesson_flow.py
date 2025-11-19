@@ -1,6 +1,6 @@
 """Lesson flow service providing sequential tutor phrases."""
 
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 LESSONS: Dict[str, List[Dict[str, str]]] = {
     "lesson_mock_001": [
@@ -16,6 +16,10 @@ class LessonFlowService:
 
     def __init__(self, lessons: Dict[str, List[Dict[str, str]]] | None = None) -> None:
         self._lessons = lessons or LESSONS
+        self._phrase_lookup: Dict[str, Tuple[str, int, Dict[str, str]]] = {}
+        for lesson_id, phrases in self._lessons.items():
+            for index, phrase in enumerate(phrases):
+                self._phrase_lookup[phrase["id"]] = (lesson_id, index, phrase)
 
     def get_next_phrase(self, lesson_id: str, index: int) -> Dict[str, object]:
         """
@@ -34,6 +38,7 @@ class LessonFlowService:
 
         phrase = lesson[index]
         tutor_phrase = phrase["pl"]
+        phrase_id = phrase.get("id", f"{lesson_id}_{index}")
 
         return {
             "lesson_id": lesson_id,
@@ -41,4 +46,25 @@ class LessonFlowService:
             "total": total,
             "tutor_phrase": tutor_phrase,
             "expected_phrases": [tutor_phrase],
+            "phrase_id": phrase_id,
         }
+
+    def find_phrase(self, phrase_id: str) -> Tuple[str, int, Dict[str, str]]:
+        """Return lesson metadata for a phrase id."""
+        if phrase_id not in self._phrase_lookup:
+            raise KeyError(f"Unknown phrase_id '{phrase_id}'")
+        return self._phrase_lookup[phrase_id]
+
+    def total_for_lesson(self, lesson_id: str) -> int:
+        """Return total phrases for a lesson."""
+        lesson = self._lessons.get(lesson_id)
+        if not lesson:
+            raise KeyError(f"Unknown lesson_id '{lesson_id}'")
+        return len(lesson)
+
+    def lesson_phrases(self, lesson_id: str) -> List[Dict[str, str]]:
+        """Return immutable copy of lesson phrase metadata."""
+        lesson = self._lessons.get(lesson_id)
+        if not lesson:
+            raise KeyError(f"Unknown lesson_id '{lesson_id}'")
+        return [dict(phrase) for phrase in lesson]

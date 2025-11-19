@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
 import { LessonChatPage } from './pages/LessonChatPage'
-import { LessonSummaryPage } from './components/LessonSummaryPage'
+import { LessonSummaryPage } from './pages/LessonSummaryPage'
 
 function App() {
   return (
