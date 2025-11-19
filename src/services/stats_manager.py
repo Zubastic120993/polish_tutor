@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 try:  # pragma: no cover - allow tests to stub src.models
     from src.models.v2 import UserStats
 except ModuleNotFoundError:
-    UserStats = object  # type: ignore[assignment]
+    UserStats = object  # type: ignore
 
 
 @dataclass

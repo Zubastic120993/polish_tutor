@@ -15,7 +15,7 @@ from src.core.database import SessionLocal
 try:  # pragma: no cover - fallback for test stubs
     from src.models.v2 import DailyReview, PhraseAttempt, UserProgress
 except ModuleNotFoundError:  # tests may stub src.models
-    DailyReview = PhraseAttempt = UserProgress = object  # type: ignore[assignment]
+    DailyReview = PhraseAttempt = UserProgress = object  # type: ignore
 from src.services.stats_manager import StatsManager, StatsDelta
 
 
