@@ -1,13 +1,15 @@
 import type { FormEvent } from 'react'
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { CefrBadge } from '../components/CefrBadge'
-import { ChatContainer } from '../components/ChatContainer'
-import { HeaderStats } from '../components/HeaderStats'
 import { KeyPhrasesCard } from '../components/KeyPhrasesCard'
 import { ProgressIndicator } from '../components/controls/ProgressIndicator'
 import { UserInputCard } from '../components/UserInputCard'
+import { HeaderLayout } from '../components/header/HeaderLayout'
+import { TutorBubble } from '../components/TutorBubble'
+import { FeedbackMessage } from '../components/messages/FeedbackMessage'
+import { TypingIndicator } from '../components/messages/TypingIndicator'
 
 import { useEvaluation } from '../hooks/useEvaluation'
 import { useLessonV2 } from '../hooks/useLessonV2'
@@ -17,6 +19,7 @@ import { useAudioQueue } from '../state/useAudioQueue'
 
 import { nextState, type LessonState } from '../state/lessonMachine'
 import type { ChatMessage } from '../types/chat'
+import type { EvaluationErrorType, EvaluationRecommendation } from '../types/evaluation'
 
 interface SummaryEntry {
   phraseId: string
@@ -28,6 +31,13 @@ interface LessonSummary {
   total: number
   correct: number
   attempts: SummaryEntry[]
+}
+
+type LessonChatMessage = ChatMessage & {
+  nextAction?: 'advance' | 'retry'
+  error_type?: EvaluationErrorType
+  recommendation?: EvaluationRecommendation
+  focus_word?: string | null
 }
 
 const createId = () =>
@@ -42,7 +52,7 @@ export function LessonChatPage() {
 
   // State
   const [state, setState] = useState<LessonState>('IDLE')
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [messages, setMessages] = useState<LessonChatMessage[]>([])
   const [typing, setTyping] = useState(false)
   const [manualInput, setManualInput] = useState('')
   const [summary, setSummary] = useState<LessonSummary>({
@@ -60,8 +70,19 @@ export function LessonChatPage() {
     useLessonV2(lessonId)
 
   const evaluation = useEvaluation()
-  const { xp, streak, cefrLevel, applyResult, xpFloatDelta, xpFloatKey, streakPulseKey } =
-    useProgressSync()
+  const {
+    xp,
+    streak,
+    cefrLevel,
+    applyResult,
+    xpFloatDelta,
+    xpFloatKey,
+    streakPulseKey,
+    isLoading: isProgressLoading,
+    xpToNext,
+    xpLevelProgress,
+    cefrProgress,
+  } = useProgressSync()
 
   const {
     startRecording,
@@ -81,6 +102,25 @@ export function LessonChatPage() {
   const autoAdvanceTimeoutRef = useRef<number | null>(null)
   const successAudioRef = useRef<HTMLAudioElement | null>(null)
   const shouldScrollRef = useRef(false)
+  const bottomRef = useRef<HTMLDivElement | null>(null)
+  const lastUserMessageIdRef = useRef<string | null>(null)
+  const userHighlightTimeoutRef = useRef<number | null>(null)
+  const tutorHighlightTimeoutRef = useRef<number | null>(null)
+  const micShakeTimeoutRef = useRef<number | null>(null)
+  const fullRetryTimeoutRef = useRef<number | null>(null)
+  const messagesRef = useRef<LessonChatMessage[]>([])
+
+  const [highlightedUserId, setHighlightedUserId] = useState<string | null>(null)
+  const [highlightedTutorId, setHighlightedTutorId] = useState<string | null>(null)
+  const [retryMeta, setRetryMeta] = useState<{
+    recommendation: EvaluationRecommendation
+    focusWord: string | null
+  }>({
+    recommendation: 'proceed',
+    focusWord: null,
+  })
+  const [micShake, setMicShake] = useState(false)
+  const [fullRetryShake, setFullRetryShake] = useState(false)
 
   const totalPhrases = tutorTurn?.total ?? manifest?.phrases.length ?? 0
 
@@ -98,6 +138,10 @@ export function LessonChatPage() {
       setSummary((prev) => ({ ...prev, total: manifest.phrases.length }))
     }
   }, [manifest])
+
+  useEffect(() => {
+    messagesRef.current = messages
+  }, [messages])
 
   // On complete
   useEffect(() => {
@@ -174,6 +218,23 @@ export function LessonChatPage() {
     }
   }, [])
 
+  useEffect(() => {
+    return () => {
+      if (userHighlightTimeoutRef.current) {
+        window.clearTimeout(userHighlightTimeoutRef.current)
+      }
+      if (tutorHighlightTimeoutRef.current) {
+        window.clearTimeout(tutorHighlightTimeoutRef.current)
+      }
+      if (micShakeTimeoutRef.current) {
+        window.clearTimeout(micShakeTimeoutRef.current)
+      }
+      if (fullRetryTimeoutRef.current) {
+        window.clearTimeout(fullRetryTimeoutRef.current)
+      }
+    }
+  }, [])
+
   // Auto scroll
   useEffect(() => {
     if (!shouldScrollRef.current) return
@@ -184,6 +245,10 @@ export function LessonChatPage() {
     shouldScrollRef.current = false
   }, [messages])
 
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, typing])
+
   // Success sound
   const playSuccessSound = useCallback(() => {
     try {
@@ -193,6 +258,87 @@ export function LessonChatPage() {
       audio.play().catch(() => undefined)
     } catch {}
   }, [])
+
+  const triggerUserHighlight = useCallback((messageId: string | null) => {
+    if (!messageId) return
+    setHighlightedUserId(messageId)
+    if (userHighlightTimeoutRef.current) {
+      window.clearTimeout(userHighlightTimeoutRef.current)
+    }
+    userHighlightTimeoutRef.current = window.setTimeout(() => {
+      setHighlightedUserId(null)
+    }, 320)
+  }, [])
+
+  const handleManualAudioPlay = useCallback(
+    (audioUrl?: string) => {
+      if (!audioUrl) return
+      hasUserInteracted.current = true
+      playAudio(audioUrl)
+    },
+    [playAudio],
+  )
+
+  const triggerTutorHighlight = useCallback((messageId: string | null) => {
+    if (!messageId) return
+    setHighlightedTutorId(messageId)
+    if (tutorHighlightTimeoutRef.current) {
+      window.clearTimeout(tutorHighlightTimeoutRef.current)
+    }
+    tutorHighlightTimeoutRef.current = window.setTimeout(() => {
+      setHighlightedTutorId(null)
+    }, 600)
+  }, [])
+
+  const triggerTutorAssist = useCallback(() => {
+    const lastTutor = [...messagesRef.current].reverse().find((msg) => msg.sender === 'tutor')
+    if (!lastTutor) return
+    if (lastTutor.audioUrl) {
+      handleManualAudioPlay(lastTutor.audioUrl)
+    }
+    if (typeof document !== 'undefined') {
+      const node = document.getElementById(`message-${lastTutor.id}`)
+      node?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+    triggerTutorHighlight(lastTutor.id)
+  }, [handleManualAudioPlay, triggerTutorHighlight])
+
+  const triggerMicShake = useCallback(() => {
+    setMicShake(true)
+    if (micShakeTimeoutRef.current) {
+      window.clearTimeout(micShakeTimeoutRef.current)
+    }
+    micShakeTimeoutRef.current = window.setTimeout(() => {
+      setMicShake(false)
+    }, 500)
+  }, [])
+
+  const triggerFullRetryShake = useCallback(() => {
+    setFullRetryShake(true)
+    if (fullRetryTimeoutRef.current) {
+      window.clearTimeout(fullRetryTimeoutRef.current)
+    }
+    fullRetryTimeoutRef.current = window.setTimeout(() => {
+      setFullRetryShake(false)
+    }, 600)
+  }, [])
+
+  const applyRecommendationEffects = useCallback(
+    (recommendation: EvaluationRecommendation = 'proceed', focusWord?: string | null) => {
+      setRetryMeta({ recommendation, focusWord: focusWord ?? null })
+      if (recommendation === 'slow_down') {
+        triggerMicShake()
+      }
+      if (recommendation === 'repeat_core') {
+        triggerTutorAssist()
+      }
+      if (recommendation === 'full_retry') {
+        triggerMicShake()
+        triggerFullRetryShake()
+      }
+    },
+    [triggerMicShake, triggerFullRetryShake, triggerTutorAssist],
+  )
 
   // Handle advancing
   const handleAdvance = (action: 'advance' | 'retry') => {
@@ -224,15 +370,17 @@ export function LessonChatPage() {
 
     setIsEvaluating(true)
 
+    const userMessageId = createId()
     setMessages((prev) => [
       ...prev,
       {
-        id: createId(),
+        id: userMessageId,
         sender: 'user',
         text: trimmed,
         transcriptSource: source,
       },
     ])
+    lastUserMessageIdRef.current = userMessageId
 
     const event = source === 'speech' ? 'TRANSCRIPT_READY' : 'REQUEST_EVAL'
     setState((prev) => nextState(prev, event))
@@ -258,21 +406,28 @@ export function LessonChatPage() {
       const tone: ChatMessage['tone'] =
         result.passed ? 'success' : result.score >= 0.6 ? 'warning' : 'error'
 
+      const feedbackId = createId()
       setMessages((prev) => [
         ...prev,
         {
-          id: createId(),
+          id: feedbackId,
           sender: 'feedback',
           text: result.feedback,
           hint: result.hint,
           score: result.score,
           tone,
+          nextAction: result.next_action,
+          error_type: result.error_type ?? null,
+          recommendation: result.recommendation,
+          focus_word: result.focus_word ?? null,
         },
       ])
 
+      applyRecommendationEffects(result.recommendation ?? 'proceed', result.focus_word ?? null)
       setState((prev) => nextState(prev, 'SHOW_FEEDBACK'))
 
       if (result.passed) {
+        triggerUserHighlight(lastUserMessageIdRef.current)
         playSuccessSound()
         setManualInput('')
         setIsAutoAdvancing(true)
@@ -330,50 +485,46 @@ export function LessonChatPage() {
     }
   }
 
-  // Manual audio play handler (when user clicks play button)
-  const handleManualAudioPlay = useCallback((audioUrl: string) => {
-    // Mark that user has interacted
-    hasUserInteracted.current = true
-    playAudio(audioUrl)
-  }, [playAudio])
-
   const canRespond = state === 'RECORDING'
   const controlsDisabled = !canRespond || isEvaluating || isAutoAdvancing
+  const shouldShowFocusBanner = retryMeta.recommendation === 'repeat_focus_word'
+  const shouldShowFullRetryCard = retryMeta.recommendation === 'full_retry'
+  const micClassName = [
+    retryMeta.recommendation === 'slow_down' ? 'animate-pulse' : '',
+    micShake ? 'animate-shake' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100">
       <div className="mx-auto flex min-h-screen w-full max-w-4xl flex-col px-4 py-8 text-slate-900 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <header className="rounded-3xl border border-slate-100 bg-white/90 px-6 py-6 shadow-sm shadow-slate-200">
-          <div className="flex flex-wrap items-center justify-between gap-6">
-            <div>
-              <p className="text-sm font-medium uppercase tracking-wide text-slate-500">Lesson</p>
-              <h1 className="text-2xl font-semibold text-slate-900">
-                {manifest?.lessonId ?? lessonId}
-              </h1>
-              <p className="text-sm text-slate-500">Stay in the flow and earn XP.</p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <CefrBadge level={cefrLevel} />
-              <HeaderStats
-                xp={xp}
-                streak={streak}
-                xpFloatDelta={xpFloatDelta}
-                xpFloatKey={xpFloatKey}
-                streakPulseKey={streakPulseKey}
-              />
-            </div>
+        <HeaderLayout
+          xp={xp}
+          xpToNext={xpToNext}
+          xpLevelProgress={xpLevelProgress}
+          xpFloatDelta={xpFloatDelta}
+          xpFloatKey={xpFloatKey}
+          streak={streak}
+          streakPulseKey={streakPulseKey}
+          cefrLevel={cefrLevel}
+          cefrProgress={cefrProgress}
+          isLoading={isProgressLoading}
+        />
+        <div className="mt-5 rounded-3xl border border-slate-100 bg-white px-6 py-4 shadow-sm shadow-slate-200">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Lesson</p>
+            <p className="text-lg font-semibold text-slate-900">{manifest?.lessonId ?? lessonId}</p>
           </div>
-
-          <div className="mt-5">
+          <div className="mt-3">
             <ProgressIndicator
               current={Math.min(totalPhrases, phraseIndex + 1)}
               total={totalPhrases || 1}
             />
           </div>
-        </header>
+        </div>
 
         {/* Main layout */}
         <main className="mt-6 grid flex-1 gap-6 lg:grid-cols-[1.8fr,1fr]">
@@ -381,27 +532,93 @@ export function LessonChatPage() {
           {/* Chat section */}
           <section className="flex min-h-0 flex-col rounded-3xl border border-slate-100 bg-white/85 p-4 shadow-sm shadow-slate-200">
             <div className="flex-1 min-h-0">
-              <ChatContainer
-                messages={messages}
-                onPlayAudio={handleManualAudioPlay}
-                showTyping={typing}
-                containerRef={chatContainerRef}
-              />
+              <div
+                ref={chatContainerRef}
+                className="flex h-full min-h-0 flex-col gap-5 overflow-y-auto rounded-3xl border border-slate-100 bg-gradient-to-b from-white to-slate-50 px-5 py-6 shadow-inner shadow-slate-200"
+              >
+                <AnimatePresence initial={false}>
+                  {messages.map((message) => {
+                    const tutorHighlighted = highlightedTutorId === message.id
+                    return (
+                      <motion.div
+                        key={message.id}
+                        id={`message-${message.id}`}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -12 }}
+                        transition={{ type: 'spring', stiffness: 140, damping: 18 }}
+                      >
+                        {message.sender === 'tutor' && (
+                          <div className="relative">
+                            {tutorHighlighted && (
+                              <span
+                                className="flash-highlight"
+                                style={{
+                                  background:
+                                    'radial-gradient(circle, rgba(59,130,246,0.25), rgba(59,130,246,0))',
+                                }}
+                              />
+                            )}
+                            <TutorBubble
+                              message={message}
+                              onReplay={() => handleManualAudioPlay(message.audioUrl)}
+                            />
+                          </div>
+                        )}
+                        {message.sender === 'user' && (
+                          <div className="flex justify-end">
+                            <div className="relative max-w-[75%] rounded-2xl bg-green-100 px-4 py-2 text-right text-slate-900 shadow">
+                              {highlightedUserId === message.id && <span className="flash-highlight" />}
+                              <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-green-600">
+                                {message.transcriptSource === 'speech' ? 'Mic' : 'You'}
+                              </div>
+                              <p className="text-base">{message.text}</p>
+                            </div>
+                          </div>
+                        )}
+                        {message.sender === 'feedback' && <FeedbackMessage message={message} />}
+                      </motion.div>
+                    )
+                  })}
+                </AnimatePresence>
+                {typing && <TypingIndicator />}
+                <div ref={bottomRef} />
+              </div>
             </div>
 
-            <UserInputCard
-              manualInput={manualInput}
-              onChange={setManualInput}
-              onSubmit={handleManualSubmit}
-              canRespond={canRespond}
-              isRecording={isRecording}
-              isTranscribing={isTranscribing}
-              onToggleMic={handleMicToggle}
-              speechError={speechError}
-              amplitude={amplitude}
-              elapsedSeconds={elapsedSeconds}
-              disabled={controlsDisabled}
-            />
+            <div className="space-y-3">
+              {shouldShowFocusBanner && (
+                <div className="shimmer rounded-2xl border border-amber-200/60 bg-amber-50/70 px-4 py-2 text-sm font-semibold text-amber-800 shadow-sm">
+                  Powtórz słowo:{' '}
+                  <span className="text-amber-900">
+                    {retryMeta.focusWord ?? '...'}
+                  </span>
+                </div>
+              )}
+              {shouldShowFullRetryCard && (
+                <div
+                  className={`rounded-2xl border border-rose-200 bg-rose-50/90 px-4 py-3 text-sm font-semibold text-rose-700 shadow-sm ${
+                    fullRetryShake ? 'animate-shake' : ''
+                  }`}
+                >
+                  Spróbuj powtórzyć całe zdanie jeszcze raz.
+                </div>
+              )}
+              <UserInputCard
+                manualInput={manualInput}
+                onChange={setManualInput}
+                onSubmit={handleManualSubmit}
+                canRespond={canRespond}
+                isRecording={isRecording}
+                isTranscribing={isTranscribing}
+                onToggleMic={handleMicToggle}
+                speechError={speechError}
+                amplitude={amplitude}
+                elapsedSeconds={elapsedSeconds}
+                disabled={controlsDisabled}
+                micClassName={micClassName}
+              />
+            </div>
           </section>
 
           {/* Sidebar */}
@@ -410,8 +627,7 @@ export function LessonChatPage() {
               phrases={manifest?.phrases ?? []}
               activePhraseId={currentPhrase?.id}
               onPlayPhrase={(phrase) => {
-                hasUserInteracted.current = true
-                playAudio(phrase.audioUrl)
+                handleManualAudioPlay(phrase.audioUrl)
               }}
             />
 

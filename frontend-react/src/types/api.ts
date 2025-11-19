@@ -1,3 +1,9 @@
+import type {
+  EvaluationDifficulty,
+  EvaluationErrorType,
+  EvaluationRecommendation,
+} from './evaluation'
+
 export interface LessonNextResponse {
   lesson_id: string
   current_index: number
@@ -24,4 +30,8 @@ export interface EvaluateResponsePayload {
   hint: string
   passed: boolean
   next_action: 'advance' | 'retry'
+  difficulty: EvaluationDifficulty
+  error_type?: EvaluationErrorType
+  recommendation: EvaluationRecommendation
+  focus_word?: string | null
 }

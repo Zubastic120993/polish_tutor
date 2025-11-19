@@ -2,9 +2,19 @@ import { motion } from 'framer-motion'
 
 interface Props {
   level: string
+  isLoading?: boolean
 }
 
-export function CefrBadge({ level }: Props) {
+export function CefrBadge({ level, isLoading = false }: Props) {
+  if (isLoading) {
+    return (
+      <div
+        className="h-8 w-28 animate-pulse rounded-full bg-slate-200/80"
+        aria-label="Loading CEFR level"
+      />
+    )
+  }
+
   return (
     <motion.div
       className="rounded-full bg-indigo-100 px-4 py-1 text-sm font-semibold text-indigo-700"

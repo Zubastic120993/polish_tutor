@@ -6,7 +6,6 @@ from pathlib import Path
 env_path = Path(__file__).resolve().parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
-
 import logging
 from pathlib import Path
 
@@ -30,6 +29,13 @@ from src.api.routers import (
     settings,
     user,
 )
+
+# Phase D router
+from src.api.routers.v2.user_progress import router as user_progress_router
+
+# ADD THIS LINE - Phase B lesson router
+from src.api.routers.v2.lessons import router as lesson_v2_router
+
 from src.core.app_context import app_context
 from src.core.logging_config import setup_structured_logging
 from src.core.middleware import (
@@ -62,62 +68,42 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-# Add middleware
+# Middlewares (order matters - first added = outermost)
 app.add_middleware(MetricsMiddleware)
 app.add_middleware(ExceptionLoggingMiddleware)
 app.add_middleware(StructuredLoggingMiddleware)
 app.add_middleware(RequestIDMiddleware)
 
-# Set up static file serving for audio
+# Create directories
 static_audio_dir = BASE_DIR / "static" / "audio"
 static_audio_dir.mkdir(parents=True, exist_ok=True)
 
-# Set up audio cache directories
 audio_cache_dir = BASE_DIR / "audio_cache"
 audio_cache_dir.mkdir(parents=True, exist_ok=True)
+
 audio_cache_v2_dir = BASE_DIR / "static" / "audio_cache_v2"
 audio_cache_v2_dir.mkdir(parents=True, exist_ok=True)
 
-# Set up frontend static files
 frontend_static_dir = BASE_DIR / "frontend" / "static"
 frontend_static_dir.mkdir(parents=True, exist_ok=True)
 
-# Set up Jinja2 templates
 templates = Jinja2Templates(directory=str(BASE_DIR / "frontend" / "templates"))
 
-
-@app.get("/audio_cache_v2/{filename:path}")
-async def serve_audio_cache_v2(filename: str):
-    file_path = (audio_cache_v2_dir / filename).resolve()
-    base_dir = audio_cache_v2_dir.resolve()
-    if not str(file_path).startswith(str(base_dir)) or not file_path.exists():
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"detail": "Audio not found"},
-        )
-    return FileResponse(file_path, media_type="audio/mpeg")
-
-
-# Mount static files
-app.mount("/static", StaticFiles(directory=frontend_static_dir), name="static")
-app.mount("/audio_cache", StaticFiles(directory=audio_cache_dir), name="audio_cache")
-app.mount(
-    "/audio_cache_v2", StaticFiles(directory=audio_cache_v2_dir), name="audio_cache_v2"
-)
-
-# Include routers
+# Include routers BEFORE static mounts (important for route priority)
 app.include_router(auth.router)
 app.include_router(chat.router)
 app.include_router(lesson.router)
@@ -128,12 +114,20 @@ app.include_router(audio.router)
 app.include_router(backup.router)
 app.include_router(error.router)
 app.include_router(api_v2_router)
+app.include_router(user_progress_router)
+app.include_router(lesson_v2_router)  # ADD THIS LINE
+
+# Static mounts (after routers to avoid conflicts)
+app.mount("/static", StaticFiles(directory=frontend_static_dir), name="static")
+app.mount("/audio_cache", StaticFiles(directory=audio_cache_dir), name="audio_cache")
+app.mount(
+    "/audio_cache_v2", StaticFiles(directory=audio_cache_v2_dir), name="audio_cache_v2"
+)
 
 
-# WebSocket endpoint
+# WebSocket
 @app.websocket("/ws/chat")
 async def websocket_endpoint(websocket: WebSocket):
-    """WebSocket endpoint for real-time chat."""
     from src.api.routers.websocket import websocket_chat
 
     await websocket_chat(websocket)
@@ -142,12 +136,13 @@ async def websocket_endpoint(websocket: WebSocket):
 # Error handlers
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    """Handle validation errors (400 Bad Request)."""
+    logger.warning(f"Validation error: {exc.errors()}")
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content={
             "status": "error",
-            "message": "Invalid request: " + str(exc.errors()),
+            "message": "Invalid request",
+            "errors": exc.errors(),
             "data": None,
         },
     )
@@ -155,8 +150,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
-    """Handle HTTP exceptions (404, etc.)."""
     if exc.status_code == 404:
+        logger.info(f"404 Not Found: {request.url.path}")
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={
@@ -165,7 +160,6 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
                 "data": None,
             },
         )
-    # For other HTTP exceptions, return the default response
     return JSONResponse(
         status_code=exc.status_code,
         content={
@@ -178,7 +172,6 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
-    """Handle unhandled exceptions (500 Internal Server Error)."""
     logger.error(f"Unhandled exception: {exc}", exc_info=True)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -186,27 +179,14 @@ async def general_exception_handler(request: Request, exc: Exception):
     )
 
 
+# Health and info endpoints
 @app.get("/health")
 async def health_check():
-    """Health check endpoint."""
     return {"status": "healthy", "service": "Patient Polish Tutor", "version": "0.1.0"}
-
-
-@app.get("/")
-async def root(request: Request):
-    """Root endpoint - serve interactive tutor shell."""
-    return templates.TemplateResponse("index.html", {"request": request})
-
-
-@app.get("/settings")
-async def settings_page(request: Request):
-    """Serve tutor settings UI."""
-    return templates.TemplateResponse("settings.html", {"request": request})
 
 
 @app.get("/api")
 async def api_info():
-    """API information endpoint."""
     return {
         "message": "Patient Polish Tutor API",
         "docs": "/docs",
@@ -217,8 +197,18 @@ async def api_info():
 
 @app.get("/metrics")
 async def get_metrics():
-    """Prometheus metrics endpoint."""
     return await metrics_endpoint()
+
+
+# Frontend routes (at the end)
+@app.get("/")
+async def root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+
+@app.get("/settings")
+async def settings_page(request: Request):
+    return templates.TemplateResponse("settings.html", {"request": request})
 
 
 if __name__ == "__main__":
@@ -226,6 +216,8 @@ if __name__ == "__main__":
 
     host = config.get("host", "0.0.0.0")
     port = config.get("port", 8000)
+
+    logger.info(f"Starting server on {host}:{port}")
 
     uvicorn.run(
         "main:app",

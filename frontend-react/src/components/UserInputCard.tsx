@@ -14,6 +14,7 @@ interface Props {
   amplitude?: number
   elapsedSeconds?: number
   disabled?: boolean
+  micClassName?: string
 }
 
 export function UserInputCard({
@@ -29,6 +30,7 @@ export function UserInputCard({
   amplitude = 0,
   elapsedSeconds = 0,
   disabled = false,
+  micClassName = '',
 }: Props) {
   const blocked = disabled || !canRespond
   const sendDisabled = blocked || !manualInput.trim()
@@ -65,6 +67,7 @@ export function UserInputCard({
           onToggle={onToggleMic}
           amplitude={amplitude}
           elapsedSeconds={elapsedSeconds}
+          className={micClassName}
         />
         {speechError && <p className="text-sm text-rose-500">{speechError}</p>}
       </div>
