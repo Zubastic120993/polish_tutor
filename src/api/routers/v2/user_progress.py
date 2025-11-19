@@ -1,3 +1,5 @@
+from typing import TypedDict
+
 from fastapi import APIRouter
 from pydantic import BaseModel
 
@@ -5,7 +7,13 @@ router = APIRouter(prefix="/api/v2/user", tags=["user-v2"])
 
 
 # Fake persistent in-memory state
-USER_STATE = {
+class UserState(TypedDict):
+    xp: int
+    streak: int
+    cefr: str
+
+
+USER_STATE: UserState = {
     "xp": 80,
     "streak": 3,
     "cefr": "A0",
