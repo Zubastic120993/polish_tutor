@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { apiFetch } from '../lib/apiClient'
+import { useAchievementQueue } from './useAchievementQueue'
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? ''
 const REFRESH_INTERVAL = 2 * 60 * 1000
@@ -57,6 +58,8 @@ export function useProgressSync() {
   const xpPendingRef = useRef(false)
   const streakChangeRef = useRef<'increase' | 'decrease' | null>(null)
   const statsHydratedRef = useRef(false)
+  const milestoneTrackerRef = useRef<Set<string>>(new Set())
+  const { pushAchievement } = useAchievementQueue()
 
   const progressQuery = useQuery({
     queryKey: ['user', 'progress'],
@@ -132,6 +135,59 @@ export function useProgressSync() {
     })
   }, [statsQuery.data])
 
+  useEffect(() => {
+    const tracker = milestoneTrackerRef.current
+    const streakMilestones = [10, 20, 50, 100]
+    streakMilestones.forEach((milestone) => {
+      const key = `streak-${milestone}`
+      if (streak >= milestone && !tracker.has(key)) {
+        pushAchievement({
+          type: 'streak_milestone',
+          title: `🔥 ${milestone}-day streak!`,
+          message: 'Amazing consistency!',
+          color: 'orange',
+          soundEffect: 'streakBoost',
+        })
+        tracker.add(key)
+      } else if (streak < milestone && tracker.has(key)) {
+        tracker.delete(key)
+      }
+    })
+
+    const perfectWeekKey = 'perfect-week'
+    if (streak === 7 && !tracker.has(perfectWeekKey)) {
+      pushAchievement({
+        type: 'perfect_streak',
+        title: '🔥 Perfect week!',
+        message: '7 days without missing a beat.',
+        color: 'red',
+        soundEffect: 'perfectStreak',
+      })
+      tracker.add(perfectWeekKey)
+    } else if (streak < 7 && tracker.has(perfectWeekKey)) {
+      tracker.delete(perfectWeekKey)
+    }
+  }, [pushAchievement, streak])
+
+  useEffect(() => {
+    if (xp <= 0 || xp % 100 !== 0) {
+      return
+    }
+    const tracker = milestoneTrackerRef.current
+    const key = `xp-${xp}`
+    if (tracker.has(key)) {
+      return
+    }
+    pushAchievement({
+      type: 'xp_milestone',
+      title: `⭐ ${xp} XP earned!`,
+      message: 'Keep it up!',
+      color: 'yellow',
+      soundEffect: 'achievementBanner',
+    })
+    tracker.add(key)
+  }, [pushAchievement, xp])
+
   const applyResult = useCallback((score: number, passed: boolean) => {
     const xpGain = calculateXp(score, passed)
     xpPendingRef.current = true
@@ -150,6 +206,7 @@ export function useProgressSync() {
       setXpFloatDelta(xpDelta)
       setXpFloatKey((key) => key + 1)
     }
+    return xpGain
   }, [])
 
   const hasProgressData = Boolean(progressQuery.data)

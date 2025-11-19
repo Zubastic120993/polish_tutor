@@ -7,6 +7,7 @@ import { KeyPhrasesCard } from '../components/KeyPhrasesCard'
 import { ProgressIndicator } from '../components/controls/ProgressIndicator'
 import { UserInputCard } from '../components/UserInputCard'
 import { HeaderLayout } from '../components/header/HeaderLayout'
+import { LessonCompleteModal } from '../components/achievements/LessonCompleteModal'
 import { TutorBubble } from '../components/TutorBubble'
 import { FeedbackMessage } from '../components/messages/FeedbackMessage'
 import { TypingIndicator } from '../components/messages/TypingIndicator'
@@ -16,6 +17,7 @@ import { useLessonV2 } from '../hooks/useLessonV2'
 import { useProgressSync } from '../hooks/useProgressSync'
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { useAudioQueue } from '../state/useAudioQueue'
+import { useAchievementQueue } from '../hooks/useAchievementQueue'
 
 import { nextState, type LessonState } from '../state/lessonMachine'
 import type { ChatMessage } from '../types/chat'
@@ -60,6 +62,8 @@ export function LessonChatPage() {
     correct: 0,
     attempts: [],
   })
+  const [lessonXpEarned, setLessonXpEarned] = useState(0)
+  const [showLessonCompleteModal, setShowLessonCompleteModal] = useState(false)
 
   const latestTutorId = useRef<string | null>(null)
   const hasUserInteracted = useRef(false)
@@ -68,6 +72,7 @@ export function LessonChatPage() {
   const { playAudio } = useAudioQueue()
   const { manifest, currentPhrase, tutorTurn, lessonError, phraseIndex, loadNextPhrase } =
     useLessonV2(lessonId)
+  const { pushAchievement: enqueueAchievement } = useAchievementQueue()
 
   const evaluation = useEvaluation()
   const {
@@ -109,6 +114,8 @@ export function LessonChatPage() {
   const micShakeTimeoutRef = useRef<number | null>(null)
   const fullRetryTimeoutRef = useRef<number | null>(null)
   const messagesRef = useRef<LessonChatMessage[]>([])
+  const lessonCompleteShownRef = useRef(false)
+  const hasNavigatedRef = useRef(false)
 
   const [highlightedUserId, setHighlightedUserId] = useState<string | null>(null)
   const [highlightedTutorId, setHighlightedTutorId] = useState<string | null>(null)
@@ -130,6 +137,10 @@ export function LessonChatPage() {
     // This ensures audio plays on restart even with cached data
     latestTutorId.current = null
     hasUserInteracted.current = false
+    lessonCompleteShownRef.current = false
+    hasNavigatedRef.current = false
+    setLessonXpEarned(0)
+    setShowLessonCompleteModal(false)
   }, [lessonId])
 
   // Summary update
@@ -145,10 +156,18 @@ export function LessonChatPage() {
 
   // On complete
   useEffect(() => {
-    if (state === 'COMPLETE') {
-      navigate('/summary', { state: summary })
+    if (state !== 'COMPLETE') {
+      return
     }
-  }, [state, summary, navigate])
+    if (showLessonCompleteModal) {
+      return
+    }
+    if (hasNavigatedRef.current) {
+      return
+    }
+    hasNavigatedRef.current = true
+    navigate('/summary', { state: summary })
+  }, [navigate, showLessonCompleteModal, state, summary])
 
   // Tutor messages
   useEffect(() => {
@@ -364,6 +383,7 @@ export function LessonChatPage() {
 
     const trimmed = transcript.trim()
     if (!trimmed) return
+    const isFinalPhrase = totalPhrases > 0 && phraseIndex + 1 >= totalPhrases
 
     // Mark that user has interacted
     hasUserInteracted.current = true
@@ -392,7 +412,8 @@ export function LessonChatPage() {
         audio_url: source === 'speech' ? '/local/microphone' : undefined,
       })
 
-      applyResult(result.score, result.passed)
+      const xpGain = applyResult(result.score, result.passed)
+      setLessonXpEarned((prev) => prev + xpGain)
 
       setSummary((prev) => ({
         total: totalPhrases || prev.total,
@@ -427,6 +448,17 @@ export function LessonChatPage() {
       setState((prev) => nextState(prev, 'SHOW_FEEDBACK'))
 
       if (result.passed) {
+        if (isFinalPhrase && !lessonCompleteShownRef.current) {
+          lessonCompleteShownRef.current = true
+          setShowLessonCompleteModal(true)
+          enqueueAchievement({
+            type: 'lesson_complete',
+            title: '📘 Lesson mastered!',
+            message: 'Time to review your progress.',
+            color: 'blue',
+            soundEffect: 'achievementBanner',
+          })
+        }
         triggerUserHighlight(lastUserMessageIdRef.current)
         playSuccessSound()
         setManualInput('')
@@ -466,6 +498,10 @@ export function LessonChatPage() {
     handleEvaluation(manualInput, 'typed')
     setManualInput('')
   }
+
+  const handleLessonModalClose = useCallback(() => {
+    setShowLessonCompleteModal(false)
+  }, [])
 
   // Mic handler
   const handleMicToggle = async () => {
@@ -642,6 +678,13 @@ export function LessonChatPage() {
 
         </main>
       </div>
+      <LessonCompleteModal
+        isOpen={showLessonCompleteModal}
+        onClose={handleLessonModalClose}
+        xpEarned={lessonXpEarned}
+        cefrLevel={cefrLevel}
+        streak={streak}
+      />
     </div>
   )
 }

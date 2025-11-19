@@ -3,12 +3,33 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      colors: {
+        achievement: {
+          orange: '#f97316',
+          green: '#22c55e',
+          blue: '#3b82f6',
+          yellow: '#eab308',
+          red: '#ef4444',
+        },
+      },
       dropShadow: {
         flame: '0 0 10px rgba(251, 191, 36, 0.5)',
         'flame-perfect': '0 0 20px rgba(249, 115, 22, 0.7)',
         'flame-error': '0 0 15px rgba(239, 68, 68, 0.6)',
       },
       keyframes: {
+        bannerSlideIn: {
+          '0%': { transform: 'translateY(-100%)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        bannerSlideOut: {
+          '0%': { transform: 'translateY(0)', opacity: '1' },
+          '100%': { transform: 'translateY(-100%)', opacity: '0' },
+        },
+        bannerSparkle: {
+          '0%': { transform: 'scale(0) rotate(0deg)', opacity: '1' },
+          '100%': { transform: 'scale(1.5) rotate(180deg)', opacity: '0' },
+        },
         flameIdle: {
           '0%, 100%': { transform: 'scale(1) translateY(0)', opacity: '0.9' },
           '50%': { transform: 'scale(1.05) translateY(-2px)', opacity: '1' },
@@ -65,6 +86,36 @@ export default {
         xpFloat: {
           '0%': { opacity: 1, transform: 'translateY(0)' },
           '100%': { opacity: 0, transform: 'translateY(-20px)' },
+        },
+        modalFadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        modalScaleIn: {
+          '0%': { transform: 'scale(0.8)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        cefrRingGlow: {
+          '0%, 100%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.5)' },
+          '50%': { boxShadow: '0 0 40px rgba(59, 130, 246, 0.8)' },
+        },
+        xpBurstPulse: {
+          '0%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.2)' },
+          '100%': { transform: 'scale(1)' },
+        },
+        goalFillProgress: {
+          '0%': { strokeDashoffset: '100' },
+          '100%': { strokeDashoffset: '0' },
+        },
+        goalCompleteGlow: {
+          '0%, 100%': { filter: 'drop-shadow(0 0 5px rgba(34, 197, 94, 0.5))' },
+          '50%': { filter: 'drop-shadow(0 0 15px rgba(34, 197, 94, 0.9))' },
+        },
+        goalCheckmark: {
+          '0%': { transform: 'scale(0)', opacity: '0' },
+          '50%': { transform: 'scale(1.2)', opacity: '1' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
         },
         shimmer: {
           '0%': { backgroundPosition: '-200px 0' },
@@ -125,6 +176,16 @@ export default {
         confettiBurst: 'confettiBurst 0.65s ease-out forwards',
         confettiDriftLeft: 'confettiDriftLeft 0.65s ease-out forwards',
         confettiDriftRight: 'confettiDriftRight 0.65s ease-out forwards',
+        'banner-slide-in': 'bannerSlideIn 0.4s ease-out',
+        'banner-slide-out': 'bannerSlideOut 0.4s ease-in forwards',
+        'banner-sparkle': 'bannerSparkle 0.8s ease-out forwards',
+        'modal-fade-in': 'modalFadeIn 0.3s ease-out forwards',
+        'modal-scale-in': 'modalScaleIn 0.4s ease-out forwards',
+        'cefr-ring-glow': 'cefrRingGlow 2s ease-in-out infinite',
+        'xp-burst-pulse': 'xpBurstPulse 0.6s ease-in-out',
+        'goal-fill': 'goalFillProgress 0.8s ease-out forwards',
+        'goal-complete-glow': 'goalCompleteGlow 1.5s ease-in-out infinite',
+        'goal-checkmark': 'goalCheckmark 0.5s ease-out forwards',
         successGlow: 'successGlow 0.45s ease-out forwards',
         cardIn: 'cardIn 0.18s ease-out both',
         flashHighlight: 'flashHighlight 0.3s ease-out forwards',
