@@ -3,6 +3,7 @@
 from .speech import SpeechRecognitionRequest, SpeechRecognitionResponse, WordTiming
 from .evaluate import EvaluateRequest, EvaluateResponse
 from .lessons import LessonNextResponse
+from .practice import PracticePackResponse, PhraseItem
 
 __all__ = (
     "SpeechRecognitionRequest",
@@ -11,4 +12,6 @@ __all__ = (
     "EvaluateRequest",
     "EvaluateResponse",
     "LessonNextResponse",
+    "PracticePackResponse",
+    "PhraseItem",
 )

@@ -11,6 +11,7 @@ class EvaluateRequest(BaseModel):
     phrase_id: str
     user_transcript: str
     audio_url: Optional[str] = None
+    expected_phrase: Optional[str] = None
 
 
 class EvaluateResponse(BaseModel):

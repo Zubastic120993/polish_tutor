@@ -22,6 +22,7 @@ export interface EvaluateRequestPayload {
   phrase_id: string
   user_transcript: string
   audio_url?: string | null
+  expected_phrase?: string
 }
 
 export interface EvaluateResponsePayload {

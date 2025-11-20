@@ -1,7 +1,7 @@
 import type { FormEvent } from 'react'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import { KeyPhrasesCard } from '../components/KeyPhrasesCard'
 import { ProgressIndicator } from '../components/controls/ProgressIndicator'
@@ -18,6 +18,7 @@ import { useProgressSync } from '../hooks/useProgressSync'
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { useAudioQueue } from '../state/useAudioQueue'
 import { useAchievementQueue } from '../hooks/useAchievementQueue'
+import { DEFAULT_LESSON_ID } from '../constants/lessons'
 
 import { nextState, type LessonState } from '../state/lessonMachine'
 import type { ChatMessage } from '../types/chat'
@@ -33,6 +34,7 @@ interface LessonSummary {
   total: number
   correct: number
   attempts: SummaryEntry[]
+  lessonId: string
 }
 
 type LessonChatMessage = ChatMessage & {
@@ -50,7 +52,7 @@ const createId = () =>
 export function LessonChatPage() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
-  const lessonId = id ?? 'lesson_mock_001'
+  const lessonId = id ?? DEFAULT_LESSON_ID
 
   // State
   const [state, setState] = useState<LessonState>('IDLE')
@@ -61,6 +63,7 @@ export function LessonChatPage() {
     total: 0,
     correct: 0,
     attempts: [],
+    lessonId,
   })
   const [lessonXpEarned, setLessonXpEarned] = useState(0)
   const [showLessonCompleteModal, setShowLessonCompleteModal] = useState(false)
@@ -150,6 +153,15 @@ export function LessonChatPage() {
     }
   }, [manifest])
 
+useEffect(() => {
+  setSummary({
+    total: 0,
+    correct: 0,
+    attempts: [],
+    lessonId,
+  })
+}, [lessonId])
+
   useEffect(() => {
     messagesRef.current = messages
   }, [messages])
@@ -166,7 +178,7 @@ export function LessonChatPage() {
       return
     }
     hasNavigatedRef.current = true
-    navigate('/summary', { state: summary })
+    navigate('/summary', { state: { ...summary, lessonId } })
   }, [navigate, showLessonCompleteModal, state, summary])
 
   // Tutor messages
@@ -405,12 +417,13 @@ export function LessonChatPage() {
     const event = source === 'speech' ? 'TRANSCRIPT_READY' : 'REQUEST_EVAL'
     setState((prev) => nextState(prev, event))
 
-    try {
-      const result = await evaluation.evaluate({
-        phrase_id: currentPhrase.id,
-        user_transcript: trimmed,
-        audio_url: source === 'speech' ? '/local/microphone' : undefined,
-      })
+      try {
+        const result = await evaluation.evaluate({
+          phrase_id: currentPhrase.id,
+          user_transcript: trimmed,
+          audio_url: source === 'speech' ? '/local/microphone' : undefined,
+          expected_phrase: currentPhrase.pl ?? tutorTurn?.tutor_phrase ?? undefined,
+        })
 
       const xpGain = applyResult(result.score, result.passed)
       setLessonXpEarned((prev) => prev + xpGain)
@@ -418,6 +431,7 @@ export function LessonChatPage() {
       setSummary((prev) => ({
         total: totalPhrases || prev.total,
         correct: result.passed ? prev.correct + 1 : prev.correct,
+        lessonId: prev.lessonId,
         attempts: [
           ...prev.attempts,
           { phraseId: currentPhrase.id, score: result.score, passed: result.passed },
@@ -559,6 +573,14 @@ export function LessonChatPage() {
               current={Math.min(totalPhrases, phraseIndex + 1)}
               total={totalPhrases || 1}
             />
+          </div>
+          <div className="mt-4 flex justify-end">
+            <Link
+              to="/practice"
+              className="rounded-full border border-blue-100 px-4 py-2 text-sm font-semibold text-blue-700 shadow-sm transition hover:bg-blue-50"
+            >
+              Daily Practice →
+            </Link>
           </div>
         </div>
 

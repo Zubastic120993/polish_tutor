@@ -13,8 +13,8 @@ from src.services.speech_engine import SpeechEngine
 
 logger = logging.getLogger(__name__)
 
-# ADD PREFIX HERE
-router = APIRouter(prefix="/api/v2/lesson", tags=["lesson-v2"])
+# Prefix is provided by the parent router include.
+router = APIRouter(tags=["lesson-v2"])
 
 _lesson_flow_service = LessonFlowService()
 

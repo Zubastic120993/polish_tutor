@@ -1,11 +1,13 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 import { MicroConfetti } from '../components/animation/MicroConfetti'
+import { DEFAULT_LESSON_ID, getNextLessonId } from '../constants/lessons'
 
 interface SummaryState {
   total: number
   correct: number
   attempts: Array<{ phraseId: string; passed: boolean; score: number }>
+  lessonId: string
 }
 
 export function LessonSummaryPage() {
@@ -17,7 +19,11 @@ export function LessonSummaryPage() {
       total: 0,
       correct: 0,
       attempts: [],
+      lessonId: DEFAULT_LESSON_ID,
     }
+
+  const currentLessonId = summary.lessonId ?? DEFAULT_LESSON_ID
+  const nextLessonId = getNextLessonId(currentLessonId)
 
   const accuracy = summary.total
     ? Math.round((summary.correct / summary.total) * 100)
@@ -87,7 +93,7 @@ export function LessonSummaryPage() {
         <button
           type="button"
           onClick={() =>
-            navigate(`/lesson/${summary.attempts?.[0]?.phraseId ?? 'lesson_mock_001'}`, {
+            navigate(`/lesson/${currentLessonId}`, {
               replace: true,
             })
           }
@@ -96,12 +102,21 @@ export function LessonSummaryPage() {
           Restart lesson
         </button>
 
-        <Link
-          to="/lesson/lesson_mock_001"
-          className="mt-4 block text-sm font-medium text-blue-600 hover:text-blue-800"
-        >
-          Start next lesson →
-        </Link>
+        {nextLessonId ? (
+          <Link
+            to={`/lesson/${nextLessonId}`}
+            className="mt-4 block text-sm font-medium text-blue-600 hover:text-blue-800"
+          >
+            Start next lesson →
+          </Link>
+        ) : (
+          <Link
+            to="/"
+            className="mt-4 block text-sm font-medium text-blue-600 hover:text-blue-800"
+          >
+            Back to dashboard →
+          </Link>
+        )}
       </div>
     </div>
   )

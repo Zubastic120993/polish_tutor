@@ -3,7 +3,7 @@ from typing import TypedDict
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-router = APIRouter(prefix="/api/v2/user", tags=["user-v2"])
+router = APIRouter(tags=["user-v2"])
 
 
 # Fake persistent in-memory state

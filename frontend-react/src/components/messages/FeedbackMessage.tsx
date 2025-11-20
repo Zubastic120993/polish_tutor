@@ -65,16 +65,17 @@ export function FeedbackMessage({ message }: Props) {
   useLayoutEffect(() => {
     if (!cardRef.current) return
     
-    // Scroll card into view first
-    cardRef.current.scrollIntoView({ 
-      behavior: 'smooth', 
-      block: 'center' 
-    })
+    // Update origin for confetti
+    updateOrigin()
     
-    // Update origin after scroll completes
+    // Scroll into view after a short delay
     const timer = setTimeout(() => {
-      updateOrigin()
-    }, 300)
+      cardRef.current?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'nearest',
+        inline: 'nearest'
+      })
+    }, 100)
     
     return () => clearTimeout(timer)
   }, [updateOrigin, message.id])

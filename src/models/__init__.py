@@ -11,6 +11,7 @@ __all__ = [
     "SRSMemory",
     "Setting",
     "Meta",
+    "UserSession",
 ]
 
 _MODULE_MAP = {
@@ -22,6 +23,7 @@ _MODULE_MAP = {
     "SRSMemory": "srs_memory",
     "Setting": "setting",
     "Meta": "meta",
+    "UserSession": "user_session",
 }
 
 

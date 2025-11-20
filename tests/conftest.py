@@ -244,6 +244,12 @@ if "src.models" not in sys.modules:
     models_module.LessonProgress = _DummyModel
     models_module.Meta = _DummyModel
     models_module.Setting = _DummyModel
+    models_module.UserSession = _DummyModel
+
+# Add user_session module stub
+if "src.models.user_session" not in sys.modules:
+    user_session_module = _ensure_module("src.models.user_session")
+    user_session_module.UserSession = _DummyModel
 
 
 # Stub Coqui TTS dependency to avoid heavy imports

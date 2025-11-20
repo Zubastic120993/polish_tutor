@@ -320,6 +320,17 @@ def test_websocket_chat():
         messages.append(websocket.receive_json())  # response
     return messages
 
+def test_practice_daily():
+    response = client.get("/api/v2/practice/daily", params={"user_id": 1})
+    assert response.status_code == 200
+    data = response.json()
+    assert "pack_id" in data
+    assert "review_phrases" in data
+    assert "new_phrases" in data
+    assert isinstance(data["review_phrases"], list)
+    assert isinstance(data["new_phrases"], list)
+    return data
+
 # ----------------------------------------------------------
 # Run all tests
 # ----------------------------------------------------------
@@ -340,6 +351,7 @@ tests = [
     ("audio_clear_cache", test_audio_clear_cache),
     ("error_report", test_error_report),
     ("websocket_chat", test_websocket_chat),
+    ("practice_daily", test_practice_daily),
 ]
 
 results = [run_test(name, func) for name, func in tests]
@@ -481,3 +493,13 @@ class TestRestApiIntegration:
         r = self.results["websocket_chat"]
         assert r["status"] == "passed", f"WebSocket failed: {r.get('error')}"
         assert isinstance(r["result"], list)
+
+    def test_practice_daily_endpoint(self):
+        r = self.results["practice_daily"]
+        assert r["status"] == "passed", f"Practice daily failed: {r.get('error')}"
+        result = r["result"]
+        assert "pack_id" in result
+        assert "review_phrases" in result
+        assert "new_phrases" in result
+        assert isinstance(result["review_phrases"], list)
+        assert isinstance(result["new_phrases"], list)

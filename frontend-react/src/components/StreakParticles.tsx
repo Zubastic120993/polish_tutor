@@ -76,7 +76,7 @@ export function StreakParticles({ mode, trigger, anchorRef, disabled = false }: 
     const now = Date.now()
     const sparkCount = 5 + Math.floor(Math.random() * 4)
     const sparks: Particle[] = Array.from({ length: sparkCount }).map((_, index) => ({
-      id: `spark-${trigger}-${index}-${now}`,
+      id: `spark-${trigger}-${index}-${now}-${Math.random().toString(16).slice(2, 6)}`,
       type: 'spark',
       size: 4 + Math.random() * 4,
       horizontal: (Math.random() - 0.5) * (anchorRect.width * 0.6),
@@ -103,7 +103,7 @@ export function StreakParticles({ mode, trigger, anchorRef, disabled = false }: 
       const now = Date.now()
       const emberCount = 2 + Math.floor(Math.random() * 2)
       const embers: Particle[] = Array.from({ length: emberCount }).map((_, index) => ({
-        id: `ember-${now}-${index}`,
+        id: `ember-${now}-${index}-${Math.random().toString(16).slice(2, 6)}`,
         type: 'ember',
         size: 6 + Math.random() * 4,
         horizontal: (Math.random() - 0.5) * (anchorRect.width * 0.4),
