@@ -82,8 +82,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Install Playwright browsers
-        run: python -m playwright install --with-deps
+      # NOTE: Playwright installation skipped - UI tests (tests/ui/) not run in CI
+      # Uncomment if UI tests are added to the test suite:
+      # - name: Install Playwright browsers
+      #   run: python -m playwright install --with-deps
 
       - name: Run database migrations
         run: alembic upgrade head
