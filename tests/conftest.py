@@ -1,10 +1,15 @@
 import importlib.machinery
+import os
 import sys
 import types
 from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+# Skip dummy module setup for integration tests
+# Integration tests should use real dependencies
+SKIP_DUMMIES = any(arg.startswith("tests/integration") for arg in sys.argv)
 
 
 def _module_spec(name: str) -> importlib.machinery.ModuleSpec:
@@ -48,7 +53,7 @@ def _ensure_module(name: str) -> types.ModuleType:
 
 
 # Stub OpenAI client (avoids optional dependency requirement)
-if "openai" not in sys.modules:
+if not SKIP_DUMMIES and "openai" not in sys.modules:
     openai_module = _ensure_module("openai")
 
     class _DummyOpenAI:
@@ -68,7 +73,7 @@ if "openai" not in sys.modules:
 
 
 # Lightweight Levenshtein distance implementation
-if "Levenshtein" not in sys.modules:
+if not SKIP_DUMMIES and "Levenshtein" not in sys.modules:
     levenshtein_module = _ensure_module("Levenshtein")
 
     def _distance(a: str, b: str) -> int:
@@ -93,7 +98,7 @@ if "Levenshtein" not in sys.modules:
 
 
 # Stub phonemizer (treats phoneme conversion as identity)
-if "phonemizer" not in sys.modules:
+if not SKIP_DUMMIES and "phonemizer" not in sys.modules:
     phonemizer_module = _ensure_module("phonemizer")
 
     def _phonemize(text: str, **_):
@@ -111,7 +116,7 @@ if "phonemizer" not in sys.modules:
 
 
 # Minimal SQLAlchemy stub for unit tests
-if "sqlalchemy" not in sys.modules:
+if not SKIP_DUMMIES and "sqlalchemy" not in sys.modules:
     sqlalchemy_module = _ensure_module("sqlalchemy")
     orm_module = _ensure_module("sqlalchemy.orm")
     exc_module = _ensure_module("sqlalchemy.exc")
@@ -238,8 +243,11 @@ if "sqlalchemy" not in sys.modules:
 
 
 # Provide lightweight ORM models used in unit tests
-if "src.models" not in sys.modules:
+if not SKIP_DUMMIES and "src.models" not in sys.modules:
     models_module = _ensure_module("src.models")
+    # CRITICAL: Set __path__ to make this a package, not just a module
+    # This allows submodule imports like "from src.models.user import User"
+    models_module.__path__ = [str(PROJECT_ROOT / "src/models")]
 
     class _DummyModel:
         pass
@@ -257,7 +265,7 @@ if "src.models" not in sys.modules:
     models_module.UserBadge = _DummyModel
 
 # Add user_session module stub
-if "src.models.user_session" not in sys.modules:
+if not SKIP_DUMMIES and "src.models.user_session" not in sys.modules:
     user_session_module = _ensure_module("src.models.user_session")
     user_session_module.UserSession = _DummyModel
 

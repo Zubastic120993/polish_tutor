@@ -1,6 +1,18 @@
-"""Database ORM models with lazy imports to avoid circular dependencies."""
+"""Database ORM models - regular imports."""
 
-from importlib import import_module
+# Import all model classes directly
+from src.models.user import User
+from src.models.lesson import Lesson
+from src.models.phrase import Phrase
+from src.models.lesson_progress import LessonProgress
+from src.models.attempt import Attempt
+from src.models.srs_memory import SRSMemory
+from src.models.setting import Setting
+from src.models.meta import Meta
+from src.models.user_session import UserSession
+from src.models.badge import Badge
+from src.models.user_badge import UserBadge
+from src.models.user_profile import UserProfile
 
 __all__ = [
     "User",
@@ -16,29 +28,3 @@ __all__ = [
     "UserBadge",
     "UserProfile",
 ]
-
-_MODULE_MAP = {
-    "User": "user",
-    "Lesson": "lesson",
-    "Phrase": "phrase",
-    "LessonProgress": "lesson_progress",
-    "Attempt": "attempt",
-    "SRSMemory": "srs_memory",
-    "Setting": "setting",
-    "Meta": "meta",
-    "UserSession": "user_session",
-    "Badge": "badge",
-    "UserBadge": "user_badge",
-    "UserProfile": "user_profile",
-}
-
-
-def __getattr__(name):
-    if name in _MODULE_MAP:
-        module = import_module(f"src.models.{_MODULE_MAP[name]}")
-        return getattr(module, name)
-    raise AttributeError(name)
-
-
-def __dir__():
-    return sorted(__all__)
