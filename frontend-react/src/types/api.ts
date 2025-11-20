@@ -36,3 +36,16 @@ export interface EvaluateResponsePayload {
   recommendation: EvaluationRecommendation
   focus_word?: string | null
 }
+
+export interface EndSessionResponse {
+  session_id: number
+  xp_total: number
+  xp_from_phrases: number
+  xp_streak_bonus: number
+  xp_session_bonus: number
+  session_start: string
+  session_end: string
+  session_duration_seconds: number
+  streak_before: number
+  streak_after: number
+}
