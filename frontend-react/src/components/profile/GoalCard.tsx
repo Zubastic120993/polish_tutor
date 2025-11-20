@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { GoalModal } from './GoalModal';
 import { GoalSuggestionsModal } from './GoalSuggestionsModal';
 import type { ProfileResponse } from '../../types/profile';
+import { formatLongDate } from './helpers/date';
 
 interface GoalCardProps {
   goalText: string | null;
@@ -39,15 +40,6 @@ export function GoalCard({ goalText, goalCreatedAt, onEditGoal, onClearGoal, pro
 
   const handleEditGoal = () => {
     setShowModal(true);
-  };
-
-  const formatDate = (isoString: string) => {
-    const date = new Date(isoString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
   };
 
   return (
@@ -138,7 +130,7 @@ export function GoalCard({ goalText, goalCreatedAt, onEditGoal, onClearGoal, pro
                   {goalCreatedAt && (
                     <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-slate-600">
                       <span>📅</span>
-                      <span>Set on {formatDate(goalCreatedAt)}</span>
+                      <span>Set on {formatLongDate(goalCreatedAt)}</span>
                     </p>
                   )}
                 </div>
@@ -160,7 +152,7 @@ export function GoalCard({ goalText, goalCreatedAt, onEditGoal, onClearGoal, pro
                   whileTap={{ scale: 0.95 }}
                   type="button"
                   onClick={handleClearGoal}
-                  className="flex-1 rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-red-600 hover:shadow-lg"
+                  className="flex-1 rounded-xl bg-red-400 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-red-500 hover:shadow-lg"
                 >
                   🗑️ Clear Goal
                 </motion.button>

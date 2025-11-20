@@ -261,7 +261,7 @@ export function ProfilePage() {
                   type="text"
                   value={draftName}
                   onChange={(e) => setDraftName(e.target.value)}
-                  className="text-xl px-3 py-1.5 rounded-xl border-2 border-blue-400 shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-all"
+                  className="text-xl px-3 py-1.5 max-w-[240px] rounded-xl border-2 border-blue-400 shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-all"
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleSaveClick();
@@ -432,10 +432,10 @@ export function ProfilePage() {
                     delay: 0.4 + index * 0.1,
                     ease: 'easeOut',
                   }}
-                  className="group relative rounded-2xl bg-white p-4 text-center shadow-md hover:shadow-xl transition-shadow cursor-pointer"
+                  className="group relative rounded-2xl bg-white p-3.5 text-center shadow-md hover:shadow-xl transition-shadow cursor-pointer"
                 >
                   <span className="text-4xl">{badge.icon || '🏅'}</span>
-                  <p className="mt-2 text-sm font-semibold text-slate-800">{badge.name}</p>
+                  <p className="mt-1.5 text-sm font-semibold text-slate-800">{badge.name}</p>
                   
                   {/* Hover tooltip */}
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg">
@@ -465,7 +465,7 @@ export function ProfilePage() {
           whileTap={{ scale: 0.95 }}
           transition={{ duration: 0.3, delay: 0.8 }}
           onClick={() => navigate('/')}
-          className="w-full rounded-2xl bg-slate-800 py-4 font-medium text-white shadow-lg transition-all hover:bg-slate-700"
+          className="w-full rounded-2xl bg-slate-800 py-[18px] font-medium text-white shadow-lg outline outline-1 outline-white/10 transition-all hover:bg-slate-700"
         >
           Back to Home
         </motion.button>
