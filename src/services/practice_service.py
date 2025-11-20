@@ -5,7 +5,7 @@ from typing import Dict, Optional, Tuple
 
 from sqlalchemy.orm import Session
 
-from src.models import UserSession
+from src.models.user_session import UserSession
 
 
 def calculate_streak_bonus(streak: int) -> int:
