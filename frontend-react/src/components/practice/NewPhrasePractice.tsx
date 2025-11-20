@@ -1,4 +1,5 @@
-import { FormEvent, useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import type { FormEvent } from 'react'
 
 import { ProgressIndicator } from '../controls/ProgressIndicator'
 import { TutorBubble } from '../TutorBubble'

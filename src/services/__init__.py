@@ -6,4 +6,10 @@ from src.services.practice_service import PracticeService
 from src.services.srs_manager import SRSManager
 from src.services.speech_engine import SpeechEngine
 
-__all__ = ["Database", "FeedbackEngine", "PracticeService", "SRSManager", "SpeechEngine"]
+__all__ = [
+    "Database",
+    "FeedbackEngine",
+    "PracticeService",
+    "SRSManager",
+    "SpeechEngine",
+]

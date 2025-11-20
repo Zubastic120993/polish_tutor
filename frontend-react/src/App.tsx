@@ -3,6 +3,10 @@ import { LessonChatPage } from './pages/LessonChatPage'
 import { LessonSummaryPage } from './pages/LessonSummaryPage'
 import { DailyPracticePage } from './pages/DailyPracticePage'
 import { PracticeSummaryPage } from './pages/PracticeSummaryPage'
+import { WeeklyStatsPage } from './pages/WeeklyStatsPage'
+import { BadgeGalleryPage } from './pages/BadgeGalleryPage'
+import { BadgeHistoryPage } from './pages/BadgeHistoryPage'
+import { ProfilePage } from './pages/ProfilePage'
 import { AchievementQueueProvider } from './hooks/useAchievementQueue'
 import { DEFAULT_LESSON_ID } from './constants/lessons'
 
@@ -16,6 +20,10 @@ function App() {
           <Route path="/summary" element={<LessonSummaryPage />} />
           <Route path="/practice" element={<DailyPracticePage />} />
           <Route path="/practice-summary" element={<PracticeSummaryPage />} />
+          <Route path="/weekly-stats" element={<WeeklyStatsPage />} />
+          <Route path="/badges" element={<BadgeGalleryPage />} />
+          <Route path="/badge-history" element={<BadgeHistoryPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Routes>
       </BrowserRouter>
     </AchievementQueueProvider>

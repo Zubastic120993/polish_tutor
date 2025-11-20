@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Index, Integer
 from sqlalchemy.orm import relationship
 
 from src.core.database import Base
@@ -26,6 +26,7 @@ class UserSession(Base):
     total_xp = Column(Integer, default=0)
     streak_before = Column(Integer, default=0)
     streak_after = Column(Integer, default=0)
+    perfect_day = Column(Boolean, default=False)
 
     # Relationship
     user = relationship("User")
@@ -35,4 +36,3 @@ class UserSession(Base):
         Index("idx_user_sessions_user", "user_id"),
         Index("idx_user_sessions_started", "started_at"),
     )
-

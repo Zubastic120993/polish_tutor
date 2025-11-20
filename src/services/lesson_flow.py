@@ -32,15 +32,15 @@ def _load_a1_lesson(lesson_id: str) -> List[Dict[str, str]] | None:
     lesson_file = LESSONS_DIR / f"{lesson_id}.json"
     if not lesson_file.exists():
         return None
-    
+
     try:
         with open(lesson_file, "r", encoding="utf-8") as f:
             data = json.load(f)
-        
+
         # Convert dialogues to phrases
         phrases = []
         dialogues = data.get("dialogues", [])
-        
+
         for dialogue in dialogues:
             phrase = {
                 "id": dialogue.get("id", f"{lesson_id}_{len(phrases)}"),
@@ -48,10 +48,10 @@ def _load_a1_lesson(lesson_id: str) -> List[Dict[str, str]] | None:
                 "en": dialogue.get("translation", ""),
             }
             phrases.append(phrase)
-        
+
         logger.info(f"Loaded lesson {lesson_id} with {len(phrases)} phrases")
         return phrases
-    
+
     except Exception as e:
         logger.error(f"Failed to load lesson {lesson_id}: {e}")
         return None
@@ -60,19 +60,19 @@ def _load_a1_lesson(lesson_id: str) -> List[Dict[str, str]] | None:
 def _load_all_lessons() -> Dict[str, List[Dict[str, str]]]:
     """Load all lessons including mock lessons and A1 lessons from files."""
     lessons = dict(MOCK_LESSONS)
-    
+
     # Load all A1 lessons (A1_L01 through A1_L60)
     for i in range(1, 61):
         lesson_id = f"A1_L{i:02d}"
         phrases = _load_a1_lesson(lesson_id)
         if phrases:
             lessons[lesson_id] = phrases
-    
+
     # Also try to load coffee_001 if it exists
     coffee_phrases = _load_a1_lesson("coffee_001")
     if coffee_phrases:
         lessons["coffee_001"] = coffee_phrases
-    
+
     logger.info(f"Loaded {len(lessons)} total lessons")
     return lessons
 

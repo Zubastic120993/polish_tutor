@@ -119,7 +119,11 @@ if "sqlalchemy" not in sys.modules:
     class SQLAlchemyError(Exception):
         pass
 
+    class IntegrityError(SQLAlchemyError):
+        pass
+
     exc_module.SQLAlchemyError = SQLAlchemyError
+    exc_module.IntegrityError = IntegrityError
 
     def create_engine(*_, **__):
         return object()
@@ -201,6 +205,9 @@ if "sqlalchemy" not in sys.modules:
     def Index(*_, **__):
         return None
 
+    def UniqueConstraint(*_, **__):
+        return None
+
     def DateTime(*_, **__):
         return None
 
@@ -219,6 +226,7 @@ if "sqlalchemy" not in sys.modules:
     sqlalchemy_module.Column = Column
     sqlalchemy_module.DateTime = DateTime
     sqlalchemy_module.Index = Index
+    sqlalchemy_module.UniqueConstraint = UniqueConstraint
     sqlalchemy_module.String = String
     sqlalchemy_module.Text = Text
     sqlalchemy_module.and_ = and_
@@ -245,6 +253,8 @@ if "src.models" not in sys.modules:
     models_module.Meta = _DummyModel
     models_module.Setting = _DummyModel
     models_module.UserSession = _DummyModel
+    models_module.Badge = _DummyModel
+    models_module.UserBadge = _DummyModel
 
 # Add user_session module stub
 if "src.models.user_session" not in sys.modules:

@@ -19,9 +19,11 @@ from src.schemas.v2.practice import (
     EndSessionResponse,
     PracticePackResponse,
     PhraseItem,
+    WeeklyStatsResponse,
 )
 from src.services.speech_engine import SpeechEngine
 from src.services.practice_service import PracticeService
+from src.services.badge_service import BadgeService
 
 practice_router = APIRouter(prefix="/practice", tags=["practice-v2"])
 logger = logging.getLogger(__name__)
@@ -45,7 +47,9 @@ def _resolve_dialogue_metadata(
         try:
             cache[lesson_id] = app_context.tutor.lesson_manager.get_lesson(lesson_id)
         except FileNotFoundError:
-            logger.debug("Lesson %s missing on disk when building practice pack", lesson_id)
+            logger.debug(
+                "Lesson %s missing on disk when building practice pack", lesson_id
+            )
             cache[lesson_id] = None
 
     lesson_data = cache.get(lesson_id)
@@ -58,7 +62,9 @@ def _resolve_dialogue_metadata(
     return None
 
 
-def _build_dialogue_audio_url(lesson_id: Optional[str], filename: Optional[str]) -> Optional[str]:
+def _build_dialogue_audio_url(
+    lesson_id: Optional[str], filename: Optional[str]
+) -> Optional[str]:
     if not lesson_id or not filename:
         return None
     native_path = NATIVE_AUDIO_DIR / lesson_id / filename
@@ -123,17 +129,23 @@ class PracticeGenerator:
     def generate_review_phrases(self, user_id: int, database) -> List[PhraseItem]:
         """Generate review phrases from SRS due items."""
         try:
-            due_items = self.srs_manager.get_due_items(user_id=user_id, database=database)
+            due_items = self.srs_manager.get_due_items(
+                user_id=user_id, database=database
+            )
         except Exception as exc:  # pragma: no cover - defensive logging
             logger.exception("Failed to load SRS due items for user %s", user_id)
-            raise HTTPException(status_code=500, detail="Unable to load review items") from exc
+            raise HTTPException(
+                status_code=500, detail="Unable to load review items"
+            ) from exc
 
         if not due_items:
             return []
 
-        phrase_ids = [item.phrase_id for item in due_items if getattr(item, "phrase_id", None)]
+        phrase_ids = [
+            item.phrase_id for item in due_items if getattr(item, "phrase_id", None)
+        ]
         review_phrases: List[PhraseItem] = []
-        
+
         if phrase_ids:
             phrases = self.db.query(Phrase).filter(Phrase.id.in_(phrase_ids)).all()
             phrase_map = {phrase.id: phrase for phrase in phrases}
@@ -158,7 +170,7 @@ class PracticeGenerator:
     def generate_new_phrases(self, user_id: int, limit: int = 3) -> List[PhraseItem]:
         """Generate new (unseen) phrases for practice."""
         from src.models import SRSMemory
-        
+
         # Get all phrase IDs that the user has already seen (has SRS memory)
         seen_phrase_ids_query = (
             self.db.query(SRSMemory.phrase_id)
@@ -169,14 +181,13 @@ class PracticeGenerator:
 
         # Query unseen phrases from available lessons
         query = self.db.query(Phrase)
-        
+
         if seen_phrase_ids:
             query = query.filter(~Phrase.id.in_(seen_phrase_ids))
-        
+
         # Prefer A1 lessons if available, otherwise use any lesson
         unseen_phrases = (
-            query
-            .order_by(Phrase.lesson_id, Phrase.id)
+            query.order_by(Phrase.lesson_id, Phrase.id)
             .limit(limit * 3)  # Get more than needed to filter out integration phrases
             .all()
         )
@@ -185,12 +196,14 @@ class PracticeGenerator:
         for phrase in unseen_phrases:
             if len(new_phrases) >= limit:
                 break
-            
+
             phrase_id = phrase.id
             raw_text = (phrase.text or "").strip()
-            
+
             # Skip integration phrases
-            if raw_text.lower() == "integration phrase" or phrase_id.startswith("integration_phrase"):
+            if raw_text.lower() == "integration phrase" or phrase_id.startswith(
+                "integration_phrase"
+            ):
                 logger.debug("Skipping placeholder integration phrase %s", phrase_id)
                 continue
 
@@ -204,12 +217,16 @@ class PracticeGenerator:
         """Build a PhraseItem from a Phrase model instance."""
         lesson_id: Optional[str] = getattr(phrase, "lesson_id", None)
         raw_text = (phrase.text or "").strip()
-        
+
         # Skip integration phrases
-        if raw_text.lower() == "integration phrase" or phrase_id.startswith("integration_phrase"):
+        if raw_text.lower() == "integration phrase" or phrase_id.startswith(
+            "integration_phrase"
+        ):
             return None
 
-        dialogue_meta = _resolve_dialogue_metadata(lesson_id, phrase_id, self._lesson_cache)
+        dialogue_meta = _resolve_dialogue_metadata(
+            lesson_id, phrase_id, self._lesson_cache
+        )
 
         target_text = raw_text
         translation = ""
@@ -231,12 +248,12 @@ class PracticeGenerator:
             audio_url = _ensure_cached_audio(lesson_id, phrase_id, target_text)
 
         return PhraseItem(
-                id=phrase_id,
-                polish=target_text,
-                english=translation,
-                audio_url=audio_url,
-                expected_responses=expected_responses,
-            )
+            id=phrase_id,
+            polish=target_text,
+            english=translation,
+            audio_url=audio_url,
+            expected_responses=expected_responses,
+        )
 
 
 @practice_router.get("/daily", response_model=PracticePackResponse)
@@ -252,18 +269,20 @@ async def get_daily_practice_pack(
 
     database = app_context.database
     pack_id = f"daily_{datetime.utcnow().date().isoformat()}"
-    
+
     # Start a new practice session
     practice_service = PracticeService(db=db)
     user_session = practice_service.start_session(user_id=user_id)
     logger.info(f"Started practice session {user_session.id} for user {user_id}")
-    
+
     # Initialize generator
     generator = PracticeGenerator(db=db, tutor=tutor, srs_manager=srs_manager)
-    
+
     # Generate review phrases from SRS
-    review_phrases = generator.generate_review_phrases(user_id=user_id, database=database)
-    
+    review_phrases = generator.generate_review_phrases(
+        user_id=user_id, database=database
+    )
+
     # Generate new phrases (unseen items)
     new_phrases = generator.generate_new_phrases(user_id=user_id, limit=3)
 
@@ -284,29 +303,71 @@ async def end_practice_session(
 ) -> EndSessionResponse:
     """End a practice session and compute metrics including streak bonus."""
     practice_service = PracticeService(db=db)
-    
+
     try:
         # Get the session to extract user_id
         session = practice_service.get_session(payload.session_id)
         if not session:
-            raise HTTPException(status_code=404, detail=f"Session {payload.session_id} not found")
-        
+            raise HTTPException(
+                status_code=404, detail=f"Session {payload.session_id} not found"
+            )
+
         # Calculate daily streak
-        streak_before, streak_after = practice_service.calculate_daily_streak(session.user_id)
-        
-        # End session with streak information
+        streak_before, streak_after = practice_service.calculate_daily_streak(
+            session.user_id
+        )
+
+        # Detect perfect day (100% accuracy)
+        correct = payload.correct_phrases
+        total = payload.total_phrases
+        perfect_day = total > 0 and correct == total
+
+        # End session with streak information and perfect day status
         session = practice_service.end_session(
             session_id=payload.session_id,
             xp_from_phrases=payload.xp_from_phrases,
             streak_before=streak_before,
             streak_after=streak_after,
+            perfect_day=perfect_day,
         )
         logger.info(
             f"Ended practice session {session.id} - "
             f"Duration: {session.duration_seconds}s, XP: {session.total_xp}, "
-            f"Streak: {session.streak_before} -> {session.streak_after}"
+            f"Streak: {session.streak_before} -> {session.streak_after}, "
+            f"Perfect Day: {session.perfect_day}"
         )
-        
+
+        # Check and unlock badges
+        from src.models import UserSession
+
+        badge_service = BadgeService(db)
+
+        # Calculate user totals for badge checking
+        all_user_sessions = (
+            db.query(UserSession)
+            .filter(
+                UserSession.user_id == session.user_id, UserSession.ended_at.isnot(None)
+            )
+            .all()
+        )
+        total_xp = sum(s.total_xp or 0 for s in all_user_sessions)
+        total_sessions = len(all_user_sessions)
+
+        # Check for newly unlocked badges
+        unlocked_badges = badge_service.check_badges(
+            user_id=session.user_id,
+            total_xp=total_xp,
+            streak=session.streak_after,
+            total_sessions=total_sessions,
+            perfect_day=perfect_day,
+        )
+
+        unlocked_badge_codes = [badge.code for badge in unlocked_badges]
+        if unlocked_badge_codes:
+            logger.info(
+                f"User {session.user_id} unlocked badges: {unlocked_badge_codes}"
+            )
+
         return EndSessionResponse(
             session_id=session.id,
             session_start=session.started_at,
@@ -318,6 +379,8 @@ async def end_practice_session(
             xp_streak_bonus=session.xp_streak_bonus,
             streak_before=session.streak_before,
             streak_after=session.streak_after,
+            perfect_day=perfect_day,
+            unlocked_badges=unlocked_badge_codes,
         )
     except ValueError as e:
         logger.error(f"Error ending session: {e}")
@@ -325,3 +388,31 @@ async def end_practice_session(
     except Exception as e:
         logger.exception(f"Unexpected error ending session: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@practice_router.get("/weekly-stats", response_model=WeeklyStatsResponse)
+async def get_weekly_stats(
+    user_id: int = Query(1, ge=1, description="User ID to get weekly statistics for"),
+    db: Session = Depends(get_db),
+) -> WeeklyStatsResponse:
+    """
+    Get weekly practice statistics for the last 7 days.
+
+    Returns aggregated statistics including:
+    - Total sessions, XP, and practice time
+    - Number of unique practice days (weekly streak)
+    - Daily breakdown of activity
+    """
+    practice_service = PracticeService(db=db)
+
+    try:
+        stats = practice_service.get_weekly_stats(user_id=user_id)
+        logger.info(
+            f"Retrieved weekly stats for user {user_id}: {stats['total_sessions']} sessions, {stats['total_xp']} XP"
+        )
+        return WeeklyStatsResponse(**stats)
+    except Exception as e:
+        logger.exception(f"Error retrieving weekly stats for user {user_id}: {e}")
+        raise HTTPException(
+            status_code=500, detail="Failed to retrieve weekly statistics"
+        )

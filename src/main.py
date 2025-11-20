@@ -111,6 +111,25 @@ app.mount(
     "/audio_cache_v2", StaticFiles(directory=audio_cache_v2_dir), name="audio_cache_v2"
 )
 
+
+# -----------------------------
+# Startup Event
+# -----------------------------
+@app.on_event("startup")
+async def startup_event():
+    """Initialize application on startup."""
+    from src.core.database import SessionLocal
+    from src.services.badge_seeder import seed_badges
+
+    logger.info("Running startup tasks...")
+
+    # Seed badges
+    with SessionLocal() as db:
+        seed_badges(db)
+
+    logger.info("Startup tasks completed")
+
+
 # -----------------------------
 # Routers (V1)
 # -----------------------------

@@ -12,6 +12,9 @@ __all__ = [
     "Setting",
     "Meta",
     "UserSession",
+    "Badge",
+    "UserBadge",
+    "UserProfile",
 ]
 
 _MODULE_MAP = {
@@ -24,6 +27,9 @@ _MODULE_MAP = {
     "Setting": "setting",
     "Meta": "meta",
     "UserSession": "user_session",
+    "Badge": "badge",
+    "UserBadge": "user_badge",
+    "UserProfile": "user_profile",
 }
 
 

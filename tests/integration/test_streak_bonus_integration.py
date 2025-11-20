@@ -23,11 +23,11 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 @pytest.mark.integration
 def test_streak_bonus_end_to_end():
     """Test that streak bonus is calculated and returned correctly."""
-    
+
     # Create a temporary database for this test
     with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as tmp_db:
         tmp_db_path = tmp_db.name
-    
+
     try:
         # Run integration test in subprocess to avoid conftest.py interference
         test_script = f"""
@@ -128,21 +128,23 @@ session.close()
 
 print("TEST PASSED")
 """
-        
+
         result = subprocess.run(
             [sys.executable, "-c", test_script],
             capture_output=True,
             text=True,
             env={**os.environ, "DATABASE_URL": f"sqlite:///{tmp_db_path}"},
         )
-        
+
         print("STDOUT:", result.stdout)
         if result.stderr:
             print("STDERR:", result.stderr)
-        
-        assert result.returncode == 0, f"Test failed with return code {{result.returncode}}\\nSTDOUT: {{result.stdout}}\\nSTDERR: {{result.stderr}}"
+
+        assert (
+            result.returncode == 0
+        ), f"Test failed with return code {{result.returncode}}\\nSTDOUT: {{result.stdout}}\\nSTDERR: {{result.stderr}}"
         assert "TEST PASSED" in result.stdout
-        
+
     finally:
         # Clean up temporary database
         if os.path.exists(tmp_db_path):
@@ -152,11 +154,11 @@ print("TEST PASSED")
 @pytest.mark.integration
 def test_streak_bonus_with_7_day_streak():
     """Test that 7-day streak gives 25 XP bonus."""
-    
+
     # Create a temporary database for this test
     with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as tmp_db:
         tmp_db_path = tmp_db.name
-    
+
     try:
         test_script = f"""
 import json
@@ -228,21 +230,23 @@ assert end_data["xp_total"] == 115, f"Expected xp_total=115 (80+10+25), got {{en
 
 print("TEST PASSED: 7-day streak gives 25 XP bonus")
 """
-        
+
         result = subprocess.run(
             [sys.executable, "-c", test_script],
             capture_output=True,
             text=True,
             env={**os.environ, "DATABASE_URL": f"sqlite:///{tmp_db_path}"},
         )
-        
+
         print("STDOUT:", result.stdout)
         if result.stderr:
             print("STDERR:", result.stderr)
-        
-        assert result.returncode == 0, f"Test failed\\nSTDOUT: {{result.stdout}}\\nSTDERR: {{result.stderr}}"
+
+        assert (
+            result.returncode == 0
+        ), f"Test failed\\nSTDOUT: {{result.stdout}}\\nSTDERR: {{result.stderr}}"
         assert "TEST PASSED" in result.stdout
-        
+
     finally:
         if os.path.exists(tmp_db_path):
             os.unlink(tmp_db_path)
@@ -251,11 +255,11 @@ print("TEST PASSED: 7-day streak gives 25 XP bonus")
 @pytest.mark.integration
 def test_session_bonus_integration():
     """Test that session completion bonus is calculated and returned correctly."""
-    
+
     # Create a temporary database for this test
     with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as tmp_db:
         tmp_db_path = tmp_db.name
-    
+
     try:
         test_script = f"""
 import json
@@ -334,21 +338,23 @@ session.close()
 
 print("TEST PASSED: Session bonus integration")
 """
-        
+
         result = subprocess.run(
             [sys.executable, "-c", test_script],
             capture_output=True,
             text=True,
             env={**os.environ, "DATABASE_URL": f"sqlite:///{tmp_db_path}"},
         )
-        
+
         print("STDOUT:", result.stdout)
         if result.stderr:
             print("STDERR:", result.stderr)
-        
-        assert result.returncode == 0, f"Test failed with return code {result.returncode}\\nSTDOUT: {result.stdout}\\nSTDERR: {result.stderr}"
+
+        assert (
+            result.returncode == 0
+        ), f"Test failed with return code {result.returncode}\\nSTDOUT: {result.stdout}\\nSTDERR: {result.stderr}"
         assert "TEST PASSED" in result.stdout
-        
+
     finally:
         # Clean up temporary database
         if os.path.exists(tmp_db_path):
@@ -360,4 +366,3 @@ if __name__ == "__main__":
     test_streak_bonus_with_7_day_streak()
     test_session_bonus_integration()
     print("✅ All integration tests passed!")
-

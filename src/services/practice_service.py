@@ -1,7 +1,7 @@
 """Practice service for managing practice sessions."""
 
 from datetime import datetime, timedelta
-from typing import Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 from sqlalchemy.orm import Session
 
@@ -11,10 +11,10 @@ from src.models.user_session import UserSession
 def calculate_streak_bonus(streak: int) -> int:
     """
     Calculate XP bonus based on current streak.
-    
+
     Args:
         streak: Current daily streak count
-        
+
     Returns:
         XP bonus amount
     """
@@ -30,7 +30,7 @@ def calculate_streak_bonus(streak: int) -> int:
 def calculate_session_bonus() -> int:
     """
     Calculate XP bonus for completing a session.
-    
+
     Returns:
         Fixed session completion bonus (10 XP)
     """
@@ -96,39 +96,38 @@ class PracticeService:
     def calculate_daily_streak(self, user_id: int) -> Tuple[int, int]:
         """
         Calculate daily streak based on session history.
-        
+
         Checks the last completed session to determine if the user practiced
         yesterday or today. Updates streak accordingly.
-        
+
         Args:
             user_id: The ID of the user
-            
+
         Returns:
             Tuple of (streak_before, streak_after)
         """
         # Get the last completed session (before current one)
         last_session = (
             self.db.query(UserSession)
-            .filter(
-                UserSession.user_id == user_id,
-                UserSession.ended_at.isnot(None)
-            )
+            .filter(UserSession.user_id == user_id, UserSession.ended_at.isnot(None))
             .order_by(UserSession.ended_at.desc())
             .first()
         )
-        
+
         today = datetime.utcnow().date()
-        
+
         if not last_session:
             # First session ever - start streak at 0, will become 1
             return 0, 1
-        
+
         last_practice_date = last_session.ended_at.date()
         days_since_last_practice = (today - last_practice_date).days
-        
+
         # Get the streak from last session
-        streak_before = last_session.streak_after if hasattr(last_session, 'streak_after') else 0
-        
+        streak_before = (
+            last_session.streak_after if hasattr(last_session, "streak_after") else 0
+        )
+
         if days_since_last_practice == 0:
             # Practiced today already - maintain streak
             streak_after = streak_before
@@ -138,7 +137,7 @@ class PracticeService:
         else:
             # Missed a day - reset streak
             streak_after = 1
-        
+
         return streak_before, streak_after
 
     def end_session(
@@ -147,6 +146,7 @@ class PracticeService:
         xp_from_phrases: int,
         streak_before: int = 0,
         streak_after: int = 0,
+        perfect_day: bool = False,
     ) -> UserSession:
         """
         End a practice session and compute metrics including streak bonus.
@@ -156,6 +156,7 @@ class PracticeService:
             xp_from_phrases: The XP earned from phrases
             streak_before: Daily streak count before this session
             streak_after: Daily streak count after this session
+            perfect_day: Whether the user achieved 100% accuracy
 
         Returns:
             UserSession: The updated session object
@@ -191,6 +192,7 @@ class PracticeService:
         session.xp_streak_bonus = streak_bonus
         session.streak_before = streak_before
         session.streak_after = streak_after
+        session.perfect_day = perfect_day
         session.total_xp = xp_from_phrases + streak_bonus + session_bonus
 
         # Commit changes
@@ -199,3 +201,92 @@ class PracticeService:
 
         return session
 
+    def get_weekly_stats(self, user_id: int) -> Dict:
+        """
+        Calculate weekly statistics for the last 7 days.
+
+        Args:
+            user_id: The ID of the user
+
+        Returns:
+            Dictionary containing weekly statistics:
+            {
+                "total_sessions": int,
+                "total_xp": int,
+                "total_time_seconds": int,
+                "weekly_streak": int,
+                "days": [
+                    {
+                        "date": "YYYY-MM-DD",
+                        "sessions": int,
+                        "xp": int,
+                        "time_seconds": int
+                    },
+                    ...
+                ]
+            }
+        """
+        # Calculate date range for last 7 days
+        end_date = datetime.utcnow()
+        start_date = end_date - timedelta(days=7)
+
+        # Query sessions from the last 7 days
+        sessions = (
+            self.db.query(UserSession)
+            .filter(
+                UserSession.user_id == user_id,
+                UserSession.started_at >= start_date,
+                UserSession.ended_at.isnot(None),  # Only completed sessions
+            )
+            .order_by(UserSession.started_at)
+            .all()
+        )
+
+        # Initialize aggregates
+        total_sessions = len(sessions)
+        total_xp = 0
+        total_time_seconds = 0
+
+        # Group sessions by date
+        daily_stats: Dict[str, Dict[str, int]] = {}
+        unique_days = set()
+
+        for session in sessions:
+            session_date = session.started_at.date()
+            date_str = session_date.isoformat()
+            unique_days.add(date_str)
+
+            # Initialize daily stats if not present
+            if date_str not in daily_stats:
+                daily_stats[date_str] = {"sessions": 0, "xp": 0, "time_seconds": 0}
+
+            # Accumulate daily stats
+            daily_stats[date_str]["sessions"] += 1
+            daily_stats[date_str]["xp"] += session.total_xp or 0
+            daily_stats[date_str]["time_seconds"] += session.duration_seconds or 0
+
+            # Accumulate totals
+            total_xp += session.total_xp or 0
+            total_time_seconds += session.duration_seconds or 0
+
+        # Calculate weekly streak (number of days with at least 1 session)
+        weekly_streak = len(unique_days)
+
+        # Build daily breakdown
+        days_list = [
+            {
+                "date": date_str,
+                "sessions": stats["sessions"],
+                "xp": stats["xp"],
+                "time_seconds": stats["time_seconds"],
+            }
+            for date_str, stats in sorted(daily_stats.items())
+        ]
+
+        return {
+            "total_sessions": total_sessions,
+            "total_xp": total_xp,
+            "total_time_seconds": total_time_seconds,
+            "weekly_streak": weekly_streak,
+            "days": days_list,
+        }

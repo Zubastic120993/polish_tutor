@@ -5,6 +5,7 @@ Revises: 9e7f1cf751cb
 Create Date: 2025-11-20 17:03:41.956461
 
 """
+
 from typing import Sequence, Union
 
 from alembic import op
@@ -12,8 +13,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '05a98c646b5d'
-down_revision: Union[str, Sequence[str], None] = '9e7f1cf751cb'
+revision: str = "05a98c646b5d"
+down_revision: Union[str, Sequence[str], None] = "9e7f1cf751cb"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -37,7 +38,9 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index("idx_user_sessions_user", "UserSessions", ["user_id"], unique=False)
-    op.create_index("idx_user_sessions_started", "UserSessions", ["started_at"], unique=False)
+    op.create_index(
+        "idx_user_sessions_started", "UserSessions", ["started_at"], unique=False
+    )
 
 
 def downgrade() -> None:

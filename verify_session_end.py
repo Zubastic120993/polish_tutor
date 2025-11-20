@@ -51,14 +51,14 @@ def test_practice_service_end_session():
 
         # Wait a moment to ensure duration > 0
         import time
+
         time.sleep(1)
 
         # End the session
         print("\n2. Ending the session...")
         xp_earned = 50
         ended_session = practice_service.end_session(
-            session_id=session.id,
-            xp_from_phrases=xp_earned
+            session_id=session.id, xp_from_phrases=xp_earned
         )
 
         # Verify fields
@@ -66,20 +66,32 @@ def test_practice_service_end_session():
         assert ended_session.ended_at is not None, "ended_at should be set"
         print(f"   ✅ ended_at: {ended_session.ended_at}")
 
-        assert ended_session.duration_seconds is not None, "duration_seconds should be set"
-        assert ended_session.duration_seconds >= 1, "duration should be at least 1 second"
+        assert (
+            ended_session.duration_seconds is not None
+        ), "duration_seconds should be set"
+        assert (
+            ended_session.duration_seconds >= 1
+        ), "duration should be at least 1 second"
         print(f"   ✅ duration_seconds: {ended_session.duration_seconds}")
 
-        assert ended_session.xp_phrases == xp_earned, f"xp_phrases should be {xp_earned}"
+        assert (
+            ended_session.xp_phrases == xp_earned
+        ), f"xp_phrases should be {xp_earned}"
         print(f"   ✅ xp_phrases: {ended_session.xp_phrases}")
 
-        assert ended_session.xp_session_bonus == 0, "xp_session_bonus should be 0 (reserved)"
+        assert (
+            ended_session.xp_session_bonus == 0
+        ), "xp_session_bonus should be 0 (reserved)"
         print(f"   ✅ xp_session_bonus: {ended_session.xp_session_bonus}")
 
-        assert ended_session.xp_streak_bonus == 0, "xp_streak_bonus should be 0 (reserved)"
+        assert (
+            ended_session.xp_streak_bonus == 0
+        ), "xp_streak_bonus should be 0 (reserved)"
         print(f"   ✅ xp_streak_bonus: {ended_session.xp_streak_bonus}")
 
-        assert ended_session.total_xp == xp_earned, f"total_xp should equal xp_phrases ({xp_earned})"
+        assert (
+            ended_session.total_xp == xp_earned
+        ), f"total_xp should equal xp_phrases ({xp_earned})"
         print(f"   ✅ total_xp: {ended_session.total_xp}")
 
         print("\n✅ TEST 1 PASSED: end_session() method works correctly")
@@ -88,6 +100,7 @@ def test_practice_service_end_session():
     except Exception as e:
         print(f"\n❌ TEST 1 FAILED: {e}")
         import traceback
+
         traceback.print_exc()
         return False
     finally:
@@ -131,7 +144,7 @@ def test_end_session_error_handling():
         print("\n3. Testing already ended session...")
         session = practice_service.start_session(user_id=1)
         practice_service.end_session(session_id=session.id, xp_from_phrases=10)
-        
+
         try:
             practice_service.end_session(session_id=session.id, xp_from_phrases=20)
             print("   ❌ Should have raised ValueError for already ended session")
@@ -145,6 +158,7 @@ def test_end_session_error_handling():
     except Exception as e:
         print(f"\n❌ TEST 2 FAILED: {e}")
         import traceback
+
         traceback.print_exc()
         return False
     finally:
@@ -173,16 +187,14 @@ def test_api_endpoint():
 
         # Wait a moment
         import time
+
         time.sleep(1)
 
         # End the session
         print("\n2. Ending the session via API...")
-        payload = {
-            "session_id": session_id,
-            "xp_from_phrases": 75
-        }
+        payload = {"session_id": session_id, "xp_from_phrases": 75}
         response = client.post("/api/v2/practice/end-session", json=payload)
-        
+
         if response.status_code != 200:
             print(f"   ❌ Failed to end session: {response.status_code}")
             print(f"   Response: {response.text}")
@@ -199,7 +211,7 @@ def test_api_endpoint():
             "session_end",
             "session_duration_seconds",
             "xp_total",
-            "xp_from_phrases"
+            "xp_from_phrases",
         ]
 
         for field in required_fields:
@@ -213,7 +225,9 @@ def test_api_endpoint():
         assert data["session_id"] == session_id, "session_id mismatch"
         assert data["xp_from_phrases"] == 75, "xp_from_phrases mismatch"
         assert data["xp_total"] == 75, "xp_total should equal xp_from_phrases"
-        assert data["session_duration_seconds"] >= 1, "duration should be at least 1 second"
+        assert (
+            data["session_duration_seconds"] >= 1
+        ), "duration should be at least 1 second"
         print("   ✅ All values are correct")
 
         print("\n✅ TEST 3 PASSED: API endpoint works correctly")
@@ -222,6 +236,7 @@ def test_api_endpoint():
     except Exception as e:
         print(f"\n❌ TEST 3 FAILED: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -240,12 +255,9 @@ def test_api_error_handling():
 
         # Test 1: Invalid payload
         print("\n1. Testing invalid session_id...")
-        payload = {
-            "session_id": -1,
-            "xp_from_phrases": 10
-        }
+        payload = {"session_id": -1, "xp_from_phrases": 10}
         response = client.post("/api/v2/practice/end-session", json=payload)
-        
+
         # Should return 422 for validation error or 400 for business logic error
         if response.status_code not in [400, 422]:
             print(f"   ❌ Expected 400 or 422, got {response.status_code}")
@@ -254,12 +266,9 @@ def test_api_error_handling():
 
         # Test 2: Non-existent session
         print("\n2. Testing non-existent session...")
-        payload = {
-            "session_id": 99999,
-            "xp_from_phrases": 10
-        }
+        payload = {"session_id": 99999, "xp_from_phrases": 10}
         response = client.post("/api/v2/practice/end-session", json=payload)
-        
+
         if response.status_code != 400:
             print(f"   ❌ Expected 400, got {response.status_code}")
             return False
@@ -271,6 +280,7 @@ def test_api_error_handling():
     except Exception as e:
         print(f"\n❌ TEST 4 FAILED: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -285,7 +295,9 @@ def main():
     results = []
 
     # Run all tests
-    results.append(("PracticeService.end_session()", test_practice_service_end_session()))
+    results.append(
+        ("PracticeService.end_session()", test_practice_service_end_session())
+    )
     results.append(("Error handling", test_end_session_error_handling()))
     results.append(("API endpoint", test_api_endpoint()))
     results.append(("API error handling", test_api_error_handling()))
@@ -318,4 +330,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-

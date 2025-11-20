@@ -23,11 +23,11 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 @pytest.mark.integration
 def test_practice_daily_creates_session():
     """Test that the /api/v2/practice/daily endpoint creates and returns a session."""
-    
+
     # Create a temporary database for this test
     with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as tmp_db:
         tmp_db_path = tmp_db.name
-    
+
     try:
         # Run integration test in subprocess to avoid conftest.py interference
         test_script = f"""
@@ -88,21 +88,23 @@ session.close()
 
 print("TEST PASSED")
 """
-        
+
         result = subprocess.run(
             [sys.executable, "-c", test_script],
             capture_output=True,
             text=True,
             env={**os.environ, "DATABASE_URL": f"sqlite:///{tmp_db_path}"},
         )
-        
+
         print("STDOUT:", result.stdout)
         if result.stderr:
             print("STDERR:", result.stderr)
-        
-        assert result.returncode == 0, f"Test failed with return code {result.returncode}\\nSTDOUT: {result.stdout}\\nSTDERR: {result.stderr}"
+
+        assert (
+            result.returncode == 0
+        ), f"Test failed with return code {result.returncode}\\nSTDOUT: {result.stdout}\\nSTDERR: {result.stderr}"
         assert "TEST PASSED" in result.stdout
-        
+
     finally:
         # Clean up temporary database
         if os.path.exists(tmp_db_path):
@@ -112,4 +114,3 @@ print("TEST PASSED")
 if __name__ == "__main__":
     test_practice_daily_creates_session()
     print("✅ All tests passed!")
-
