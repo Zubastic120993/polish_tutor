@@ -20,4 +20,3 @@ def setup_test_database():
 def client():
     """Create a test client for FastAPI app."""
     return TestClient(app)
-
