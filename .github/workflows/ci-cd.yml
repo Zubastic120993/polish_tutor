@@ -92,8 +92,14 @@ jobs:
         env:
           DATABASE_URL: sqlite:///./test.db
 
-      - name: Run tests with coverage
-        run: pytest tests/unit/ tests/integration/ -v --cov=src --cov-report=xml --cov-report=term
+      - name: Run unit tests with coverage
+        run: pytest tests/unit/ -v --cov=src --cov-report=xml --cov-report=term
+        env:
+          REDIS_URL: redis://localhost:6379
+          DATABASE_URL: sqlite:///./test.db
+
+      - name: Run integration tests (append coverage)
+        run: pytest tests/integration/ tests/api/ -v --cov=src --cov-append --cov-report=xml --cov-report=term
         env:
           REDIS_URL: redis://localhost:6379
           DATABASE_URL: sqlite:///./test.db

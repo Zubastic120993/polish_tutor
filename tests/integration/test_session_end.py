@@ -1,15 +1,6 @@
 """Integration tests for session end functionality."""
 
 import pytest
-from fastapi.testclient import TestClient
-
-from src.main import app
-
-
-@pytest.fixture
-def client():
-    """Create a test client."""
-    return TestClient(app)
 
 
 def test_session_end_flow(client):

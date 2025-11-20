@@ -8,7 +8,11 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 # Skip dummy module setup for integration and API tests
-# These tests should use real dependencies
+# Unit tests need dummies, integration/API tests need real dependencies
+# Note: Tests should be run separately to avoid conflicts:
+#   - pytest tests/unit/           # Uses dummies
+#   - pytest tests/integration/    # Uses real modules
+#   - pytest tests/api/            # Uses real modules
 SKIP_DUMMIES = any(
     arg.startswith("tests/integration") or arg.startswith("tests/api")
     for arg in sys.argv

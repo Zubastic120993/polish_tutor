@@ -10,12 +10,6 @@ from src.services.badge_service import BadgeService
 
 
 @pytest.fixture
-def client():
-    """Create a test client."""
-    return TestClient(app)
-
-
-@pytest.fixture
 def db_session():
     """Create a database session for testing."""
     session = SessionLocal()
