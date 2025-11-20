@@ -7,9 +7,12 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-# Skip dummy module setup for integration tests
-# Integration tests should use real dependencies
-SKIP_DUMMIES = any(arg.startswith("tests/integration") for arg in sys.argv)
+# Skip dummy module setup for integration and API tests
+# These tests should use real dependencies
+SKIP_DUMMIES = any(
+    arg.startswith("tests/integration") or arg.startswith("tests/api")
+    for arg in sys.argv
+)
 
 
 def _module_spec(name: str) -> importlib.machinery.ModuleSpec:
