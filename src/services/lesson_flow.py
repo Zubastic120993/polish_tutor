@@ -38,7 +38,7 @@ def _load_a1_lesson(lesson_id: str) -> List[Dict[str, str]] | None:
             data = json.load(f)
 
         # Convert dialogues to phrases
-        phrases = []
+        phrases: list[dict[str, str]] = []
         dialogues = data.get("dialogues", [])
 
         for dialogue in dialogues:

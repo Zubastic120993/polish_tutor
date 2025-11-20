@@ -41,4 +41,4 @@ def get_profile(user_id: int, db: Session = Depends(get_db)) -> ProfileResponse:
     data = service.get_profile(user_id)
 
     logger.info(f"Profile retrieved for user {user_id}")
-    return data
+    return ProfileResponse(**data)
