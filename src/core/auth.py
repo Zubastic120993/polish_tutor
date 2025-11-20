@@ -11,7 +11,7 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 
 from src.core.app_context import app_context
-from src.models.user import User
+from src.models import User
 from src.services.database_service import Database
 
 # Password hashing context

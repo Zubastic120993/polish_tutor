@@ -13,7 +13,7 @@ from src.core.auth import (
     store_refresh_token,
     verify_token,
 )
-from src.models.user import User
+from src.models import User
 from src.services.database_service import Database
 from src.core.metrics import record_auth_login, record_auth_token_issued
 
