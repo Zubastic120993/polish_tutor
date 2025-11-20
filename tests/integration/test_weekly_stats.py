@@ -55,7 +55,12 @@ def test_after_practice_session(client):
     session_id = response.json()["session_id"]
 
     # End the session with some XP
-    payload = {"session_id": session_id, "xp_from_phrases": 100}
+    payload = {
+        "session_id": session_id,
+        "xp_from_phrases": 100,
+        "correct_phrases": 5,
+        "total_phrases": 5,
+    }
     response = client.post("/api/v2/practice/end-session", json=payload)
     assert response.status_code == 200
 
@@ -94,7 +99,12 @@ def test_multiple_sessions_same_day(client):
 
     response = client.post(
         "/api/v2/practice/end-session",
-        json={"session_id": session_id_1, "xp_from_phrases": 50},
+        json={
+            "session_id": session_id_1,
+            "xp_from_phrases": 50,
+            "correct_phrases": 3,
+            "total_phrases": 5,
+        },
     )
     assert response.status_code == 200
 
@@ -105,7 +115,12 @@ def test_multiple_sessions_same_day(client):
 
     response = client.post(
         "/api/v2/practice/end-session",
-        json={"session_id": session_id_2, "xp_from_phrases": 75},
+        json={
+            "session_id": session_id_2,
+            "xp_from_phrases": 75,
+            "correct_phrases": 4,
+            "total_phrases": 5,
+        },
     )
     assert response.status_code == 200
 
@@ -139,7 +154,12 @@ def test_date_format(client):
 
     response = client.post(
         "/api/v2/practice/end-session",
-        json={"session_id": session_id, "xp_from_phrases": 50},
+        json={
+            "session_id": session_id,
+            "xp_from_phrases": 50,
+            "correct_phrases": 3,
+            "total_phrases": 5,
+        },
     )
     assert response.status_code == 200
 
@@ -165,18 +185,23 @@ def test_date_format(client):
 def test_days_sorted_chronologically(client):
     """Test that days are sorted in chronological order."""
     # Create a session
-    response = client.get("/api/v2/practice/daily?user_id=4")
+    response = client.get("/api/v2/practice/daily?user_id=1")
     assert response.status_code == 200
     session_id = response.json()["session_id"]
 
     response = client.post(
         "/api/v2/practice/end-session",
-        json={"session_id": session_id, "xp_from_phrases": 50},
+        json={
+            "session_id": session_id,
+            "xp_from_phrases": 50,
+            "correct_phrases": 3,
+            "total_phrases": 5,
+        },
     )
     assert response.status_code == 200
 
     # Get weekly stats
-    response = client.get("/api/v2/practice/weekly-stats?user_id=4")
+    response = client.get("/api/v2/practice/weekly-stats?user_id=1")
     assert response.status_code == 200
 
     data = response.json()
@@ -188,20 +213,25 @@ def test_days_sorted_chronologically(client):
 
 def test_no_incomplete_sessions_in_stats(client):
     """Test that incomplete sessions (not ended) don't appear in weekly stats."""
-    user_id = 5
+    user_id = 1
+
+    # Get stats before starting the incomplete session
+    response = client.get(f"/api/v2/practice/weekly-stats?user_id={user_id}")
+    assert response.status_code == 200
+    sessions_before = response.json()["total_sessions"]
 
     # Start but don't end a session
     response = client.get(f"/api/v2/practice/daily?user_id={user_id}")
     assert response.status_code == 200
     incomplete_session_id = response.json()["session_id"]
 
-    # Get weekly stats (should be empty)
+    # Get weekly stats again - should be unchanged
     response = client.get(f"/api/v2/practice/weekly-stats?user_id={user_id}")
     assert response.status_code == 200
 
     data = response.json()
 
-    # The incomplete session should not be counted
-    # (assuming this is a fresh user with no other sessions)
-    # Note: If user 5 has existing sessions, this test would need adjustment
-    assert data["total_sessions"] == 0, "Incomplete sessions should not be counted"
+    # The incomplete session should not be counted - count should remain the same
+    assert (
+        data["total_sessions"] == sessions_before
+    ), "Incomplete sessions should not be counted"
