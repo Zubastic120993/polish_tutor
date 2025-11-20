@@ -382,6 +382,9 @@ async def end_practice_session(
             perfect_day=perfect_day,
             unlocked_badges=unlocked_badge_codes,
         )
+    except HTTPException:
+        # Re-raise HTTPException (e.g., 404) as-is
+        raise
     except ValueError as e:
         logger.error(f"Error ending session: {e}")
         raise HTTPException(status_code=400, detail=str(e))
@@ -411,6 +414,12 @@ async def get_weekly_stats(
             f"Retrieved weekly stats for user {user_id}: {stats['total_sessions']} sessions, {stats['total_xp']} XP"
         )
         return WeeklyStatsResponse(**stats)
+    except HTTPException:
+        # Re-raise HTTPException as-is
+        raise
+    except ValueError as e:
+        logger.error(f"Invalid request for weekly stats: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         logger.exception(f"Error retrieving weekly stats for user {user_id}: {e}")
         raise HTTPException(

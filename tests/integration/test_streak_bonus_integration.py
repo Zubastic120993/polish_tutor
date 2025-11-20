@@ -91,7 +91,9 @@ print("Started session:", session_id)
 # End the session with XP
 end_payload = {{
     "session_id": session_id,
-    "xp_from_phrases": 100
+    "xp_from_phrases": 100,
+    "correct_phrases": 5,
+    "total_phrases": 5,
 }}
 end_response = client.post("/api/v2/practice/end-session", json=end_payload)
 assert end_response.status_code == 200, f"Expected 200, got {{end_response.status_code}}"
@@ -217,7 +219,9 @@ session_id = daily_response.json()["session_id"]
 
 end_payload = {{
     "session_id": session_id,
-    "xp_from_phrases": 80
+    "xp_from_phrases": 80,
+    "correct_phrases": 4,
+    "total_phrases": 5,
 }}
 end_response = client.post("/api/v2/practice/end-session", json=end_payload)
 end_data = end_response.json()
@@ -306,7 +310,9 @@ print("Started session:", session_id)
 # End the session with XP
 end_payload = {{
     "session_id": session_id,
-    "xp_from_phrases": 50
+    "xp_from_phrases": 50,
+    "correct_phrases": 3,
+    "total_phrases": 5,
 }}
 end_response = client.post("/api/v2/practice/end-session", json=end_payload)
 assert end_response.status_code == 200, f"Expected 200, got {{end_response.status_code}}"

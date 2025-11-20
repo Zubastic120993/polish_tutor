@@ -138,7 +138,12 @@ def test_unlock_badge_via_session_then_verify_via_api(client, db_session, test_u
     session_id = response.json()["session_id"]
 
     # End session with high XP to unlock badges
-    payload = {"session_id": session_id, "xp_from_phrases": 50}
+    payload = {
+        "session_id": session_id,
+        "xp_from_phrases": 50,
+        "correct_phrases": 3,
+        "total_phrases": 5,
+    }
     response = client.post("/api/v2/practice/end-session", json=payload)
     assert response.status_code == 200
 
@@ -175,7 +180,12 @@ def test_get_session_unlocked_badges_existing_session(client):
     assert response.status_code == 200
     session_id = response.json()["session_id"]
 
-    payload = {"session_id": session_id, "xp_from_phrases": 30}
+    payload = {
+        "session_id": session_id,
+        "xp_from_phrases": 30,
+        "correct_phrases": 2,
+        "total_phrases": 5,
+    }
     response = client.post("/api/v2/practice/end-session", json=payload)
     assert response.status_code == 200
 

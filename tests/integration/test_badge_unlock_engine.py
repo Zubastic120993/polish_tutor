@@ -277,7 +277,12 @@ def test_end_session_endpoint_includes_unlocked_badges(client):
     session_id = response.json()["session_id"]
 
     # End session with high XP to potentially unlock badges
-    payload = {"session_id": session_id, "xp_from_phrases": 100}
+    payload = {
+        "session_id": session_id,
+        "xp_from_phrases": 100,
+        "correct_phrases": 5,
+        "total_phrases": 5,
+    }
     response = client.post("/api/v2/practice/end-session", json=payload)
     assert response.status_code == 200
 
