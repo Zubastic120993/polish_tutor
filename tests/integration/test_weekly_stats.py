@@ -83,6 +83,14 @@ def test_multiple_sessions_same_day(client):
     """Test that multiple sessions on the same day are aggregated correctly."""
     user_id = 2
 
+    # Clean up any existing sessions for this user from previous tests
+    from src.core.database import SessionLocal
+    from src.models.user_session import UserSession
+
+    with SessionLocal() as db:
+        db.query(UserSession).filter(UserSession.user_id == user_id).delete()
+        db.commit()
+
     # Create first session
     response = client.get(f"/api/v2/practice/daily?user_id={user_id}")
     assert response.status_code == 200

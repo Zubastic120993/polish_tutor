@@ -10,6 +10,15 @@ from src.services.srs_manager import SRSManager, MIN_EFACTOR
 def srs_memory_stub(monkeypatch):
     """Create a mock SRSMemory class that behaves like SQLAlchemy columns."""
 
+    class MockExpression:
+        """Mock SQLAlchemy expression that can be used in and_() and other operations."""
+
+        def __init__(self, description):
+            self.description = description
+
+        def __repr__(self):
+            return f"MockExpression({self.description})"
+
     class MockColumn:
         """Mock SQLAlchemy column that supports comparison operations."""
 
@@ -17,27 +26,27 @@ def srs_memory_stub(monkeypatch):
             self.name = name
 
         def __eq__(self, other):
-            return f"{self.name} == {other}"
+            return MockExpression(f"{self.name} == {other}")
 
         def __le__(self, other):
-            return f"{self.name} <= {other}"
+            return MockExpression(f"{self.name} <= {other}")
 
         def __ge__(self, other):
-            return f"{self.name} >= {other}"
+            return MockExpression(f"{self.name} >= {other}")
 
         def __lt__(self, other):
-            return f"{self.name} < {other}"
+            return MockExpression(f"{self.name} < {other}")
 
         def __gt__(self, other):
-            return f"{self.name} > {other}"
+            return MockExpression(f"{self.name} > {other}")
 
         def asc(self):
             """Mock ascending order for order_by()."""
-            return f"{self.name} ASC"
+            return MockExpression(f"{self.name} ASC")
 
         def desc(self):
             """Mock descending order for order_by()."""
-            return f"{self.name} DESC"
+            return MockExpression(f"{self.name} DESC")
 
     class Memory(SimpleNamespace):
         """Mock SRSMemory model with column-like attributes."""
@@ -55,6 +64,16 @@ def srs_memory_stub(monkeypatch):
             super().__init__(**kwargs)
 
     monkeypatch.setattr("src.services.srs_manager.SRSMemory", Memory)
+
+    # Mock and_() to accept MockExpression objects
+    def mock_and(*conditions):
+        """Mock and_() that accepts MockExpression objects."""
+        return MockExpression(
+            f"AND({', '.join(str(c.description if hasattr(c, 'description') else c) for c in conditions)})"
+        )
+
+    monkeypatch.setattr("src.services.srs_manager.and_", mock_and)
+
     return Memory
 
 

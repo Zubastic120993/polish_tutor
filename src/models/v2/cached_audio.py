@@ -2,7 +2,8 @@
 
 from uuid import uuid4
 
-from sqlalchemy import Column, DateTime, String, func
+from sqlalchemy import Column, DateTime, String
+from sqlalchemy.sql import func
 
 from src.core.database import Base
 from src.models.v2._types import UUID

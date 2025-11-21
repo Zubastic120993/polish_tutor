@@ -18,6 +18,14 @@ SKIP_DUMMIES = any(
     for arg in sys.argv
 )
 
+# Also skip dummies if no specific test path is provided (running all tests)
+# This prevents dummy models from interfering with integration tests
+if not SKIP_DUMMIES:
+    test_paths_in_argv = [arg for arg in sys.argv if arg.startswith("tests/")]
+    # If no test paths specified, or if we're running all tests, skip dummies
+    if not test_paths_in_argv or any("tests" == arg or arg == "." for arg in sys.argv):
+        SKIP_DUMMIES = True
+
 
 def _module_spec(name: str) -> importlib.machinery.ModuleSpec:
     return importlib.machinery.ModuleSpec(name=name, loader=None)
@@ -127,6 +135,7 @@ if not SKIP_DUMMIES and "sqlalchemy" not in sys.modules:
     sqlalchemy_module = _ensure_module("sqlalchemy")
     orm_module = _ensure_module("sqlalchemy.orm")
     exc_module = _ensure_module("sqlalchemy.exc")
+    sql_module = _ensure_module("sqlalchemy.sql")
 
     class SQLAlchemyError(Exception):
         pass
@@ -153,6 +162,9 @@ if not SKIP_DUMMIES and "sqlalchemy" not in sys.modules:
         def filter(self, *_, **__):
             return self
 
+        def filter_by(self, **__):
+            return self
+
         def all(self):
             return list(self._result)
 
@@ -171,6 +183,14 @@ if not SKIP_DUMMIES and "sqlalchemy" not in sys.modules:
 
         def __call__(self):
             return self
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            if exc_type is not None:
+                self.rollback()
+            return False
 
         def add(self, *_):
             pass
@@ -229,6 +249,21 @@ if not SKIP_DUMMIES and "sqlalchemy" not in sys.modules:
     def Text(*_, **__):
         return None
 
+    def Integer(*_, **__):
+        return None
+
+    def Float(*_, **__):
+        return None
+
+    def Boolean(*_, **__):
+        return None
+
+    class _DummyFunc:
+        def now(self, *_, **__):
+            return None
+
+    func = _DummyFunc()
+
     sqlalchemy_module.create_engine = create_engine
     sqlalchemy_module.event = types.SimpleNamespace(listens_for=listens_for)
 
@@ -241,7 +276,13 @@ if not SKIP_DUMMIES and "sqlalchemy" not in sys.modules:
     sqlalchemy_module.UniqueConstraint = UniqueConstraint
     sqlalchemy_module.String = String
     sqlalchemy_module.Text = Text
+    sqlalchemy_module.Integer = Integer
+    sqlalchemy_module.Float = Float
+    sqlalchemy_module.Boolean = Boolean
     sqlalchemy_module.and_ = and_
+    sqlalchemy_module.func = func
+
+    sql_module.func = func
 
     orm_module.sessionmaker = sessionmaker
     orm_module.declarative_base = declarative_base
@@ -257,7 +298,9 @@ if not SKIP_DUMMIES and "src.models" not in sys.modules:
     models_module.__path__ = [str(PROJECT_ROOT / "src/models")]
 
     class _DummyModel:
-        pass
+        def __init__(self, **kwargs):
+            for key, value in kwargs.items():
+                setattr(self, key, value)
 
     models_module.Lesson = _DummyModel
     models_module.Phrase = _DummyModel

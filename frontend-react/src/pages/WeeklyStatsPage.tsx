@@ -195,6 +195,13 @@ export function WeeklyStatsPage() {
         >
           <button
             type="button"
+            onClick={() => navigate('/share/weekly-summary')}
+            className="w-full rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-3 font-semibold text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
+          >
+            📤 Share Weekly Summary →
+          </button>
+          <button
+            type="button"
             onClick={() => navigate('/badges')}
             className="w-full rounded-full bg-amber-500 px-4 py-3 font-semibold text-white shadow hover:bg-amber-400"
           >

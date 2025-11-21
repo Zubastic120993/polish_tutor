@@ -17,5 +17,8 @@ export interface ProfileResponse {
   next_level_xp: number
   xp_for_next_level: number
   best_badges: ProfileBadge[]
+  avatar: string
+  username: string
+  goal_text?: string | null
 }
 

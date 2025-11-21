@@ -7,6 +7,9 @@ import { WeeklyStatsPage } from './pages/WeeklyStatsPage'
 import { BadgeGalleryPage } from './pages/BadgeGalleryPage'
 import { BadgeHistoryPage } from './pages/BadgeHistoryPage'
 import { ProfilePage } from './pages/ProfilePage'
+import ShareProfilePage from './pages/ShareProfilePage'
+import ShareAchievementPage from './pages/ShareAchievementPage'
+import ShareWeeklySummaryPage from './pages/ShareWeeklySummaryPage'
 import { AchievementQueueProvider } from './hooks/useAchievementQueue'
 import { DEFAULT_LESSON_ID } from './constants/lessons'
 
@@ -24,6 +27,9 @@ function App() {
           <Route path="/badges" element={<BadgeGalleryPage />} />
           <Route path="/badge-history" element={<BadgeHistoryPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/share/profile" element={<ShareProfilePage />} />
+          <Route path="/share/achievement/:code" element={<ShareAchievementPage />} />
+          <Route path="/share/weekly-summary" element={<ShareWeeklySummaryPage />} />
         </Routes>
       </BrowserRouter>
     </AchievementQueueProvider>
