@@ -10,6 +10,7 @@ export interface PhraseItem {
 
 export interface PracticePack {
   packId: string
+  sessionId?: number
   reviewPhrases: PhraseItem[]
   newPhrases?: PhraseItem[]
   dialog?: any
@@ -24,6 +25,7 @@ export interface PracticeAttemptSummary {
 
 export interface PracticeSummary {
   packId: string
+  sessionId?: number
   total: number
   correct: number
   attempts: PracticeAttemptSummary[]

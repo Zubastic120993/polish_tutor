@@ -15,6 +15,7 @@ interface PracticePhraseResponse {
 
 interface PracticePackResponse {
   pack_id: string
+  session_id?: number
   review_phrases: PracticePhraseResponse[]
   new_phrases?: PracticePhraseResponse[]
   dialog?: any
@@ -54,6 +55,7 @@ export function useDailyPractice(userId = 1) {
     if (!query.data) return null
     return {
       packId: query.data.pack_id,
+      sessionId: query.data.session_id,
       reviewPhrases: (query.data.review_phrases ?? []).map(mapPhrase),
       newPhrases: query.data.new_phrases?.map(mapPhrase),
       dialog: query.data.dialog,

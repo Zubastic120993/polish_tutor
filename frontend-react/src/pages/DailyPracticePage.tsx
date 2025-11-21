@@ -59,7 +59,9 @@ export function DailyPracticePage() {
         setCurrentType('new')
       } else {
         // No new phrases, go straight to summary
-      navigate('/practice-summary', { state: summary })
+        navigate('/practice-summary', {
+          state: { ...summary, sessionId: practicePack?.sessionId }
+        })
       }
     },
     [navigate, practicePack],
@@ -70,6 +72,7 @@ export function DailyPracticePage() {
       // Merge review and new summaries
       const combinedSummary: PracticeSummary = {
         packId: practicePack?.packId ?? 'daily_pack',
+        sessionId: practicePack?.sessionId,
         total: (reviewSummary?.total ?? 0) + newSummary.total,
         correct: (reviewSummary?.correct ?? 0) + newSummary.correct,
         attempts: [...(reviewSummary?.attempts ?? []), ...newSummary.attempts],

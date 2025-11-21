@@ -6,6 +6,10 @@ import type { ProfileResponse } from '../types/profile';
 import type { UserProfileResponse } from '../types/userProfile';
 import { EmojiPickerModal } from '../components/profile/EmojiPickerModal';
 import { GoalCard } from '../components/profile/GoalCard';
+import { LevelUpCelebrationModal } from '../components/celebration/LevelUpCelebrationModal';
+import { CelebrationParticles } from '../components/celebration/CelebrationParticles';
+import { loadCelebrationSnapshot } from '../types/celebration';
+import type { CelebrationSnapshot } from '../types/celebration';
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? '';
 
@@ -26,6 +30,10 @@ export function ProfilePage() {
   // Learning goal state
   const [goalText, setGoalText] = useState<string | null>(null);
   const [goalCreatedAt, setGoalCreatedAt] = useState<string | null>(null);
+
+  // Replay Celebration State
+  const [replayData, setReplayData] = useState<CelebrationSnapshot | null>(null);
+  const [showReplay, setShowReplay] = useState(false);
 
   // Edit handlers
   const handleEditClick = () => {
@@ -336,7 +344,7 @@ export function ProfilePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.3 }}
-          className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
         >
           {/* Total XP Card */}
           <motion.div
@@ -400,6 +408,41 @@ export function ProfilePage() {
               </div>
             </div>
           </motion.div>
+
+          {/* Replay Celebration Card */}
+          {loadCelebrationSnapshot() && (
+            <motion.div
+              animate={{ y: [-2, 2, -2] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+              className="relative rounded-2xl bg-gradient-to-br from-purple-50 to-purple-100 p-[2px] shadow-md"
+            >
+              <div className="rounded-2xl bg-gradient-to-br from-purple-50 to-purple-100 p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-purple-700">
+                      Latest Achievement
+                    </p>
+                    <p className="mt-2 text-2xl font-bold text-purple-950">
+                      Level {loadCelebrationSnapshot()?.levelAfter ?? ''}
+                    </p>
+                  </div>
+                  <div className="text-4xl">🎉</div>
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    const snap = loadCelebrationSnapshot();
+                    setReplayData(snap);
+                    setShowReplay(true);
+                  }}
+                  className="w-full rounded-lg bg-purple-600 text-white py-2.5 text-sm font-semibold shadow-md hover:bg-purple-700 transition"
+                >
+                  ✨ Replay Celebration
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Best Badges Section */}
@@ -480,6 +523,20 @@ export function ProfilePage() {
           }}
           onClose={() => setShowAvatarPicker(false)}
         />
+      )}
+
+      {/* Celebration Replay Modal */}
+      {showReplay && replayData && (
+        <>
+          <CelebrationParticles />
+          <LevelUpCelebrationModal
+            visible={showReplay}
+            level={replayData.levelAfter}
+            xpGained={replayData.xpGained}
+            newBadges={replayData.newBadges}
+            onClose={() => setShowReplay(false)}
+          />
+        </>
       )}
     </div>
   );
