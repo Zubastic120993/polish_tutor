@@ -154,3 +154,12 @@
     transform: translateX(4px);
   }
 }
+
+/* ---------------------------------------------------------
+   LARGER MOBILE TAP TARGET
+---------------------------------------------------------- */
+
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
